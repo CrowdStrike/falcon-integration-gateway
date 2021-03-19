@@ -1,5 +1,10 @@
 from falconpy import api_complete as FalconSDK
 from ..config import config
+from ..log import log
+
+
+class ApiError(Exception):
+    pass
 
 
 class Api():
@@ -21,12 +26,13 @@ class Api():
         return 'https://' + cls.CLOUD_REGIONS[config.get('falcon', 'cloud_region')]
 
     def streams(self):
+        app_id = config.get('falcon', 'application_id')
         response = self.client.command(action='listAvailableStreamsOAuth2',
                             parameters={'appId': config.get('falcon', 'application_id')})
         if 'resources' in response['body']:
-            print("stream found")
+            log.debug("stream found")
         else:
-            print("stream not found")
+            raise ApiError('Falcon Streaming API not discovered. This may be caused by second instance of this application already running in your environment with the same application_id={}, or by missing streaming API capability.'.format(app_id))
 
 
 
