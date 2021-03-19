@@ -1,7 +1,9 @@
-from falconpy import api_complete as FalconSDK
-from ..config import config
-
+from .api import Api
 
 class Stream():
-    def run():
+    def __init__(self):
+        self.falcon_api = Api()
+
+    def run(self):
         print("Stream.run")
+        self.falcon_api.streams()
