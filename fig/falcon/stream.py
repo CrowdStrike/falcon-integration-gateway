@@ -4,6 +4,7 @@ import requests
 from .api import Stream
 from .event import Event
 from ..util import StoppableThread
+from ..log import log
 
 
 class StreamingThread(StoppableThread):
@@ -22,6 +23,7 @@ class StreamingThread(StoppableThread):
                 if self.stopped:
                     break
         finally:
+            log.warning("Streaming Connection was closed.")
             self.conn.close()
 
     def process_event(self, event):
@@ -41,6 +43,7 @@ class StreamingConnection():
             'Date': datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S +0000'),
             'Connection': 'Keep-Alive'
         }
+        log.info("Opening Streaming Connection")
         self.connection = requests.get(self.stream.url, headers=headers, stream=True)
         return self.connection
 
