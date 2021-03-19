@@ -66,6 +66,7 @@ TODO
    docker run -it --rm \
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
+       -e FALCON_CLOUD_REGION="us-1" \
        -e GOOGLE_APPLICATION_CREDENTIALS=/gcloud/gcloud-secret-falcon-integration-gateway.json \
        -v ~/.config/gcloud:/gcloud/ \
        falcon-integration-gateway:latest
