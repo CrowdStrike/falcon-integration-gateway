@@ -1,4 +1,4 @@
-# falcon-integration-gateway
+# falcon-integration-gateway [![Python Lint](https://github.com/CrowdStrike/falcon-integration-gateway/actions/workflows/linting.yml/badge.svg)](https://github.com/CrowdStrike/falcon-integration-gateway/actions/workflows/linting.yml)
 
 Falcon Integration Gateway for GCP Security Command Center forwards findings from CrowdStrike Falcon platform
 to GCP Security Command Center.
