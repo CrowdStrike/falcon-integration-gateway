@@ -1,11 +1,13 @@
 import logging
+from ..config import config
 
-# create logger
+level = logging.getLevelName(config.get('logging', 'level'))
+
 log = logging.getLogger('fig')
-log.setLevel(logging.DEBUG)
+log.setLevel(level)
 
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+ch.setLevel(level)
 
 formatter = logging.Formatter('%(asctime)s %(name)s %(threadName)-10s %(levelname)-8s %(message)s', '%Y-%m-%d %H:%M:%S')
 ch.setFormatter(formatter)
