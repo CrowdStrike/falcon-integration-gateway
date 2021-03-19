@@ -16,12 +16,15 @@ class StreamingThread(StoppableThread):
         try:
             for event in self.conn.events():
                 if event:
-                    self.queue.put(event)
+                    self.process_event(event)
 
                 if self.stopped:
                     break
         finally:
             self.conn.close()
+
+    def process_event(self, event):
+        self.queue.put(event)
 
 
 class StreamingConnection():
