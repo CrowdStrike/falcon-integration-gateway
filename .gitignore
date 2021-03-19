@@ -3,4 +3,5 @@
 *.swp
 *.egg
 *.egg-info
+/config/devel.ini
 /runtest.sh
