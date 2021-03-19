@@ -26,7 +26,8 @@ class StreamingThread(StoppableThread):
 
     def process_event(self, event):
         e = Event(event)
-        self.queue.put(e)
+        if not e.irrelevant():
+            self.queue.put(e)
 
 
 class StreamingConnection():
