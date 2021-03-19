@@ -1,4 +1,4 @@
 from .api import Api
-from .stream import StreamConnection
+from .stream import StreamingThread
 
-__all__ = ['Api', 'StreamConnection']
+__all__ = ['Api', 'StreamingThread']

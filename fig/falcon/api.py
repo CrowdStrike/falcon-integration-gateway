@@ -44,5 +44,4 @@ class Stream(dict):
 
     @property
     def url(self):
-        print(self)
         return self['dataFeedURL']

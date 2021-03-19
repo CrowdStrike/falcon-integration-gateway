@@ -2,9 +2,29 @@ import datetime
 import requests
 
 from .api import Stream
+from ..util import StoppableThread
 
 
-class StreamConnection():
+class StreamingThread(StoppableThread):
+    def __init__(self, stream: Stream, queue, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'cs_stream')
+        super().__init__(*args, **kwargs)
+        self.conn = StreamingConnection(stream)
+        self.queue = queue
+
+    def run(self):
+        try:
+            for event in self.conn.events():
+                if event:
+                    self.queue.put(event)
+
+                if self.stopped:
+                    break
+        finally:
+            self.conn.close()
+
+
+class StreamingConnection():
     def __init__(self, stream: Stream):
         self.stream = stream
         self.connection = None
@@ -20,14 +40,6 @@ class StreamConnection():
 
     def events(self):
         return self.open().iter_lines()
-
-    def stream_to_queue(self, queue):
-        for event in self.events():
-            if event:
-                queue.put(event)
-            else:
-                print("Empty event")
-        self.close()
 
     def close(self):
         if self.connection:
