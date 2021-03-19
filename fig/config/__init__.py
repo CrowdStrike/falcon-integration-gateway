@@ -3,7 +3,7 @@ import configparser
 
 
 config = configparser.SafeConfigParser()
-config.read(['config/defaults.ini', 'config/config.ini'])
+config.read(['config/defaults.ini', 'config/devel.ini', 'config/config.ini'])
 
 
 __ENV_DEFAULTS = [

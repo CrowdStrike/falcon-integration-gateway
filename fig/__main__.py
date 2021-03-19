@@ -1,18 +1,14 @@
 import threading
 from .config import config
-from .falcon import Api, StreamConnection
+from .falcon import Api, StreamingThread
+from .log import log
 from .queue import falcon_events
 
 
 def read_and_log_queue():
     while True:
-        print(falcon_events.get())
-
-
-def read_stream_and_write_queue(s):
-    conn = StreamConnection(s)
-    for event in conn.events():
-        falcon_events.put(event)
+        e = falcon_events.get()
+        log.info("Detection: %s", e['event']['DetectDescription'])
 
 
 if __name__ == "__main__":
@@ -21,7 +17,6 @@ if __name__ == "__main__":
 
     falcon_api = Api()
     application_id = config.get('falcon', 'application_id')
-    for s in falcon_api.streams(application_id):
-        conn = StreamConnection(s)
-        thread = threading.Thread(target=conn.stream_to_queue, kwargs={'queue': falcon_events})
+    for stream in falcon_api.streams(application_id):
+        thread = StreamingThread(stream, falcon_events)
         thread.start()
