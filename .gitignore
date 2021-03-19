@@ -1,0 +1,6 @@
+/.venv
+*.pyc
+*.swp
+*.egg
+*.egg-info
+/runtest.sh
