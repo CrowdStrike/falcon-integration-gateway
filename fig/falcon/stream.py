@@ -21,6 +21,14 @@ class StreamConnection():
     def events(self):
         return self.open().iter_lines()
 
+    def stream_to_queue(self, queue):
+        for event in self.events():
+            if event:
+                queue.put(event)
+            else:
+                print("Empty event")
+        self.close()
+
     def close(self):
         if self.connection:
             self.connection.close()
