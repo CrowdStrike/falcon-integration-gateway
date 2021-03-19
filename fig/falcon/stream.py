@@ -2,6 +2,7 @@ import datetime
 import requests
 
 from .api import Stream
+from .event import Event
 from ..util import StoppableThread
 
 
@@ -24,7 +25,8 @@ class StreamingThread(StoppableThread):
             self.conn.close()
 
     def process_event(self, event):
-        self.queue.put(event)
+        e = Event(event)
+        self.queue.put(e)
 
 
 class StreamingConnection():
