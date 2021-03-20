@@ -1,10 +1,26 @@
 import datetime
 import requests
+import threading
 
-from .api import Stream
+from .api import Api, Stream
 from .event import Event
 from ..util import StoppableThread
 from ..log import log
+from ..config import config
+
+
+class StreamManagementThread(threading.Thread):
+    def __init__(self, output_queue, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'cs_mngmt')
+        super().__init__(*args, **kwargs)
+        self.output_queue = output_queue
+
+    def run(self):
+        falcon_api = Api()
+        application_id = config.get('falcon', 'application_id')
+        for stream in falcon_api.streams(application_id):
+            thread = StreamingThread(stream, self.output_queue)
+            thread.start()
 
 
 class StreamingThread(StoppableThread):
