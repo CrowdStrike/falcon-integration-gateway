@@ -36,6 +36,17 @@ class Api():
                 'already running in your environment with the same application_id={}, or by missing streaming API '
                 ' capability.'.format(app_id))
 
+    def refresh_streaming_session(self, app_id):
+        response = self.client.command(action='refreshActiveStreamSession',
+                                       parametes={
+                                           'action_name': 'refresh_active_stream_session',
+                                           'appId': app_id
+                                       })
+        if 'status_code' not in response or response['status_code'] != 200:
+            raise ApiError(
+                'Could not refresh Falcon Streaming API. Response was: {}'.format(response)
+            )
+
 
 class Stream(dict):
     @property
@@ -45,3 +56,7 @@ class Stream(dict):
     @property
     def url(self):
         return self['dataFeedURL']
+
+    @property
+    def refresh_interval(self):
+        return self['refreshActiveSessionInterval']

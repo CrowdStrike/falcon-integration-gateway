@@ -1,5 +1,6 @@
 import datetime
 import requests
+import time
 import threading
 
 from .api import Api, Stream
@@ -10,6 +11,8 @@ from ..config import config
 
 
 class StreamManagementThread(threading.Thread):
+    """Thread that spins-out sub-threads to manage CrowdStrike Falcon Streaming API"""
+
     def __init__(self, output_queue, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_mngmt')
         super().__init__(*args, **kwargs)
@@ -19,8 +22,37 @@ class StreamManagementThread(threading.Thread):
         falcon_api = Api()
         application_id = config.get('falcon', 'application_id')
         for stream in falcon_api.streams(application_id):
-            thread = StreamingThread(stream, self.output_queue)
-            thread.start()
+            t1 = StreamingThread(stream, self.output_queue)
+            t1.start()
+
+            t2 = StreamRefreshThread(application_id, stream, falcon_api)
+            t2.start()
+
+
+class StreamRefreshThread(StoppableThread):
+    def __init__(self, application_id, stream: Stream, falcon_api: Api, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'cs_refresh')
+        super().__init__(*args, **kwargs)
+        self.stream = stream
+        self.falcon_api = falcon_api
+        self.application_id = application_id
+
+    def run(self):
+        try:
+            self.sleep()
+            while not self.stopped:
+                self.refresh_stream_session()
+                self.sleep()
+
+        finally:
+            self.stop()
+
+    def sleep(self):
+        time.sleep(self.stream.refresh_interval * 9 / 10)
+
+    def refresh_stream_session(self):
+        self.falcon_api.refresh_streaming_session(self.application_id)
+        log.debug("Refresh of streaming session succeeded")
 
 
 class StreamingThread(StoppableThread):
@@ -40,6 +72,7 @@ class StreamingThread(StoppableThread):
                     break
         finally:
             log.warning("Streaming Connection was closed.")
+            self.stop()
             self.conn.close()
 
     def process_event(self, event):
