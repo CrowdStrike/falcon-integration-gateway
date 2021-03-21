@@ -51,7 +51,7 @@ class StreamRefreshThread(StoppableThread):
         time.sleep(self.stream.refresh_interval * 9 / 10)
 
     def refresh_stream_session(self):
-        self.falcon_api.refresh_streaming_session(self.application_id)
+        self.falcon_api.refresh_streaming_session(self.application_id, self.stream)
         log.debug("Refresh of streaming session succeeded")
 
 
