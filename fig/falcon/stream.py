@@ -1,8 +1,8 @@
 import sys
 import datetime
-import requests
 import time
 import threading
+import requests
 
 from .api import Api, Stream
 from .event import Event
@@ -26,7 +26,7 @@ class StreamManagementThread(threading.Thread):
                 while not workers_died_event.is_set():
                     time.sleep(60)
                 log.debug("Restarting stream session")
-            except Exception:
+            except Exception:  # pylint: disable=W0703
                 log.exception("Could not restart stream session")
                 sys.exit(1)  # TODO implement re-try mechanism
 
@@ -87,9 +87,9 @@ class StreamingThread(StoppableThread):
             self.conn.close()
 
     def process_event(self, event):
-        e = Event(event)
-        if not e.irrelevant():
-            self.queue.put(e)
+        event = Event(event)
+        if not event.irrelevant():
+            self.queue.put(event)
 
 
 class StreamingConnection():

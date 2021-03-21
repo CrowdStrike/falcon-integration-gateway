@@ -25,3 +25,6 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8 fig
+    - name: Lint with pylint
+      run: |
+        pylint fig

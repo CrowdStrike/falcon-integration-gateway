@@ -6,8 +6,8 @@ from .queue import falcon_events
 
 def read_and_log_queue():
     while True:
-        e = falcon_events.get()
-        log.info("Detection: %s", e['event']['DetectDescription'])
+        event = falcon_events.get()
+        log.info("Detection: %s", event['event']['DetectDescription'])
 
 
 if __name__ == "__main__":
