@@ -28,6 +28,7 @@ setup(
             'flake8',
             'pylint',
             'pytest',
+            'bandit',
         ],
     },
     classifiers=[
