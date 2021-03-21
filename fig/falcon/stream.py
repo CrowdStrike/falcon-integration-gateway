@@ -1,3 +1,4 @@
+import sys
 import datetime
 import requests
 import time
@@ -19,14 +20,24 @@ class StreamManagementThread(threading.Thread):
         self.output_queue = output_queue
 
     def run(self):
+        while True:
+            try:
+                workers_died_event = self.start_workers()
+                while not workers_died_event.is_set():
+                    time.sleep(60)
+                log.debug("Restarting stream session")
+            except Exception:
+                log.exception("Could not restart stream session")
+                sys.exit(1)  # TODO implement re-try mechanism
+
+    def start_workers(self):
+        stop_event = threading.Event()
         falcon_api = Api()
         application_id = config.get('falcon', 'application_id')
         for stream in falcon_api.streams(application_id):
-            t1 = StreamingThread(stream, self.output_queue)
-            t1.start()
-
-            t2 = StreamRefreshThread(application_id, stream, falcon_api)
-            t2.start()
+            StreamingThread(stream, self.output_queue, stop_event=stop_event).start()
+            StreamRefreshThread(application_id, stream, falcon_api, stop_event).start()
+        return stop_event
 
 
 class StreamRefreshThread(StoppableThread):
