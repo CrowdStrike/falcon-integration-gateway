@@ -8,3 +8,7 @@ class Event(dict):
 
     def irrelevant(self):
         return self['metadata']['eventType'] != 'DetectionSummaryEvent'
+
+    @property
+    def offset(self):
+        return self['metadata']['offset']

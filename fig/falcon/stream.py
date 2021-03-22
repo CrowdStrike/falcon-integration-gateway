@@ -70,7 +70,7 @@ class StreamingThread(StoppableThread):
     def __init__(self, stream: Stream, queue, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
-        self.conn = StreamingConnection(stream)
+        self.conn = StreamingConnection(stream, queue.last_offset())
         self.queue = queue
 
     def run(self):
@@ -97,9 +97,10 @@ class StreamingThread(StoppableThread):
 
 
 class StreamingConnection():
-    def __init__(self, stream: Stream):
+    def __init__(self, stream: Stream, last_seen_offset=0):
         self.stream = stream
         self.connection = None
+        self.last_seen_offset = last_seen_offset
 
     def open(self):
         headers = {
@@ -108,7 +109,8 @@ class StreamingConnection():
             'Connection': 'Keep-Alive'
         }
         log.info("Opening Streaming Connection")
-        self.connection = requests.get(self.stream.url, headers=headers, stream=True)
+        url = self.stream.url + '&offset={}'.format(self.last_seen_offset)
+        self.connection = requests.get(url, headers=headers, stream=True)
         return self.connection
 
     def events(self):
