@@ -31,7 +31,7 @@ class Api():
         body = response['body']
         if 'errors' in body and len(body['errors']) > 0:
             raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
-        if 'resources' in body and len(body['resources']) > 0:
+        if 'resources' in body and body['resources']:
             return (Stream(s) for s in body['resources'])
         raise ApiError(
             'Falcon Streaming API not discovered. This may be caused by second instance of this application already '
