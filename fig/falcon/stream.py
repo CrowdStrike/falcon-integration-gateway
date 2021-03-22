@@ -36,7 +36,7 @@ class StreamManagementThread(threading.Thread):
         application_id = config.get('falcon', 'application_id')
         for stream in falcon_api.streams(application_id):
             StreamingThread(stream, self.output_queue, stop_event=stop_event).start()
-            StreamRefreshThread(application_id, stream, falcon_api, stop_event).start()
+            StreamRefreshThread(application_id, stream, falcon_api, stop_event=stop_event).start()
         return stop_event
 
 
