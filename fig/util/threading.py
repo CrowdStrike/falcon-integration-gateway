@@ -1,4 +1,5 @@
 import threading
+from ..log import log
 
 
 class StoppableThread(threading.Thread):
@@ -9,3 +10,8 @@ class StoppableThread(threading.Thread):
     @property
     def stopped(self):
         return self.stop_event.is_set()
+
+    def stop(self):
+        if not self.stopped:
+            log.info("Thread requested to stop")
+            self.stop_event.set()

@@ -1,3 +1,4 @@
+import re
 from falconpy import api_complete as FalconSDK
 from ..config import config
 
@@ -36,6 +37,18 @@ class Api():
                 'already running in your environment with the same application_id={}, or by missing streaming API '
                 ' capability.'.format(app_id))
 
+    def refresh_streaming_session(self, app_id, stream):
+        response = self.client.command(action='refreshActiveStreamSession',
+                                       partition=stream.partition,
+                                       parameters={
+                                           'action_name': 'refresh_active_stream_session',
+                                           'appId': app_id
+                                       })
+        if 'status_code' not in response or response['status_code'] != 200:
+            raise ApiError(
+                'Could not refresh Falcon Streaming API. Response was: {}'.format(response)
+            )
+
 
 class Stream(dict):
     @property
@@ -45,3 +58,15 @@ class Stream(dict):
     @property
     def url(self):
         return self['dataFeedURL']
+
+    @property
+    def refresh_interval(self):
+        return self['refreshActiveSessionInterval']
+
+    @property
+    def partition(self):
+        match = re.match(r'.*\/sensors\/entities\/datafeed-actions/v1/([0-9a-zA-Z]+)\?',
+                         self['refreshActiveSessionURL'])
+        if not match or not match.group(1):
+            raise Exception('Cannot parse stream partition from stream data: {}'.format(self))
+        return match.group(1)
