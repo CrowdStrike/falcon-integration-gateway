@@ -1,18 +1,11 @@
-import threading
 from .falcon import StreamManagementThread
-from .log import log
+from .gcp import GCPWorkerThread
 from .queue import falcon_events
 
 
-def read_and_log_queue():
-    while True:
-        event = falcon_events.get()
-        log.info("Detection: %s", event['event']['DetectDescription'])
-
-
 if __name__ == "__main__":
-    reader = threading.Thread(target=read_and_log_queue, daemon=True)
-    reader.start()
+    # Central to the fig architecture is a message queue (falcon_events). GCPWorkerThread/s read the queue and process
+    # each event. The events are put on queue by StreamingThread. StreamingThread is restarted by StreamManagementThread
 
-    falcon_stream_manager = StreamManagementThread(output_queue=falcon_events)
-    falcon_stream_manager.start()
+    StreamManagementThread(output_queue=falcon_events).start()
+    GCPWorkerThread(input_queue=falcon_events, daemon=True).start()  # TODO: Run multiple reader threads in pool
