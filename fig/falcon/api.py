@@ -7,7 +7,7 @@ class ApiError(Exception):
     pass
 
 
-class Api():
+class FalconAPI():
     CLOUD_REGIONS = {
         'us-1': 'api.crowdstrike.com',
         'us-2': 'api.us-2.crowdstrike.com',
@@ -19,7 +19,7 @@ class Api():
         self.client = FalconSDK.APIHarness(creds={
             'client_id': config.get('falcon', 'client_id'),
             'client_secret': config.get('falcon', 'client_secret')},
-            base_url=Api.base_url())
+            base_url=self.__class__.base_url())
 
     @classmethod
     def base_url(cls):

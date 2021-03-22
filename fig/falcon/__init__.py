@@ -1,4 +1,4 @@
-from .api import Api
+from .api import FalconAPI
 from .stream import StreamManagementThread
 
-__all__ = ['Api', 'StreamManagementThread']
+__all__ = ['FalconAPI', 'StreamManagementThread']
