@@ -1,0 +1,87 @@
+# Kubernetes pod spec for falcon-integration-gateway
+#
+# Deployment
+#    kubectl apply -f ./falcon-integration-gateway.yaml
+# Tear Down
+#    kubectl delete -f ./falcon-integration-gateway.yaml
+#
+# This example shows how to bind CrowdStrike OAuth Credentials and configuration file to the application.
+---
+apiVersion: v1
+data:
+  FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+kind: Secret
+type: Opaque
+metadata:
+  name: falcon-integration-gateway-creds
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falcon-integration-gateway-config
+data:
+  config.ini: |
+    # Falcon Integration Gateway
+
+    [logging]
+    # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
+    # level = DEBUG
+
+    [falcon]
+    # Uncomment to provide Falcon Cloud alternatively use FALCON_CLOUD_REGION to override
+    #cloud_region = us-1
+    # Uncomment to provide OAuth Secret alternatively use FALCON_CLIENT_SECRET to override
+    #client_id = ABCD
+
+    # Uncomment to provide OAuth Secret alternatively use FALCON_CLIENT_SECRET to override
+    #client_secret = ABCD
+    # Uncomment to provide application id. Needs to be different per each fig instance.
+    #application_id = my-acme-gcp-1
+
+    [gcp]
+    # Use GOOGLE_APPLICATION_CREDENTIALS env variable
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falcon-integration-gateway
+spec:
+  selector:
+   matchLabels:
+      run: falcon-integration-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: falcon-integration-gateway
+    spec:
+      containers:
+          - name: app
+            image: gcr.io/solar-gcp-integration-lab/falcon-integration-gateway:latest
+            imagePullPolicy: Always
+            volumeMounts:
+              - name: config-volume
+                mountPath: /app/config/config.ini
+                subPath: config.ini
+            env:
+              - name: FALCON_CLIENT_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: FALCON_CLIENT_ID
+              - name: FALCON_CLIENT_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: FALCON_CLIENT_SECRET
+      volumes:
+          - name: config-volume
+            configMap:
+              name: falcon-integration-gateway-config
+              items:
+              - key: config.ini
+                path: config.ini
