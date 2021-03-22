@@ -31,11 +31,10 @@ class Api():
         body = response['body']
         if 'resources' in body and len(body['resources']) > 0:
             return (Stream(s) for s in body['resources'])
-        else:
-            raise ApiError(
-                'Falcon Streaming API not discovered. This may be caused by second instance of this application '
-                'already running in your environment with the same application_id={}, or by missing streaming API '
-                ' capability.'.format(app_id))
+        raise ApiError(
+            'Falcon Streaming API not discovered. This may be caused by second instance of this application already '
+            'running in your environment with the same application_id={}, or by missing streaming API capability.'
+            .format(app_id))
 
     def refresh_streaming_session(self, app_id, stream):
         response = self.client.command(action='refreshActiveStreamSession',

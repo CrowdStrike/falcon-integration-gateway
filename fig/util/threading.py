@@ -3,7 +3,7 @@ from ..log import log
 
 
 class StoppableThread(threading.Thread):
-    def __init__(self, stop_event=threading.Event(), *args, **kwargs):
+    def __init__(self, *args, stop_event=threading.Event(), **kwargs):
         super().__init__(*args, **kwargs)
         self.stop_event = stop_event
 
