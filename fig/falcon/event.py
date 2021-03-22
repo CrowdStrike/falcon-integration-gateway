@@ -1,4 +1,5 @@
 import json
+from ..config import config
 
 
 class Event(dict):
@@ -7,8 +8,13 @@ class Event(dict):
         super().__init__(event)
 
     def irrelevant(self):
-        return self['metadata']['eventType'] != 'DetectionSummaryEvent'
+        return self['metadata']['eventType'] != 'DetectionSummaryEvent' \
+            or self.severity < int(config.get('events', 'severity_threshold'))
 
     @property
     def offset(self):
         return self['metadata']['offset']
+
+    @property
+    def severity(self):
+        return self['event'].get('Severity', 5)

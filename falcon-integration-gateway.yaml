@@ -25,6 +25,10 @@ data:
   config.ini: |
     # Falcon Integration Gateway
 
+    [events]
+    # Uncomment to filter out events based on severity (allowed values 1-5, default 2)
+    #severity_threshold = 3
+
     [logging]
     # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
     # level = DEBUG
