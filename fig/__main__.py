@@ -1,5 +1,5 @@
 from .falcon import StreamManagementThread
-from .gcp import GCPWorkerThread
+from .gcp_translator import GCPWorkerThread
 from .queue import falcon_events
 
 
