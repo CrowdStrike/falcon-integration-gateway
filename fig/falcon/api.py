@@ -29,6 +29,8 @@ class Api():
         response = self.client.command(action='listAvailableStreamsOAuth2',
                                        parameters={'appId': config.get('falcon', 'application_id')})
         body = response['body']
+        if 'errors' in body and len(body['errors']) > 0:
+            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
         if 'resources' in body and len(body['resources']) > 0:
             return (Stream(s) for s in body['resources'])
         raise ApiError(
