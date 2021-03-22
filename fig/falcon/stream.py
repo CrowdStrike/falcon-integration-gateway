@@ -4,7 +4,7 @@ import time
 import threading
 import requests
 
-from .api import Api, Stream
+from .api import FalconAPI, Stream
 from .event import Event
 from ..util import StoppableThread
 from ..log import log
@@ -32,16 +32,16 @@ class StreamManagementThread(threading.Thread):
 
     def start_workers(self):
         stop_event = threading.Event()
-        falcon_api = Api()
+        falcon_api = FalconAPI()
         application_id = config.get('falcon', 'application_id')
         for stream in falcon_api.streams(application_id):
             StreamingThread(stream, self.output_queue, stop_event=stop_event).start()
-            StreamRefreshThread(application_id, stream, falcon_api, stop_event).start()
+            StreamRefreshThread(application_id, stream, falcon_api, stop_event=stop_event).start()
         return stop_event
 
 
 class StreamRefreshThread(StoppableThread):
-    def __init__(self, application_id, stream: Stream, falcon_api: Api, *args, **kwargs):
+    def __init__(self, application_id, stream: Stream, falcon_api: FalconAPI, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_refresh')
         super().__init__(*args, **kwargs)
         self.stream = stream
@@ -81,10 +81,14 @@ class StreamingThread(StoppableThread):
 
                 if self.stopped:
                     break
+        except requests.exceptions.ChunkedEncodingError:
+            pass  # ChunkedEncodingError is expected when streaming session closes abruptly
         finally:
             log.warning("Streaming Connection was closed.")
-            self.stop()
-            self.conn.close()
+            if not self.stopped:
+                self.stop()
+            else:
+                self.conn.close()
 
     def process_event(self, event):
         event = Event(event)

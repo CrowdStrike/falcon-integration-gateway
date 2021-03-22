@@ -11,7 +11,7 @@ def read_and_log_queue():
 
 
 if __name__ == "__main__":
-    reader = threading.Thread(target=read_and_log_queue)
+    reader = threading.Thread(target=read_and_log_queue, daemon=True)
     reader.start()
 
     falcon_stream_manager = StreamManagementThread(output_queue=falcon_events)

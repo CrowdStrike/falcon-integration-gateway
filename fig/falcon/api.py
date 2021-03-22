@@ -7,7 +7,7 @@ class ApiError(Exception):
     pass
 
 
-class Api():
+class FalconAPI():
     CLOUD_REGIONS = {
         'us-1': 'api.crowdstrike.com',
         'us-2': 'api.us-2.crowdstrike.com',
@@ -19,7 +19,7 @@ class Api():
         self.client = FalconSDK.APIHarness(creds={
             'client_id': config.get('falcon', 'client_id'),
             'client_secret': config.get('falcon', 'client_secret')},
-            base_url=Api.base_url())
+            base_url=self.__class__.base_url())
 
     @classmethod
     def base_url(cls):
@@ -29,7 +29,9 @@ class Api():
         response = self.client.command(action='listAvailableStreamsOAuth2',
                                        parameters={'appId': config.get('falcon', 'application_id')})
         body = response['body']
-        if 'resources' in body and len(body['resources']) > 0:
+        if 'errors' in body and len(body['errors']) > 0:
+            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
+        if 'resources' in body and body['resources']:
             return (Stream(s) for s in body['resources'])
         raise ApiError(
             'Falcon Streaming API not discovered. This may be caused by second instance of this application already '
