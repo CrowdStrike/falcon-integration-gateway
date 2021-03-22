@@ -81,10 +81,14 @@ class StreamingThread(StoppableThread):
 
                 if self.stopped:
                     break
+        except requests.exceptions.ChunkedEncodingError:
+            pass  # ChunkedEncodingError is expected when streaming session closes abruptly
         finally:
             log.warning("Streaming Connection was closed.")
-            self.stop()
-            self.conn.close()
+            if not self.stopped:
+                self.stop()
+            else:
+                self.conn.close()
 
     def process_event(self, event):
         event = Event(event)
