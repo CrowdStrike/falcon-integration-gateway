@@ -10,5 +10,13 @@ class GCPWorkerThread(threading.Thread):
 
     def run(self):
         while True:
-            event = self.input_queue.get()
-            log.info("Processing detection: %s", event['event']['DetectDescription'])
+            try:
+                event = self.input_queue.get()
+                self.process_event(event)
+            except Exception:  # pylint: disable=W0703
+                log.exception("Error occurred while processing event %s", event)
+                self.input_queue.put(event)
+
+    @classmethod
+    def process_event(cls, event):
+        log.info("Processing detection: %s", event['event']['DetectDescription'])
