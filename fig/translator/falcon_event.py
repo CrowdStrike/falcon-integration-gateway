@@ -14,3 +14,7 @@ class FalconEvent():
     @property
     def cloud_provider(self):
         return self.device_details.get('service_provider', None)
+
+    @property
+    def cloud_provider_account_id(self):
+        return self.device_details.get('service_provider_account_id')
