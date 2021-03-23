@@ -26,15 +26,14 @@ class FalconAPI():
         return 'https://' + cls.CLOUD_REGIONS[config.get('falcon', 'cloud_region')]
 
     def streams(self, app_id):
-        response = self._command(action='listAvailableStreamsOAuth2',
-                                 parameters={'appId': config.get('falcon', 'application_id')})
-        body = response['body']
-        if 'resources' in body and body['resources']:
-            return (Stream(s) for s in body['resources'])
-        raise ApiError(
-            'Falcon Streaming API not discovered. This may be caused by second instance of this application already '
-            'running in your environment with the same application_id={}, or by missing streaming API capability.'
-            .format(app_id))
+        resources = self._resources(action='listAvailableStreamsOAuth2',
+                                    parameters={'appId': config.get('falcon', 'application_id')})
+        if not resources:
+            raise ApiError(
+                'Falcon Streaming API not discovered. This may be caused by second instance of this application '
+                'already running in your environment with the same application_id={}, or by missing streaming API '
+                'capability.'.format(app_id))
+        return (Stream(s) for s in resources)
 
     def refresh_streaming_session(self, app_id, stream):
         self._command(action='refreshActiveStreamSession',
@@ -45,12 +44,14 @@ class FalconAPI():
                       })
 
     def device_details(self, device_id):
-        response = self._command(action='GetDeviceDetails', ids=[device_id])
-        body = response['body']
-        if 'resources' in body and body['resources']:
-            return body['resources']
+        return self._resources(action='GetDeviceDetails', ids=[device_id])
 
-        raise ApiError('No device detail found for {}: {}'.format(device_id, response))
+    def _resources(self, *args, **kwargs):
+        response = self._command(*args, **kwargs)
+        body = response['body']
+        if 'resources' not in body or not body['resources']:
+            return []
+        return body['resources']
 
     def _command(self, *args, **kwargs):
         response = self.client.command(*args, **kwargs)
