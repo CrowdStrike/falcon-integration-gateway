@@ -30,6 +30,7 @@ class FigConfig(configparser.SafeConfigParser):
                         envvar, section, var)) from err
 
         assert int(self.get('events', 'severity_threshold')) in range(0, 5)
+        assert int(self.get('events', 'older_than_days_threshold')) in range(0, 10000)
 
 
 config = FigConfig()

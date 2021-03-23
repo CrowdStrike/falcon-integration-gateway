@@ -29,6 +29,9 @@ data:
     # Uncomment to filter out events based on severity (allowed values 1-5, default 2)
     #severity_threshold = 3
 
+    # Uncomment to filter out events based on number of days past the event (default 365)
+    #older_than_days_threshold = 90
+
     [logging]
     # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
     # level = DEBUG
