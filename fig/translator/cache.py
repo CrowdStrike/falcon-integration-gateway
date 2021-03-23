@@ -1,9 +1,11 @@
 from .errors import EventDataError, FalconAPIDataError
+from ..cloud_providers import gcp
 
 
 class TranslationCache():
     def __init__(self, falcon_api):
         self.falcon = FalconCache(falcon_api)
+        self.gcp = GCPCache()
 
 
 class FalconCache():
@@ -25,3 +27,23 @@ class FalconCache():
             self._host_detail[sensor_id] = self.falcon_api.device_details(sensor_id)[0]
 
         return self._host_detail[sensor_id]
+
+
+class GCPCache():
+    def __init__(self):
+        self._projects = {}
+
+    def project_number_accesible(self, project_number: int) -> bool:
+        if project_number in self.projects:
+            return True
+        self._refresh_projects()
+        return project_number in self.projects
+
+    @property
+    def projects(self):
+        if not self._projects:
+            self._refresh_projects()
+        return self._projects
+
+    def _refresh_projects(self):
+        self._projects = gcp.projects()

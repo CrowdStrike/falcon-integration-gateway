@@ -2,7 +2,6 @@ import threading
 from ..log import log
 from .errors import EventDataError
 from .falcon_event import FalconEvent
-from ..cloud_providers import gcp
 
 
 class WorkerThread(threading.Thread):
@@ -31,7 +30,7 @@ class WorkerThread(threading.Thread):
             return  # TODO implement other providers
 
         gcp_project_id = falcon_event.cloud_provider_account_id
-        if gcp_project_id not in gcp.projects():
+        if not self.cache.gcp.project_number_accesible(gcp_project_id):
             log.warning(
                 "Falcon Detection belongs to project %s, but google service account has no acess to this project",
                 gcp_project_id)
