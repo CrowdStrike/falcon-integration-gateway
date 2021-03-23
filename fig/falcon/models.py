@@ -1,4 +1,5 @@
 import json
+import re
 import datetime
 from ..config import config
 
@@ -36,3 +37,25 @@ class Event(dict):
     @classmethod
     def cut_off_date(cls):
         return datetime.datetime.now() - datetime.timedelta(days=int(config.get('events', 'older_than_days_threshold')))
+
+
+class Stream(dict):
+    @property
+    def token(self):
+        return self['sessionToken']['token']
+
+    @property
+    def url(self):
+        return self['dataFeedURL']
+
+    @property
+    def refresh_interval(self):
+        return self['refreshActiveSessionInterval']
+
+    @property
+    def partition(self):
+        match = re.match(r'.*\/sensors\/entities\/datafeed-actions/v1/([0-9a-zA-Z]+)\?',
+                         self['refreshActiveSessionURL'])
+        if not match or not match.group(1):
+            raise Exception('Cannot parse stream partition from stream data: {}'.format(self))
+        return match.group(1)

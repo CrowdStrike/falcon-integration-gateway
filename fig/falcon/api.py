@@ -1,6 +1,6 @@
-import re
 from falconpy import api_complete as FalconSDK
 from ..config import config
+from .models import Stream
 
 
 class ApiError(Exception):
@@ -61,25 +61,3 @@ class FalconAPI():
         if 'status_code' not in response or response['status_code'] != 200:
             raise ApiError('Unexpected response code from Falcon API. Response was: {}'.format(response))
         return response
-
-
-class Stream(dict):
-    @property
-    def token(self):
-        return self['sessionToken']['token']
-
-    @property
-    def url(self):
-        return self['dataFeedURL']
-
-    @property
-    def refresh_interval(self):
-        return self['refreshActiveSessionInterval']
-
-    @property
-    def partition(self):
-        match = re.match(r'.*\/sensors\/entities\/datafeed-actions/v1/([0-9a-zA-Z]+)\?',
-                         self['refreshActiveSessionURL'])
-        if not match or not match.group(1):
-            raise Exception('Cannot parse stream partition from stream data: {}'.format(self))
-        return match.group(1)
