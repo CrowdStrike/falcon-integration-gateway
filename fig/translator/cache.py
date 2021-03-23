@@ -1,4 +1,4 @@
-from .errors import EventDataError, FalconAPIDataError
+from .errors import EventDataError, FalconAPIDataError, GCPAPIDataError
 from ..cloud_providers import gcp
 
 
@@ -32,6 +32,12 @@ class FalconCache():
 class GCPCache():
     def __init__(self):
         self._projects = {}
+
+    def organization_parent_of(self, project_id):
+        project = self.projects[project_id]
+        if 'type' not in project.parent or project.parent['type'] != 'organization':
+            raise GCPAPIDataError('Could not determine parent organization for gcp project {}'.format(project_id))
+        return project.parent['id']
 
     def project_number_accesible(self, project_number: int) -> bool:
         if project_number in self.projects:

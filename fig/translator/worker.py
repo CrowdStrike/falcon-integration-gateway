@@ -35,6 +35,7 @@ class WorkerThread(threading.Thread):
                 "Falcon Detection belongs to project %s, but google service account has no acess to this project",
                 gcp_project_id)
             return
+        org_id = self.cache.gcp.organization_parent_of(gcp_project_id)
+        print(org_id)
 
         log.info("Processing detection: %s", event['event']['DetectDescription'])
-        log.info("    Service provider was: %s", falcon_event.cloud_provider)
