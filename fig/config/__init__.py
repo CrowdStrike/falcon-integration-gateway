@@ -29,8 +29,10 @@ class FigConfig(configparser.SafeConfigParser):
                     "Please provide environment variable {} or configuration option {}.{}".format(
                         envvar, section, var)) from err
 
-        assert int(self.get('events', 'severity_threshold')) in range(0, 5)
-        assert int(self.get('events', 'older_than_days_threshold')) in range(0, 10000)
+        if int(self.get('events', 'severity_threshold')) not in range(0, 5):
+            raise Exception('Malformed configuration: expected events.severity_threshold to be in range 0-5')
+        if int(self.get('events', 'older_than_days_threshold')) not in range(0, 10000):
+            raise Exception('Malformed configuration: expected events.older_than_days_threshold to be in range 0-10000')
 
 
 config = FigConfig()
