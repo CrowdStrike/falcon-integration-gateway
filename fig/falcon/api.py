@@ -26,11 +26,9 @@ class FalconAPI():
         return 'https://' + cls.CLOUD_REGIONS[config.get('falcon', 'cloud_region')]
 
     def streams(self, app_id):
-        response = self.client.command(action='listAvailableStreamsOAuth2',
-                                       parameters={'appId': config.get('falcon', 'application_id')})
+        response = self._command(action='listAvailableStreamsOAuth2',
+                                 parameters={'appId': config.get('falcon', 'application_id')})
         body = response['body']
-        if 'errors' in body and len(body['errors']) > 0:
-            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
         if 'resources' in body and body['resources']:
             return (Stream(s) for s in body['resources'])
         raise ApiError(
@@ -39,22 +37,20 @@ class FalconAPI():
             .format(app_id))
 
     def refresh_streaming_session(self, app_id, stream):
-        response = self.client.command(action='refreshActiveStreamSession',
-                                       partition=stream.partition,
-                                       parameters={
-                                           'action_name': 'refresh_active_stream_session',
-                                           'appId': app_id
-                                       })
+        response = self._command(action='refreshActiveStreamSession',
+                                 partition=stream.partition,
+                                 parameters={
+                                     'action_name': 'refresh_active_stream_session',
+                                     'appId': app_id
+                                 })
         if 'status_code' not in response or response['status_code'] != 200:
             raise ApiError(
                 'Could not refresh Falcon Streaming API. Response was: {}'.format(response)
             )
 
     def device_details(self, device_id):
-        response = self.client.command(action='GetDeviceDetails', ids=[device_id])
+        response = self._command(action='GetDeviceDetails', ids=[device_id])
         body = response['body']
-        if 'errors' in body and len(body['errors']) > 0:
-            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
         if 'status_code' not in response or response['status_code'] != 200:
             raise ApiError(
                 'Could not get host details from Falcon API. Response was: {}'.format(response)
@@ -63,6 +59,13 @@ class FalconAPI():
             return body['resources']
 
         raise ApiError('No device detail found for {}: {}'.format(device_id, response))
+
+    def _command(self, *args, **kwargs):
+        response = self.client.command(*args, **kwargs)
+        body = response['body']
+        if 'errors' in body and len(body['errors']) > 0:
+            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
+        return response
 
 
 class Stream(dict):
