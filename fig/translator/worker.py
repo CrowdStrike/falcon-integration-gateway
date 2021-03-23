@@ -2,6 +2,7 @@ import threading
 from ..log import log
 from .errors import EventDataError
 from .falcon_event import FalconEvent
+from ..cloud_providers import gcp
 
 
 class WorkerThread(threading.Thread):
@@ -36,6 +37,8 @@ class WorkerThread(threading.Thread):
                 gcp_project_id)
             return
         org_id = self.cache.gcp.organization_parent_of(gcp_project_id)
-        print(org_id)
+        scc = gcp.SecurityCommandCenter()
+        source = scc.get_or_create_fig_source(org_id)
+        print(source)
 
         log.info("Processing detection: %s", event['event']['DetectDescription'])
