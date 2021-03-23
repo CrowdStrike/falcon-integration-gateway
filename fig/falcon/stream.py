@@ -4,8 +4,8 @@ import time
 import threading
 import requests
 
-from .api import FalconAPI, Stream
-from .event import Event
+from .api import FalconAPI
+from .models import Event, Stream
 from ..util import StoppableThread
 from ..log import log
 from ..config import config

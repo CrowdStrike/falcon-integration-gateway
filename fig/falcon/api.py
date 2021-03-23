@@ -1,6 +1,6 @@
-import re
 from falconpy import api_complete as FalconSDK
 from ..config import config
+from .models import Stream
 
 
 class ApiError(Exception):
@@ -26,48 +26,38 @@ class FalconAPI():
         return 'https://' + cls.CLOUD_REGIONS[config.get('falcon', 'cloud_region')]
 
     def streams(self, app_id):
-        response = self.client.command(action='listAvailableStreamsOAuth2',
-                                       parameters={'appId': config.get('falcon', 'application_id')})
+        resources = self._resources(action='listAvailableStreamsOAuth2',
+                                    parameters={'appId': config.get('falcon', 'application_id')})
+        if not resources:
+            raise ApiError(
+                'Falcon Streaming API not discovered. This may be caused by second instance of this application '
+                'already running in your environment with the same application_id={}, or by missing streaming API '
+                'capability.'.format(app_id))
+        return (Stream(s) for s in resources)
+
+    def refresh_streaming_session(self, app_id, stream):
+        self._command(action='refreshActiveStreamSession',
+                      partition=stream.partition,
+                      parameters={
+                          'action_name': 'refresh_active_stream_session',
+                          'appId': app_id
+                      })
+
+    def device_details(self, device_id):
+        return self._resources(action='GetDeviceDetails', ids=[device_id])
+
+    def _resources(self, *args, **kwargs):
+        response = self._command(*args, **kwargs)
+        body = response['body']
+        if 'resources' not in body or not body['resources']:
+            return []
+        return body['resources']
+
+    def _command(self, *args, **kwargs):
+        response = self.client.command(*args, **kwargs)
         body = response['body']
         if 'errors' in body and len(body['errors']) > 0:
             raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
-        if 'resources' in body and body['resources']:
-            return (Stream(s) for s in body['resources'])
-        raise ApiError(
-            'Falcon Streaming API not discovered. This may be caused by second instance of this application already '
-            'running in your environment with the same application_id={}, or by missing streaming API capability.'
-            .format(app_id))
-
-    def refresh_streaming_session(self, app_id, stream):
-        response = self.client.command(action='refreshActiveStreamSession',
-                                       partition=stream.partition,
-                                       parameters={
-                                           'action_name': 'refresh_active_stream_session',
-                                           'appId': app_id
-                                       })
         if 'status_code' not in response or response['status_code'] != 200:
-            raise ApiError(
-                'Could not refresh Falcon Streaming API. Response was: {}'.format(response)
-            )
-
-
-class Stream(dict):
-    @property
-    def token(self):
-        return self['sessionToken']['token']
-
-    @property
-    def url(self):
-        return self['dataFeedURL']
-
-    @property
-    def refresh_interval(self):
-        return self['refreshActiveSessionInterval']
-
-    @property
-    def partition(self):
-        match = re.match(r'.*\/sensors\/entities\/datafeed-actions/v1/([0-9a-zA-Z]+)\?',
-                         self['refreshActiveSessionURL'])
-        if not match or not match.group(1):
-            raise Exception('Cannot parse stream partition from stream data: {}'.format(self))
-        return match.group(1)
+            raise ApiError('Unexpected response code from Falcon API. Response was: {}'.format(response))
+        return response

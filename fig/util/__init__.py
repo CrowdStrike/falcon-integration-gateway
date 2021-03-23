@@ -1,4 +1,4 @@
 from .threading import StoppableThread
 
 
-__ALL__ = [StoppableThread]
+__all__ = ['StoppableThread']
