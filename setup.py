@@ -22,6 +22,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'crowdstrike-falconpy',
+        'google-cloud-securitycenter',
+        'google-cloud-resource-manager',
     ],
     extras_require={
         'devel': [
