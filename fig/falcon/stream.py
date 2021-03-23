@@ -5,7 +5,7 @@ import threading
 import requests
 
 from .api import FalconAPI, Stream
-from .event import Event
+from .models import Event
 from ..util import StoppableThread
 from ..log import log
 from ..config import config
