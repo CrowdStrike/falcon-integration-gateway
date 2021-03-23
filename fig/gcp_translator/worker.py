@@ -1,7 +1,7 @@
 import threading
 from ..log import log
 from .errors import EventDataError
-from .translation import Translation
+from .falcon_event import FalconEvent
 
 
 class GCPWorkerThread(threading.Thread):
@@ -23,8 +23,8 @@ class GCPWorkerThread(threading.Thread):
                 self.input_queue.put(event)
 
     def process_event(self, event):
-        translation = Translation(event, self.cache)
-        if translation.cloud_provider is None:
+        falcon_event = FalconEvent(event, self.cache)
+        if falcon_event.cloud_provider is None:
             return
         log.info("Processing detection: %s", event['event']['DetectDescription'])
-        log.info("    Service provider was: %s", translation.cloud_provider)
+        log.info("    Service provider was: %s", falcon_event.cloud_provider)

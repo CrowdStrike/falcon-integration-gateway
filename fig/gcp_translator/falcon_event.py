@@ -2,7 +2,7 @@ from ..falcon import Event
 from .cache import TranslationCache
 
 
-class Translation():
+class FalconEvent():
     def __init__(self, original_event: Event, cache: TranslationCache):
         self.original_event = original_event
         self.cache = cache
