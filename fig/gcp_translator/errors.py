@@ -4,3 +4,7 @@ class GCPTranslatorError(Exception):
 
 class EventDataError(GCPTranslatorError):
     pass
+
+
+class FalconAPIDataError(GCPTranslatorError):
+    pass

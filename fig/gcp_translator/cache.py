@@ -1,4 +1,4 @@
-from .errors import EventDataError
+from .errors import EventDataError, FalconAPIDataError
 
 
 class TranslationCache():
@@ -16,6 +16,12 @@ class FalconCache():
             return EventDataError("Cannot process event. SensorId field is missing: ")
 
         if sensor_id not in self._host_detail:
-            self._host_detail[sensor_id] = self.falcon_api.device_details(sensor_id)
+            resources = self.falcon_api.device_details(sensor_id)
+            if len(resources) > 1:
+                raise FalconAPIDataError(
+                    'Cannot process event for device: {}, multiple devices exists'.format(sensor_id))
+            if len(resources) == 0:
+                raise FalconAPIDataError('Cannot process event for device {}, device not known'.format(sensor_id))
+            self._host_detail[sensor_id] = self.falcon_api.device_details(sensor_id)[0]
 
         return self._host_detail[sensor_id]
