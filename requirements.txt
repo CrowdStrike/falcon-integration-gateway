@@ -1,1 +1,2 @@
 crowdstrike-falconpy
+google-cloud-securitycenter
