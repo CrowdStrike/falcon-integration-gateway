@@ -24,6 +24,7 @@ class GCPWorkerThread(threading.Thread):
 
     def process_event(self, event):
         translation = Translation(event, self.cache)
+        if translation.cloud_provider is None:
+            return
         log.info("Processing detection: %s", event['event']['DetectDescription'])
-        if 'service_provider' in translation.device_details:
-            log.info("    Service provider was: %s", translation.device_details['service_provider'])
+        log.info("    Service provider was: %s", translation.cloud_provider)
