@@ -25,6 +25,10 @@ class Event(dict):
     def creation_time(self):
         return self.parse_cs_time(self['metadata']['eventCreationTime'])
 
+    @property
+    def sensor_id(self):
+        return self['event']['SensorId']
+
     @classmethod
     def parse_cs_time(cls, cs_timestamp):
         return datetime.datetime.utcfromtimestamp(float(cs_timestamp) / 1000.0)

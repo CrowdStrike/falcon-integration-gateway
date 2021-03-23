@@ -50,6 +50,20 @@ class FalconAPI():
                 'Could not refresh Falcon Streaming API. Response was: {}'.format(response)
             )
 
+    def device_details(self, device_id):
+        response = self.client.command(action='GetDeviceDetails', ids=[device_id])
+        body = response['body']
+        if 'errors' in body and len(body['errors']) > 0:
+            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
+        if 'status_code' not in response or response['status_code'] != 200:
+            raise ApiError(
+                'Could not get host details from Falcon API. Response was: {}'.format(response)
+            )
+        if 'resources' in body and body['resources']:
+            return body['resources']
+
+        raise ApiError('No device detail found for {}: {}'.format(device_id, response))
+
 
 class Stream(dict):
     @property
