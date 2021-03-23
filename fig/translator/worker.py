@@ -4,7 +4,7 @@ from .errors import EventDataError
 from .falcon_event import FalconEvent
 
 
-class GCPWorkerThread(threading.Thread):
+class WorkerThread(threading.Thread):
     def __init__(self, input_queue, translation_cache, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'gcp_worker')
         super().__init__(*args, **kwargs)

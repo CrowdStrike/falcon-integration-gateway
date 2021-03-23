@@ -1,5 +1,5 @@
 from .falcon import FalconAPI, StreamManagementThread
-from .gcp_translator import TranslationCache, GCPWorkerThread
+from .translator import TranslationCache, WorkerThread
 from .queue import falcon_events
 from .config import config
 
@@ -13,5 +13,5 @@ if __name__ == "__main__":
     translation_cache = TranslationCache(FalconAPI())
 
     StreamManagementThread(output_queue=falcon_events).start()
-    GCPWorkerThread(input_queue=falcon_events, translation_cache=translation_cache,
-                    daemon=True).start()  # TODO: Run multiple reader threads in pool
+    WorkerThread(input_queue=falcon_events, translation_cache=translation_cache,
+                 daemon=True).start()  # TODO: Run multiple reader threads in pool
