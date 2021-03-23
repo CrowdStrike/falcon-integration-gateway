@@ -37,24 +37,16 @@ class FalconAPI():
             .format(app_id))
 
     def refresh_streaming_session(self, app_id, stream):
-        response = self._command(action='refreshActiveStreamSession',
-                                 partition=stream.partition,
-                                 parameters={
-                                     'action_name': 'refresh_active_stream_session',
-                                     'appId': app_id
-                                 })
-        if 'status_code' not in response or response['status_code'] != 200:
-            raise ApiError(
-                'Could not refresh Falcon Streaming API. Response was: {}'.format(response)
-            )
+        self._command(action='refreshActiveStreamSession',
+                      partition=stream.partition,
+                      parameters={
+                          'action_name': 'refresh_active_stream_session',
+                          'appId': app_id
+                      })
 
     def device_details(self, device_id):
         response = self._command(action='GetDeviceDetails', ids=[device_id])
         body = response['body']
-        if 'status_code' not in response or response['status_code'] != 200:
-            raise ApiError(
-                'Could not get host details from Falcon API. Response was: {}'.format(response)
-            )
         if 'resources' in body and body['resources']:
             return body['resources']
 
@@ -65,6 +57,8 @@ class FalconAPI():
         body = response['body']
         if 'errors' in body and len(body['errors']) > 0:
             raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
+        if 'status_code' not in response or response['status_code'] != 200:
+            raise ApiError('Unexpected response code from Falcon API. Response was: {}'.format(response))
         return response
 
 
