@@ -17,3 +17,15 @@ for section, var, envvar in __ENV_DEFAULTS:
     value = os.getenv(envvar)
     if value:
         config.set(section, var, value)
+
+
+def validate_config():
+    for section, var, envvar in __ENV_DEFAULTS:
+        try:
+            config.get(section, var)
+        except configparser.NoOptionError:
+            raise Exception(
+                "Please provide environment variable {} or configuration option {}.{}".format(
+                    envvar, section, var))
+
+    assert int(config.get('events', 'severity_threshold')) in range(0, 5)
