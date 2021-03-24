@@ -141,4 +141,4 @@ class Submitter():
         return self.event.cloud_provider_account_id
 
 
-__all__ = ['api', 'APIDataError', 'AssetNotFound', 'Cache', 'Submitter']
+__all__ = ['APIDataError', 'AssetNotFound', 'Cache', 'Submitter']
