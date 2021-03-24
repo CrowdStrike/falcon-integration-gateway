@@ -1,4 +1,4 @@
-from .errors import EventDataError, FalconAPIDataError, GCPAPIDataError
+from .errors import EventDataError, FalconAPIDataError, GCPAPIDataError, GCPAssetNotFound
 from ..cloud_providers import gcp
 
 
@@ -33,6 +33,23 @@ class GCPCache():
     def __init__(self):
         self._projects = {}
         self._sources = {}
+        self._assets = {}
+
+    def asset(self, event):
+        asset_id = event.device_details['instance_id']
+
+        if asset_id not in self._assets:
+            scc = gcp.SecurityCommandCenter()
+            project_number = event.cloud_provider_account_id
+            assets = scc.get_asset(project_number, event.device_details['instance_id'])
+            if len(assets) == 1:
+                self._assets[asset_id] = assets[0]
+            elif len(assets) == 0:
+                raise GCPAssetNotFound("Asset {} not found in GCP Project {}".format(asset_id, project_number))
+            else:
+                raise GCPAPIDataError(
+                    "Multiple assets found with ID={} within GCP Project {}".format(asset_id, project_number))
+        return self._assets[asset_id]
 
     def source(self, org_id):
         if org_id not in self._sources:

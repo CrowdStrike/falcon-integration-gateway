@@ -12,3 +12,7 @@ class FalconAPIDataError(TranslatorError):
 
 class GCPAPIDataError(TranslatorError):
     pass
+
+
+class GCPAssetNotFound(GCPAPIDataError):
+    pass
