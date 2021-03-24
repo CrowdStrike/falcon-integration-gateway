@@ -18,3 +18,15 @@ class FalconEvent():
     @property
     def cloud_provider_account_id(self):
         return self.device_details.get('service_provider_account_id')
+
+    @property
+    def falcon_link(self):
+        return self.original_event['event']['FalconHostLink']
+
+    @property
+    def event_id(self):
+        return self.original_event['event']['DetectId']
+
+    @property
+    def time(self):
+        return self.original_event.creation_time

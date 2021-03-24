@@ -73,4 +73,6 @@ TODO
    ```
 
 ### Developer Resources
+ - [Google Cloud Python Client](https://github.com/googleapis/google-cloud-python)
+ - [Understanding Google Cloud Resource hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy)
  - [GCP SCC API Explorer](https://developers.google.com/apis-explorer/#p/securitycenter/v1/)

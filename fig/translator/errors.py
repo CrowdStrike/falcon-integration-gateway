@@ -1,10 +1,18 @@
-class GCPTranslatorError(Exception):
+class TranslatorError(Exception):
     pass
 
 
-class EventDataError(GCPTranslatorError):
+class EventDataError(TranslatorError):
     pass
 
 
-class FalconAPIDataError(GCPTranslatorError):
+class FalconAPIDataError(TranslatorError):
+    pass
+
+
+class GCPAPIDataError(TranslatorError):
+    pass
+
+
+class GCPAssetNotFound(GCPAPIDataError):
     pass
