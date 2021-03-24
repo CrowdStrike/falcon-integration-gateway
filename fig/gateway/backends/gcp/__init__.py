@@ -69,7 +69,7 @@ class Submitter():
 
     def submit(self):
         log.info("Processing detection: %s", self.event.original_event['event']['DetectDescription'])
-        if not self.cache.gcp.project_number_accesible(self.gcp_project_number):
+        if not self.cache.project_number_accesible(self.gcp_project_number):
             log.warning(
                 "Falcon Detection belongs to project %s, but google service account has no acess to this project",
                 self.gcp_project_number)
@@ -107,7 +107,7 @@ class Submitter():
 
     @property
     def asset(self):
-        return self.cache.gcp.asset(self.event)
+        return self.cache.asset(self.event)
 
     @property
     def finding_path(self):
@@ -128,12 +128,12 @@ class Submitter():
     @property
     @lru_cache
     def source(self):
-        return self.cache.gcp.source(self.org_id)
+        return self.cache.source(self.org_id)
 
     @property
     @lru_cache
     def org_id(self):
-        return self.cache.gcp.organization_parent_of(self.gcp_project_number)
+        return self.cache.organization_parent_of(self.gcp_project_number)
 
     @property
     @lru_cache
@@ -141,4 +141,12 @@ class Submitter():
         return self.event.cloud_provider_account_id
 
 
-__all__ = ['APIDataError', 'AssetNotFound', 'Cache', 'Submitter']
+class Runtime():
+    def __init__(self):
+        self.cache = Cache()
+
+    def process(self, falcon_event):
+        Submitter(self.cache, falcon_event).submit()
+
+
+__all__ = ['Runtime']

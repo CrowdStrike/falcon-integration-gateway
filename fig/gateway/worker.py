@@ -29,4 +29,4 @@ class WorkerThread(threading.Thread):
         if falcon_event.cloud_provider != 'GCP':
             return  # TODO implement other providers
 
-        gcp.Submitter(self.cache, falcon_event).submit()
+        gcp.Runtime().process(falcon_event)

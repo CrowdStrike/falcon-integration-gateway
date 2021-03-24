@@ -1,11 +1,9 @@
 from .errors import EventDataError, FalconAPIDataError
-from .backends import gcp
 
 
 class TranslationCache():
     def __init__(self, falcon_api):
         self.falcon = FalconCache(falcon_api)
-        self.gcp = gcp.Cache()
 
 
 class FalconCache():
