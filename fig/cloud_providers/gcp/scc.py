@@ -12,6 +12,13 @@ class SecurityCommandCenter():
     def __init__(self):
         self.client = securitycenter.SecurityCenterClient()
 
+    def list_instances(self, project_number):
+        asset_iterator = self.client.list_assets(request={
+            "parent": self.client.common_project_path(project_number),
+            'filter': 'security_center_properties.resource_type=' + '"google.compute.Instance"',
+        })
+        return list(asset_iterator)
+
     def get_fig_source(self, org_id):
         for i, source in enumerate(self.client.list_sources(request={"parent": self._org_name(org_id)})):
             if source.display_name == self.FIG_SOURCE_NAME:
