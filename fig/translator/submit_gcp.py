@@ -17,12 +17,12 @@ class GCPSCC():
                 "Falcon Detection belongs to project %s, but google service account has no acess to this project",
                 self.gcp_project_number)
             return
+
         try:
-            print(self.finding)
+            self.finding()
         except GCPAssetNotFound:
             log.warning("Corresponding asset not found in GCP Project")
 
-    @property
     def finding(self):
         return Finding(
             name=self.finding_path,
@@ -54,7 +54,6 @@ class GCPSCC():
 
     @property
     def finding_path(self):
-        # name := fmt.Sprintf("%s/findings/%s", parent, d.Event.DetectID)
         return SecurityCenterClient.finding_path(self.org_id, self.source_id, self.finding_id)
 
     @property

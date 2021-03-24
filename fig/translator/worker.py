@@ -7,7 +7,7 @@ from .submit_gcp import GCPSCC
 
 class WorkerThread(threading.Thread):
     def __init__(self, input_queue, translation_cache, *args, **kwargs):
-        kwargs['name'] = kwargs.get('name', 'gcp_worker')
+        kwargs['name'] = kwargs.get('name', 'worker')
         super().__init__(*args, **kwargs)
         self.input_queue = input_queue
         self.cache = translation_cache
