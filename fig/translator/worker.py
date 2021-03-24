@@ -21,7 +21,6 @@ class WorkerThread(threading.Thread):
                 log.exception("Could not translate event to GCP SCC")
             except Exception:  # pylint: disable=W0703
                 log.exception("Error occurred while processing event %s", event)
-                self.input_queue.put(event)
 
     def process_event(self, event):
         falcon_event = FalconEvent(event, self.cache)
