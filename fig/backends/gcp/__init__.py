@@ -1,5 +1,6 @@
+import re
 from functools import lru_cache
-from google.cloud.securitycenter import Finding, SecurityCenterClient
+from google.cloud.securitycenter import Asset, Finding, SecurityCenterClient
 from ...log import log
 from . import api
 
@@ -17,6 +18,7 @@ class Cache():
         self._projects = {}
         self._sources = {}
         self._assets = {}
+        self._findings = {}
 
     def asset(self, event):
         asset_id = event.device_details['instance_id']
@@ -26,7 +28,7 @@ class Cache():
             project_number = event.cloud_provider_account_id
             assets = scc.get_asset(project_number, event.device_details['instance_id'])
             if len(assets) == 1:
-                self._assets[asset_id] = assets[0]
+                self._assets[asset_id] = assets[0].asset
             elif len(assets) == 0:
                 raise AssetNotFound("Asset {} not found in GCP Project {}".format(asset_id, project_number))
             else:
@@ -61,6 +63,18 @@ class Cache():
     def _refresh_projects(self):
         self._projects = api.projects()
 
+    def submit_finding(self, finding_id, finding: Finding, org_id: str):
+        if org_id not in self._findings:
+            self._findings[org_id] = {}
+
+        if finding_id in self._findings[org_id]:
+            return None
+
+        scc = api.SecurityCommandCenter()
+        finding = scc.get_or_create_finding(finding_id, finding, self.source(org_id))
+        self._findings[org_id][finding_id] = finding
+        return finding
+
 
 class Submitter():
     def __init__(self, cache, event):
@@ -76,9 +90,11 @@ class Submitter():
             return
 
         try:
-            self.finding()
+            finding = self.finding()
         except AssetNotFound:
             log.warning("Corresponding asset not found in GCP Project")
+
+        self.submit_finding(finding)
 
     def finding(self):
         return Finding(
@@ -88,9 +104,7 @@ class Submitter():
             state=Finding.State.ACTIVE,
             external_uri=self.event.falcon_link,
             event_time=self.event.time,
-            # TODO: The additional taxonomy group within findings from a given source. This field is immutable after
-            # creation time. Example: "XSS_FLASH_INJECTION".
-            # category="MEDIUM_RISK_ONE",
+            category=self.event_category,
 
             # TODO: Source specific properties. These properties are managed by the source that writes the finding.
             # The key names in the source_properties map must be between 1 and 255 characters, and must start with
@@ -102,11 +116,19 @@ class Submitter():
         )
 
     @property
-    def asset_path(self):
-        return SecurityCenterClient.asset_path(self.org_id, self.asset)
+    def event_category(self):
+        return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(
+            self.event.original_event['event']['Tactic'], self.event.original_event['event']['Technique'])
+
+    def submit_finding(self, finding):
+        return self.cache.submit_finding(self.finding_id, finding, self.org_id)
 
     @property
-    def asset(self):
+    def asset_path(self):
+        return self.asset.name
+
+    @property
+    def asset(self) -> Asset:
         return self.cache.asset(self.event)
 
     @property
@@ -115,7 +137,8 @@ class Submitter():
 
     @property
     def finding_id(self):
-        return self.event.event_id
+        fid = re.sub('^ldt-', '', self.event.event_id)
+        return re.sub('[^0-9a-zA-Z]+', '', fid)[0:32]
 
     @property
     def source_path(self):
@@ -123,7 +146,8 @@ class Submitter():
 
     @property
     def source_id(self):
-        return self.source.name
+        parsed = SecurityCenterClient.parse_source_path(self.source.name)
+        return parsed['source']
 
     @property
     @lru_cache

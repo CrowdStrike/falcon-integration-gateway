@@ -1,5 +1,6 @@
 import threading
 from google.cloud import securitycenter
+from google.cloud.securitycenter import CreateFindingRequest, Finding, Source
 from ....log import log
 
 
@@ -54,6 +55,31 @@ class SecurityCommandCenter():
                 },
             }
         )
+
+    def get_or_create_finding(self, finding_id, finding: Finding, source: Source):
+        existing = self.get_finding(finding, source)
+        if len(existing) == 0:
+            return [self.create_finding(finding_id, finding, source)]
+        return existing[0]
+
+    def get_finding(self, finding: Finding, source: Source):
+        _ = finding
+        return list(self.client.list_findings(
+            request={
+                'parent': source.name,
+                'filter': 'name="{}"'.format(finding.name),
+            }))
+
+    def create_finding(self, finding_id, finding: Finding, source: Source):
+        log.info("Creating new Finding in GCP Security Command Center")
+        created_finding = self.client.create_finding(
+            request=CreateFindingRequest(
+                parent=source.name,
+                finding_id=finding_id,
+                finding=finding,
+            )
+        )
+        return created_finding
 
     @classmethod
     def _org_name(cls, org_id):
