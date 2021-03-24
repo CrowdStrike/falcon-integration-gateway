@@ -32,6 +32,13 @@ class FalconCache():
 class GCPCache():
     def __init__(self):
         self._projects = {}
+        self._sources = {}
+
+    def source(self, org_id):
+        if org_id not in self._sources:
+            scc = gcp.SecurityCommandCenter()
+            self._sources[org_id] = scc.get_or_create_fig_source(org_id)
+        return self._sources[org_id]
 
     def organization_parent_of(self, project_id):
         project = self.projects[project_id]
