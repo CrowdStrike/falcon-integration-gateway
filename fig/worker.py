@@ -4,11 +4,11 @@ from .falcon_data import FalconEvent, EventDataError
 
 
 class WorkerThread(threading.Thread):
-    def __init__(self, input_queue, translation_cache, backends, *args, **kwargs):
+    def __init__(self, input_queue, falcon_cache, backends, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'worker')
         super().__init__(*args, **kwargs)
         self.input_queue = input_queue
-        self.cache = translation_cache
+        self.cache = falcon_cache
         self.backends = backends
 
     def run(self):

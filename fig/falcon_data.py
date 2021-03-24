@@ -13,11 +13,6 @@ class FalconAPIDataError(TranslatorError):
     pass
 
 
-class TranslationCache():
-    def __init__(self, falcon_api):
-        self.falcon = FalconCache(falcon_api)
-
-
 class FalconCache():
     def __init__(self, falcon_api):
         self.falcon_api = falcon_api
@@ -40,13 +35,13 @@ class FalconCache():
 
 
 class FalconEvent():
-    def __init__(self, original_event: Event, cache: TranslationCache):
+    def __init__(self, original_event: Event, cache: FalconCache):
         self.original_event = original_event
         self.cache = cache
 
     @property
     def device_details(self):
-        return self.cache.falcon.device_details(self.original_event.sensor_id)
+        return self.cache.device_details(self.original_event.sensor_id)
 
     @property
     def cloud_provider(self):
