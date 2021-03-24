@@ -1,5 +1,5 @@
 from .falcon import FalconAPI, StreamManagementThread
-from .translator import TranslationCache, WorkerThread
+from .gateway import TranslationCache, WorkerThread
 from .queue import falcon_events
 from .config import config
 
