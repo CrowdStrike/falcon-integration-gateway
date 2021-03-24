@@ -1,5 +1,4 @@
 from .errors import EventDataError, FalconAPIDataError
-from ..cloud_providers import gcp as gcp_api
 from .backends import gcp
 
 
@@ -40,7 +39,7 @@ class GCPCache():
         asset_id = event.device_details['instance_id']
 
         if asset_id not in self._assets:
-            scc = gcp_api.SecurityCommandCenter()
+            scc = gcp.api.SecurityCommandCenter()
             project_number = event.cloud_provider_account_id
             assets = scc.get_asset(project_number, event.device_details['instance_id'])
             if len(assets) == 1:
@@ -54,7 +53,7 @@ class GCPCache():
 
     def source(self, org_id):
         if org_id not in self._sources:
-            scc = gcp_api.SecurityCommandCenter()
+            scc = gcp.api.SecurityCommandCenter()
             self._sources[org_id] = scc.get_or_create_fig_source(org_id)
         return self._sources[org_id]
 
@@ -77,4 +76,4 @@ class GCPCache():
         return self._projects
 
     def _refresh_projects(self):
-        self._projects = gcp_api.projects()
+        self._projects = gcp.api.projects()

@@ -1,6 +1,6 @@
 import threading
 from google.cloud import securitycenter
-from ...log import log
+from .....log import log
 
 
 _sources_lock = threading.Lock()
@@ -27,9 +27,10 @@ class SecurityCommandCenter():
         return list(asset_iterator)
 
     def get_fig_source(self, org_id):
-        for i, source in enumerate(self.client.list_sources(request={"parent": self._org_name(org_id)})):
+        for _, source in enumerate(self.client.list_sources(request={"parent": self._org_name(org_id)})):
             if source.display_name == self.FIG_SOURCE_NAME:
                 return source
+        return None
 
     def get_or_create_fig_source(self, org_id):
         source = self.get_fig_source(org_id)
