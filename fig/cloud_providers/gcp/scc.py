@@ -12,6 +12,13 @@ class SecurityCommandCenter():
     def __init__(self):
         self.client = securitycenter.SecurityCenterClient()
 
+    def get_asset(self, project_number, asset_id):
+        asset_iterator = self.client.list_assets(request={
+            "parent": self.client.common_project_path(project_number),
+            'filter': 'resource_properties.id="{}"'.format(asset_id)
+        })
+        return list(asset_iterator)
+
     def list_instances(self, project_number):
         asset_iterator = self.client.list_assets(request={
             "parent": self.client.common_project_path(project_number),
