@@ -1,4 +1,4 @@
-from ..falcon import Event
+from .falcon import Event
 
 
 class TranslatorError(Exception):

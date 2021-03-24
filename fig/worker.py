@@ -1,5 +1,5 @@
 import threading
-from ..log import log
+from .log import log
 from .falcon_data import FalconEvent, EventDataError
 
 

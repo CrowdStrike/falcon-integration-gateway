@@ -1,8 +1,9 @@
 from .falcon import FalconAPI, StreamManagementThread
-from .gateway import TranslationCache, WorkerThread
+from .worker import WorkerThread
 from .queue import falcon_events
 from .config import config
-from .gateway.backends import Backends
+from .backends import Backends
+from .falcon_data import TranslationCache
 
 
 if __name__ == "__main__":

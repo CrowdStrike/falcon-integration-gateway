@@ -1,6 +1,6 @@
 import threading
 from google.cloud import securitycenter
-from .....log import log
+from ....log import log
 
 
 _sources_lock = threading.Lock()

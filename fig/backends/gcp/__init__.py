@@ -1,6 +1,6 @@
 from functools import lru_cache
 from google.cloud.securitycenter import Finding, SecurityCenterClient
-from ....log import log
+from ...log import log
 from . import api
 
 
