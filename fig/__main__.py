@@ -2,6 +2,7 @@ from .falcon import FalconAPI, StreamManagementThread
 from .gateway import TranslationCache, WorkerThread
 from .queue import falcon_events
 from .config import config
+from .gateway.backends import Backends
 
 
 if __name__ == "__main__":
@@ -11,7 +12,10 @@ if __name__ == "__main__":
     config.validate()
 
     translation_cache = TranslationCache(FalconAPI())
+    backends = Backends()
 
     StreamManagementThread(output_queue=falcon_events).start()
-    WorkerThread(input_queue=falcon_events, translation_cache=translation_cache,
+    WorkerThread(input_queue=falcon_events,
+                 translation_cache=translation_cache,
+                 backends=Backends(),
                  daemon=True).start()  # TODO: Run multiple reader threads in pool
