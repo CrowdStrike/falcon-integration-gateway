@@ -1,7 +1,6 @@
 import threading
 from ..log import log
-from .errors import EventDataError
-from .falcon_event import FalconEvent
+from .falcon_data import FalconEvent, EventDataError
 
 
 class WorkerThread(threading.Thread):

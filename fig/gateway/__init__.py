@@ -1,4 +1,4 @@
 from .worker import WorkerThread
-from .cache import TranslationCache
+from .falcon_data import TranslationCache
 
 __all__ = ['TranslationCache', 'WorkerThread']
