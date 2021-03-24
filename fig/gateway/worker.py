@@ -2,7 +2,7 @@ import threading
 from ..log import log
 from .errors import EventDataError
 from .falcon_event import FalconEvent
-from .submit_gcp import GCPSCC
+from .backends import gcp
 
 
 class WorkerThread(threading.Thread):
@@ -29,4 +29,4 @@ class WorkerThread(threading.Thread):
         if falcon_event.cloud_provider != 'GCP':
             return  # TODO implement other providers
 
-        GCPSCC(self.cache, falcon_event).submit()
+        gcp.Submitter(self.cache, falcon_event).submit()
