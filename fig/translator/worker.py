@@ -30,4 +30,4 @@ class WorkerThread(threading.Thread):
         if falcon_event.cloud_provider != 'GCP':
             return  # TODO implement other providers
 
-        GCPSCC(self.cache).submit(falcon_event)
+        GCPSCC(self.cache, falcon_event).submit()
