@@ -8,11 +8,3 @@ class EventDataError(TranslatorError):
 
 class FalconAPIDataError(TranslatorError):
     pass
-
-
-class GCPAPIDataError(TranslatorError):
-    pass
-
-
-class GCPAssetNotFound(GCPAPIDataError):
-    pass

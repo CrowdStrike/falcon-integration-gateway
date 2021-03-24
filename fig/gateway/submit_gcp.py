@@ -1,8 +1,8 @@
 from functools import lru_cache
 from google.cloud.securitycenter import Finding, SecurityCenterClient
 from ..log import log
-from .errors import GCPAssetNotFound
 from .falcon_event import FalconEvent
+from .backends import gcp
 
 
 class GCPSCC():
@@ -20,7 +20,7 @@ class GCPSCC():
 
         try:
             self.finding()
-        except GCPAssetNotFound:
+        except gcp.AssetNotFound:
             log.warning("Corresponding asset not found in GCP Project")
 
     def finding(self):

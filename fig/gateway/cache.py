@@ -1,5 +1,6 @@
-from .errors import EventDataError, FalconAPIDataError, GCPAPIDataError, GCPAssetNotFound
-from ..cloud_providers import gcp
+from .errors import EventDataError, FalconAPIDataError
+from ..cloud_providers import gcp as gcp_api
+from .backends import gcp
 
 
 class TranslationCache():
@@ -39,28 +40,28 @@ class GCPCache():
         asset_id = event.device_details['instance_id']
 
         if asset_id not in self._assets:
-            scc = gcp.SecurityCommandCenter()
+            scc = gcp_api.SecurityCommandCenter()
             project_number = event.cloud_provider_account_id
             assets = scc.get_asset(project_number, event.device_details['instance_id'])
             if len(assets) == 1:
                 self._assets[asset_id] = assets[0]
             elif len(assets) == 0:
-                raise GCPAssetNotFound("Asset {} not found in GCP Project {}".format(asset_id, project_number))
+                raise gcp.AssetNotFound("Asset {} not found in GCP Project {}".format(asset_id, project_number))
             else:
-                raise GCPAPIDataError(
+                raise gcp.APIDataError(
                     "Multiple assets found with ID={} within GCP Project {}".format(asset_id, project_number))
         return self._assets[asset_id]
 
     def source(self, org_id):
         if org_id not in self._sources:
-            scc = gcp.SecurityCommandCenter()
+            scc = gcp_api.SecurityCommandCenter()
             self._sources[org_id] = scc.get_or_create_fig_source(org_id)
         return self._sources[org_id]
 
     def organization_parent_of(self, project_id):
         project = self.projects[project_id]
         if 'type' not in project.parent or project.parent['type'] != 'organization':
-            raise GCPAPIDataError('Could not determine parent organization for gcp project {}'.format(project_id))
+            raise gcp.APIDataError('Could not determine parent organization for gcp project {}'.format(project_id))
         return project.parent['id']
 
     def project_number_accesible(self, project_number: int) -> bool:
@@ -76,4 +77,4 @@ class GCPCache():
         return self._projects
 
     def _refresh_projects(self):
-        self._projects = gcp.projects()
+        self._projects = gcp_api.projects()
