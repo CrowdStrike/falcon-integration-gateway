@@ -113,6 +113,7 @@ class Submitter():
             # The key names in the source_properties map must be between 1 and 255 characters, and must start with
             # a letter and contain alphanumeric characters or underscores only.
             source_properties={
+                'FalconEventId': self.event.event_id,
                 'ComputerName': self.event.original_event['event']['ComputerName'],
                 'Description': self.event.detect_description,
                 'ProcessName': self.event.original_event['event']['FileName'],
@@ -127,6 +128,7 @@ class Submitter():
         # ART finding.severity=self.original_event['event']['Severity']
         # ART finding.source_properties.severity = self.original_event['event']['Severity']
         # ART del(finding.source_properties.CommandLine)
+        # ART del(finding.source_properties.FalconEventId)
 
     @property
     def event_category(self):
