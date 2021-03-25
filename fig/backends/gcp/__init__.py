@@ -21,12 +21,12 @@ class Cache():
         self._findings = {}
 
     def asset(self, event):
-        asset_id = event.device_details['instance_id']
+        asset_id = event.instance_id
 
         if asset_id not in self._assets:
             scc = api.SecurityCommandCenter()
             project_number = event.cloud_provider_account_id
-            assets = scc.get_asset(project_number, event.device_details['instance_id'])
+            assets = scc.get_asset(project_number, asset_id)
             if len(assets) == 1:
                 self._assets[asset_id] = assets[0].asset
             elif len(assets) == 0:
@@ -82,7 +82,7 @@ class Submitter():
         self.event = event
 
     def submit(self):
-        log.info("Processing detection: %s", self.event.original_event['event']['DetectDescription'])
+        log.info("Processing detection: %s", self.event.detect_description)
         if not self.cache.project_number_accesible(self.gcp_project_number):
             log.warning(
                 "Falcon Detection belongs to project %s, but google service account has no acess to this project",
@@ -100,25 +100,45 @@ class Submitter():
         return Finding(
             name=self.finding_path,
             parent=self.source_path,
-            resource_name=self.asset_path,
+            resource_name=self.asset.security_center_properties.resource_name,
             state=Finding.State.ACTIVE,
             external_uri=self.event.falcon_link,
             event_time=self.event.time,
             category=self.event_category,
+            severity=self.severity.upper(),
 
             # TODO: Source specific properties. These properties are managed by the source that writes the finding.
             # The key names in the source_properties map must be between 1 and 255 characters, and must start with
             # a letter and contain alphanumeric characters or underscores only.
-            # source_properties= ?,
-
-            # TODO: The severity of the finding. This field is managed by the source that writes the finding.
-            # severity= ?
+            source_properties={
+                'ComputerName': self.event.original_event['event']['ComputerName'],
+                'Description': self.event.detect_description,
+                'ProcessName': self.event.original_event['event']['FileName'],
+                'ProcessPath': self.event.original_event['event']['FilePath'],
+                'Severity': self.severity,
+                'Title': 'Falcon Alert. Instance {}'.format(self.event.instance_id),
+                'Category': self.event_category,
+                'CommandLine': self.event.original_event['event']['CommandLine']
+            }
         )
+        # ART Uncomment these fields to force behavior parity with the prior art. Don't.
+        # ART finding.severity=self.original_event['event']['Severity']
+        # ART finding.source_properties.severity = self.original_event['event']['Severity']
+        # ART del(finding.source_properties.CommandLine)
 
     @property
     def event_category(self):
-        return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(
-            self.event.original_event['event']['Tactic'], self.event.original_event['event']['Technique'])
+        # ART Uncomment the following lines to force behavior parity with the prior art. Don't.
+        # ART tactic = self.event.original_event['event']['Tactic']
+        # ART technique = self.event.original_event['event']['Technique']
+        # ART if tactic and technique:
+        #    return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(tactic, technique)
+        # ART return self.event.detect_description
+        return 'Falcon: ' + self.event.detect_name
+
+    @property
+    def severity(self):
+        return self.event.severity.upper()
 
     def submit_finding(self, finding):
         return self.cache.submit_finding(self.finding_id, finding, self.org_id)

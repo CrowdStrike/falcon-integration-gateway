@@ -1,6 +1,7 @@
 import threading
 from google.cloud import securitycenter
 from google.cloud.securitycenter import CreateFindingRequest, Finding, Source
+from google.protobuf.field_mask_pb2 import FieldMask
 from ....log import log
 
 
@@ -60,7 +61,7 @@ class SecurityCommandCenter():
         existing = self.get_finding(finding, source)
         if len(existing) == 0:
             return [self.create_finding(finding_id, finding, source)]
-        return existing[0]
+        return existing[0].finding
 
     def get_finding(self, finding: Finding, source: Source):
         _ = finding
@@ -80,6 +81,18 @@ class SecurityCommandCenter():
             )
         )
         return created_finding
+
+    def update_finding(self, finding):
+        field_mask = FieldMask(
+            paths=['event_time']
+        )
+        updated_finding = self.client.update_finding(
+            request={
+                "finding": finding,
+                "update_mask": field_mask,
+            }
+        )
+        return updated_finding
 
     @classmethod
     def _org_name(cls, org_id):

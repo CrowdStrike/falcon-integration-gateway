@@ -52,6 +52,10 @@ class FalconEvent():
         return self.device_details.get('service_provider_account_id')
 
     @property
+    def instance_id(self):
+        return self.device_details['instance_id']
+
+    @property
     def falcon_link(self):
         return self.original_event['event']['FalconHostLink']
 
@@ -62,3 +66,15 @@ class FalconEvent():
     @property
     def time(self):
         return self.original_event.creation_time
+
+    @property
+    def severity(self):
+        return self.original_event['event']['SeverityName']
+
+    @property
+    def detect_description(self):
+        return self.original_event['event']['DetectDescription']
+
+    @property
+    def detect_name(self):
+        return self.original_event['event']['DetectName']
