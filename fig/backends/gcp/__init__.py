@@ -108,10 +108,6 @@ class Submitter():
             event_time=self.event.time,
             category=self.event_category,
             severity=self.severity.upper(),
-
-            # TODO: Source specific properties. These properties are managed by the source that writes the finding.
-            # The key names in the source_properties map must be between 1 and 255 characters, and must start with
-            # a letter and contain alphanumeric characters or underscores only.
             source_properties={
                 'FalconEventId': self.event.event_id,
                 'ComputerName': self.event.original_event['event']['ComputerName'],
