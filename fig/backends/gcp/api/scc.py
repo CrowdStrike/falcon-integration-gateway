@@ -61,6 +61,7 @@ class SecurityCommandCenter():
         existing = self.get_finding(finding, source)
         if len(existing) == 0:
             return [self.create_finding(finding_id, finding, source)]
+        log.debug("Finding %s already exists in GCP SCC", finding_id)
         return existing[0].finding
 
     def get_finding(self, finding: Finding, source: Source):
