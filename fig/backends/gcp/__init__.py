@@ -68,8 +68,10 @@ class Cache():
             self._findings[org_id] = {}
 
         if finding_id in self._findings[org_id]:
+            log.debug("Finding %s already exists in GCP SCC", finding_id)
             return None
 
+        log.info("Submitting finding to GCP SCC")
         scc = api.SecurityCommandCenter()
         finding = scc.get_or_create_finding(finding_id, finding, self.source(org_id))
         self._findings[org_id][finding_id] = finding
@@ -106,11 +108,8 @@ class Submitter():
             event_time=self.event.time,
             category=self.event_category,
             severity=self.severity.upper(),
-
-            # TODO: Source specific properties. These properties are managed by the source that writes the finding.
-            # The key names in the source_properties map must be between 1 and 255 characters, and must start with
-            # a letter and contain alphanumeric characters or underscores only.
             source_properties={
+                'FalconEventId': self.event.event_id,
                 'ComputerName': self.event.original_event['event']['ComputerName'],
                 'Description': self.event.detect_description,
                 'ProcessName': self.event.original_event['event']['FileName'],
@@ -125,6 +124,7 @@ class Submitter():
         # ART finding.severity=self.original_event['event']['Severity']
         # ART finding.source_properties.severity = self.original_event['event']['Severity']
         # ART del(finding.source_properties.CommandLine)
+        # ART del(finding.source_properties.FalconEventId)
 
     @property
     def event_category(self):
@@ -157,8 +157,7 @@ class Submitter():
 
     @property
     def finding_id(self):
-        fid = re.sub('^ldt-', '', self.event.event_id)
-        return re.sub('[^0-9a-zA-Z]+', '', fid)[0:32]
+        return re.sub('[^0-9a-zA-Z]+', '', self.event.event_id)[-32:]
 
     @property
     def source_path(self):
