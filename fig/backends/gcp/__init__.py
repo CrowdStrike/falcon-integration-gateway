@@ -157,8 +157,7 @@ class Submitter():
 
     @property
     def finding_id(self):
-        fid = re.sub('^ldt-', '', self.event.event_id)
-        return re.sub('[^0-9a-zA-Z]+', '', fid)[0:32]
+        return re.sub('[^0-9a-zA-Z]+', '', self.event.event_id)[-32:]
 
     @property
     def source_path(self):
