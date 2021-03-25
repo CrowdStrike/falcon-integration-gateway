@@ -134,7 +134,7 @@ class Submitter():
         # ART if tactic and technique:
         #    return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(tactic, technique)
         # ART return self.event.detect_description
-        return 'Falcon: ' + self.event.detect_name
+        return self.event.detect_name
 
     @property
     def severity(self):
