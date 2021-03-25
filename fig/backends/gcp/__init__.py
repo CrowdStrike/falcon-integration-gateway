@@ -82,7 +82,7 @@ class Submitter():
         self.event = event
 
     def submit(self):
-        log.info("Processing detection: %s", self.event.original_event['event']['DetectDescription'])
+        log.info("Processing detection: %s", self.event.detect_description)
         if not self.cache.project_number_accesible(self.gcp_project_number):
             log.warning(
                 "Falcon Detection belongs to project %s, but google service account has no acess to this project",
@@ -100,25 +100,33 @@ class Submitter():
         return Finding(
             name=self.finding_path,
             parent=self.source_path,
-            resource_name=self.asset_path,
+            resource_name=self.asset.security_center_properties.resource_name,
             state=Finding.State.ACTIVE,
             external_uri=self.event.falcon_link,
             event_time=self.event.time,
             category=self.event_category,
+            severity=self.gcp_severity,
 
             # TODO: Source specific properties. These properties are managed by the source that writes the finding.
             # The key names in the source_properties map must be between 1 and 255 characters, and must start with
             # a letter and contain alphanumeric characters or underscores only.
             # source_properties= ?,
 
-            # TODO: The severity of the finding. This field is managed by the source that writes the finding.
-            # severity= ?
         )
+        # Uncomment these fields to force behavior parity with the prior art. Don't.
+        # severity=self.original_event['event']['Severity']
 
     @property
     def event_category(self):
-        return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(
-            self.event.original_event['event']['Tactic'], self.event.original_event['event']['Technique'])
+        tactic = self.event.original_event['event']['Tactic']
+        technique = self.event.original_event['event']['Technique']
+        if tactic and technique:
+            return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(tactic, technique)
+        return self.event.detect_description
+
+    @property
+    def gcp_severity(self):
+        return self.event.severity.upper()
 
     def submit_finding(self, finding):
         return self.cache.submit_finding(self.finding_id, finding, self.org_id)
