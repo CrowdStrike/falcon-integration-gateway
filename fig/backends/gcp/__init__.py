@@ -71,7 +71,6 @@ class Cache():
             log.debug("Finding %s already exists in GCP SCC", finding_id)
             return None
 
-        log.info("Submitting finding to GCP SCC")
         scc = api.SecurityCommandCenter()
         finding = scc.get_or_create_finding(finding_id, finding, self.source(org_id))
         self._findings[org_id][finding_id] = finding
