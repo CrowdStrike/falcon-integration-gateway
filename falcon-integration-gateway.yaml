@@ -75,7 +75,6 @@ spec:
               - name: config-volume
                 mountPath: /app/config/config.ini
                 subPath: config.ini
-            volumeMounts:
               - name: google-application-credentials
                 mountPath: /google-application-credentials.yaml
                 subPath: google-application-credentials.yaml
