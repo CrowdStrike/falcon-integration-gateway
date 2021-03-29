@@ -24,9 +24,8 @@ class Cache():
         asset_id = event.instance_id
 
         if asset_id not in self._assets:
-            scc = api.SecurityCommandCenter()
             project_number = event.cloud_provider_account_id
-            assets = scc.get_asset(project_number, asset_id)
+            assets = self.scc.get_asset(project_number, asset_id)
             if len(assets) == 1:
                 self._assets[asset_id] = assets[0].asset
             elif len(assets) == 0:
@@ -38,8 +37,7 @@ class Cache():
 
     def source(self, org_id):
         if org_id not in self._sources:
-            scc = api.SecurityCommandCenter()
-            self._sources[org_id] = scc.get_or_create_fig_source(org_id)
+            self._sources[org_id] = self.scc.get_or_create_fig_source(org_id)
         return self._sources[org_id]
 
     def organization_parent_of(self, project_id):
@@ -71,11 +69,14 @@ class Cache():
             log.debug("Finding %s already exists in GCP SCC", finding_id)
             return None
 
-        log.info("Submitting finding to GCP SCC")
-        scc = api.SecurityCommandCenter()
-        finding = scc.get_or_create_finding(finding_id, finding, self.source(org_id))
+        finding = self.scc.get_or_create_finding(finding_id, finding, self.source(org_id))
         self._findings[org_id][finding_id] = finding
         return finding
+
+    @property
+    @lru_cache
+    def scc(self):
+        return api.SecurityCommandCenter()
 
 
 class Submitter():
@@ -112,12 +113,14 @@ class Submitter():
                 'FalconEventId': self.event.event_id,
                 'ComputerName': self.event.original_event['event']['ComputerName'],
                 'Description': self.event.detect_description,
-                'ProcessName': self.event.original_event['event']['FileName'],
-                'ProcessPath': self.event.original_event['event']['FilePath'],
                 'Severity': self.severity,
                 'Title': 'Falcon Alert. Instance {}'.format(self.event.instance_id),
                 'Category': self.event_category,
-                'CommandLine': self.event.original_event['event']['CommandLine']
+                'ProcessInformation': {
+                    'ProcessName': self.event.original_event['event']['FileName'],
+                    'ProcessPath': self.event.original_event['event']['FilePath'],
+                    'CommandLine': self.event.original_event['event']['CommandLine']
+                },
             }
         )
         # ART Uncomment these fields to force behavior parity with the prior art. Don't.
@@ -134,7 +137,7 @@ class Submitter():
         # ART if tactic and technique:
         #    return 'Namespace: TTPs, Category: {}, Classifier: {}'.format(tactic, technique)
         # ART return self.event.detect_description
-        return 'Falcon: ' + self.event.detect_name
+        return self.event.detect_name
 
     @property
     def severity(self):

@@ -29,7 +29,14 @@ class FalconCache():
                     'Cannot process event for device: {}, multiple devices exists'.format(sensor_id))
             if len(resources) == 0:
                 raise FalconAPIDataError('Cannot process event for device {}, device not known'.format(sensor_id))
-            self._host_detail[sensor_id] = self.falcon_api.device_details(sensor_id)[0]
+            detail = self.falcon_api.device_details(sensor_id)[0]
+
+            if not detail.get('service_provider'):
+                # No need to cache device detail if we know that it is not relevant to the clouds.
+                # Let's just cache the information about the device existence and irrelevance.
+                detail = {}
+
+            self._host_detail[sensor_id] = detail
 
         return self._host_detail[sensor_id]
 

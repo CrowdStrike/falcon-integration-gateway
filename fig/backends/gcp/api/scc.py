@@ -73,7 +73,7 @@ class SecurityCommandCenter():
             }))
 
     def create_finding(self, finding_id, finding: Finding, source: Source):
-        log.info("Creating new Finding in GCP Security Command Center")
+        log.info('Submitting new finding to GCP Security Command Center (finding_id=%s)', finding_id)
         created_finding = self.client.create_finding(
             request=CreateFindingRequest(
                 parent=source.name,

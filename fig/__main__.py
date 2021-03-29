@@ -16,7 +16,10 @@ if __name__ == "__main__":
     backends = Backends()
 
     StreamManagementThread(output_queue=falcon_events).start()
-    WorkerThread(input_queue=falcon_events,
-                 falcon_cache=falcon_cache,
-                 backends=Backends(),
-                 daemon=True).start()  # TODO: Run multiple reader threads in pool
+
+    for i in range(int(config.get('main', 'worker_threads'))):
+        WorkerThread(name='worker-' + str(i),
+                     input_queue=falcon_events,
+                     falcon_cache=falcon_cache,
+                     backends=Backends(),
+                     daemon=True).start()
