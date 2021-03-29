@@ -77,7 +77,7 @@ spec:
             imagePullPolicy: Always
             volumeMounts:
               - name: config-volume
-                mountPath: /app/config/config.ini
+                mountPath: /fig/config/config.ini
                 subPath: config.ini
               - name: google-application-credentials
                 mountPath: /google-application-credentials.yaml
