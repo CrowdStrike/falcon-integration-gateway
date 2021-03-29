@@ -24,9 +24,8 @@ class Cache():
         asset_id = event.instance_id
 
         if asset_id not in self._assets:
-            scc = api.SecurityCommandCenter()
             project_number = event.cloud_provider_account_id
-            assets = scc.get_asset(project_number, asset_id)
+            assets = self.scc.get_asset(project_number, asset_id)
             if len(assets) == 1:
                 self._assets[asset_id] = assets[0].asset
             elif len(assets) == 0:
@@ -38,8 +37,7 @@ class Cache():
 
     def source(self, org_id):
         if org_id not in self._sources:
-            scc = api.SecurityCommandCenter()
-            self._sources[org_id] = scc.get_or_create_fig_source(org_id)
+            self._sources[org_id] = self.scc.get_or_create_fig_source(org_id)
         return self._sources[org_id]
 
     def organization_parent_of(self, project_id):
@@ -71,10 +69,14 @@ class Cache():
             log.debug("Finding %s already exists in GCP SCC", finding_id)
             return None
 
-        scc = api.SecurityCommandCenter()
-        finding = scc.get_or_create_finding(finding_id, finding, self.source(org_id))
+        finding = self.scc.get_or_create_finding(finding_id, finding, self.source(org_id))
         self._findings[org_id][finding_id] = finding
         return finding
+
+    @property
+    @lru_cache
+    def scc(self):
+        return api.SecurityCommandCenter()
 
 
 class Submitter():
