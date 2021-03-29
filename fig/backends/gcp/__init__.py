@@ -111,12 +111,14 @@ class Submitter():
                 'FalconEventId': self.event.event_id,
                 'ComputerName': self.event.original_event['event']['ComputerName'],
                 'Description': self.event.detect_description,
-                'ProcessName': self.event.original_event['event']['FileName'],
-                'ProcessPath': self.event.original_event['event']['FilePath'],
                 'Severity': self.severity,
                 'Title': 'Falcon Alert. Instance {}'.format(self.event.instance_id),
                 'Category': self.event_category,
-                'CommandLine': self.event.original_event['event']['CommandLine']
+                'ProcessInformation': {
+                    'ProcessName': self.event.original_event['event']['FileName'],
+                    'ProcessPath': self.event.original_event['event']['FilePath'],
+                    'CommandLine': self.event.original_event['event']['CommandLine']
+                },
             }
         )
         # ART Uncomment these fields to force behavior parity with the prior art. Don't.
