@@ -159,8 +159,11 @@ class Submitter():
         return SecurityCenterClient.finding_path(self.org_id, self.source_id, self.finding_id)
 
     @property
+    @lru_cache
     def finding_id(self):
-        return re.sub('[^0-9a-zA-Z]+', '', self.event.event_id)[-32:]
+        event_id = re.sub('[^0-9a-zA-Z]+', '', self.event.event_id)
+        creation_time = str(hex(int(self.event.original_event['metadata']['eventCreationTime'])))[-6:]
+        return (event_id + creation_time)[-32:]
 
     @property
     def source_path(self):
