@@ -26,6 +26,10 @@ data:
   config.ini: |
     # Falcon Integration Gateway
 
+    [main]
+    # Uncomment to configure number of threads that process Falcon Events
+    # worker_threads = 4
+
     [events]
     # Uncomment to filter out events based on severity (allowed values 1-5, default 2)
     #severity_threshold = 3
