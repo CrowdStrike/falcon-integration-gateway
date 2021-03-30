@@ -80,8 +80,8 @@ spec:
                 mountPath: /fig/config/config.ini
                 subPath: config.ini
               - name: google-application-credentials
-                mountPath: /google-application-credentials.yaml
-                subPath: google-application-credentials.yaml
+                mountPath: /google-application-credentials.json
+                subPath: google-application-credentials.json
             env:
               - name: FALCON_CLIENT_ID
                 valueFrom:
@@ -94,7 +94,7 @@ spec:
                     name: falcon-integration-gateway-creds
                     key: FALCON_CLIENT_SECRET
               - name: GOOGLE_APPLICATION_CREDENTIALS
-                value: /google-application-credentials.yaml
+                value: /google-application-credentials.json
       volumes:
           - name: config-volume
             configMap:
@@ -107,4 +107,4 @@ spec:
               secretName: falcon-integration-gateway-creds
               items:
               - key: GOOGLE_APPLICATION_CREDENTIALS
-                path: google-application-credentials.yaml
+                path: google-application-credentials.json
