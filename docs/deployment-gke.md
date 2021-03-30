@@ -66,3 +66,15 @@ echo -n $FALCON_CLIENT_SECRET | base64
 ```
 base64 $KEY_LOCATION
 ```
+
+### Step 5: Deploy to GKE
+
+Ensure your kubectl command is configured to use GKE environment
+```
+kubectl cluster-info || gcloud container clusters get-credentials MY_CLUSTER_NAME
+```
+
+Deploy the pod
+```
+kubectl apply -f falcon-integration-gateway.yaml
+```
