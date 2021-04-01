@@ -1,6 +1,8 @@
+from . import azure
 from . import gcp
 
 ALL_BACKENDS = {
+    'Azure': azure,
     'GCP': gcp
 }
 
