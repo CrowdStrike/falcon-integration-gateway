@@ -96,6 +96,7 @@ class Submitter():
             finding = self.finding()
         except AssetNotFound:
             log.warning("Corresponding asset not found in GCP Project")
+            return
 
         self.submit_finding(finding)
 
