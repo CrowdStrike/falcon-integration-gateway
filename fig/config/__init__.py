@@ -35,6 +35,13 @@ class FigConfig(configparser.SafeConfigParser):
             raise Exception('Malformed configuration: expected events.older_than_days_threshold to be in range 0-10000')
         if int(self.get('main', 'worker_threads')) not in range(1, 128):
             raise Exception('Malformed configuration: expected main.worker_threads to be in range 1-128')
+        if not self.backends.issubset({'Azure', 'GCP'}) or len(self.backends) < 1:
+            raise Exception(
+                'Malformed configuration: expected main.backends to be subset of "Azure,GCP" and contain at least one')
+
+    @property
+    def backends(self):
+        return set(self.get('main', 'backends').split(','))
 
 
 config = FigConfig()
