@@ -21,5 +21,5 @@ if __name__ == "__main__":
         WorkerThread(name='worker-' + str(i),
                      input_queue=falcon_events,
                      falcon_cache=falcon_cache,
-                     backends=Backends(),
+                     backends=backends,
                      daemon=True).start()
