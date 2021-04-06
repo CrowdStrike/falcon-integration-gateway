@@ -193,6 +193,7 @@ class Submitter():
 
 class Runtime():
     def __init__(self):
+        log.info("GCP Backend is enabled.")
         self.cache = Cache()
 
     def process(self, falcon_event):
