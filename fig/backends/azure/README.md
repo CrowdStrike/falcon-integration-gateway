@@ -4,7 +4,7 @@ Integration with Microsoft Azure Log Analytics.
 
 ### Example Configuration file
 
-[config/config.ini](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/config/config.ini) is expected to configure Falcon Integration Gateway. Minimal configuration for Azure backend follows.
+[config/config.ini](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/config/config.ini) configures Falcon Integration Gateway. Below is a minimal configuration example for Azure:
 ```
 [main]
 # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
