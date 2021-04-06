@@ -1,0 +1,121 @@
+# Kubernetes pod spec for falcon-integration-gateway
+#
+# Deployment
+#    kubectl apply -f ./falcon-integration-gateway.yaml
+# Tear Down
+#    kubectl delete -f ./falcon-integration-gateway.yaml
+#
+# This example shows how to bind CrowdStrike OAuth Credentials and configuration file to the application.
+---
+apiVersion: v1
+data:
+  FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  WORKSPACE_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  PRIMARY_KEY: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+
+kind: Secret
+type: Opaque
+metadata:
+  name: falcon-integration-gateway-creds
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falcon-integration-gateway-config
+data:
+  config.ini: |
+    # Falcon Integration Gateway
+
+    [main]
+    # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
+    backends=AZURE
+
+    # Uncomment to configure number of threads that process Falcon Events
+    # worker_threads = 4
+
+    [events]
+    # Uncomment to filter out events based on severity (allowed values 1-5, default 2)
+    # severity_threshold = 3
+
+    # Uncomment to filter out events based on number of days past the event (default 365)
+    #older_than_days_threshold = 90
+
+    [logging]
+    # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
+    #level = DEBUG
+
+    [falcon]
+    # Uncomment to provide Falcon Cloud. Alternatively, use FALCON_CLOUD_REGION env variable.
+    #cloud_region = us-1
+
+    # Uncomment to provide OAuth Secret. Alternatively, use FALCON_CLIENT_SECRET env variable.
+    #client_id = ABCD
+
+    # Uncomment to provide OAuth Secret. Alternatively, use FALCON_CLIENT_SECRET env variable.
+    #client_secret = ABCD
+
+    # Uncomment to provide application id. Needs to be different per each fig instance.
+    #application_id = my-acme-azure-1
+
+    [azure]
+    # Azure section is applicable only when AZURE backend is enabled in the [main] section.
+    
+    # Uncomment to provide Azure Workspace ID. Alternatively, use WORKSPACE_ID env variable.
+    #workspace_id =
+    # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
+    #primary_key =
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falcon-integration-gateway
+spec:
+  selector:
+   matchLabels:
+      run: falcon-integration-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: falcon-integration-gateway
+    spec:
+      containers:
+          - name: app
+            image: quay.io/crowdstrike/falcon-integration-gateway:latest
+            imagePullPolicy: Always
+            volumeMounts:
+              - name: config-volume
+                mountPath: /fig/config/config.ini
+                subPath: config.ini
+            env:
+              - name: FALCON_CLIENT_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: FALCON_CLIENT_ID
+              - name: FALCON_CLIENT_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: FALCON_CLIENT_SECRET
+              - name: WORKSPACE_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: WORKSPACE_ID
+              - name: PRIMARY_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: PRIMARY_KEY
+      volumes:
+          - name: config-volume
+            configMap:
+              name: falcon-integration-gateway-config
+              items:
+              - key: config.ini
+                path: config.ini

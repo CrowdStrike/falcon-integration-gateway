@@ -6,6 +6,7 @@ Status: This is pre-release version (WIP).
 
 ## Deployment Guide
 
+- [Deployment to AKS](docs/aks)
 - [Deployment to GKE](docs/gke)
 
 ## Developer Guide
