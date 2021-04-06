@@ -17,6 +17,7 @@ def build_signature(workspace_id, primary_key, date, content_length, method, con
     authorization = "SharedKey {}:{}".format(workspace_id, encoded_hash)
     return authorization
 
+
 def post_data(workspace_id, primary_key, body, log_type):
     method = 'POST'
     content_type = 'application/json'
