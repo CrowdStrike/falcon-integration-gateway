@@ -27,34 +27,50 @@ data:
     # Falcon Integration Gateway
 
     [main]
+    # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
+    backends=AZURE,GCP
+
     # Uncomment to configure number of threads that process Falcon Events
     # worker_threads = 4
 
     [events]
     # Uncomment to filter out events based on severity (allowed values 1-5, default 2)
-    #severity_threshold = 3
+    # severity_threshold = 3
 
     # Uncomment to filter out events based on number of days past the event (default 365)
     #older_than_days_threshold = 90
 
     [logging]
     # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
-    # level = DEBUG
+    #level = DEBUG
 
     [falcon]
-    # Uncomment to provide Falcon Cloud alternatively use FALCON_CLOUD_REGION to override
+    # Uncomment to provide Falcon Cloud. Alternatively, use FALCON_CLOUD_REGION env variable.
     #cloud_region = us-1
-    # Uncomment to provide OAuth Secret alternatively use FALCON_CLIENT_SECRET to override
+
+    # Uncomment to provide OAuth Secret. Alternatively, use FALCON_CLIENT_SECRET env variable.
     #client_id = ABCD
 
-    # Uncomment to provide OAuth Secret alternatively use FALCON_CLIENT_SECRET to override
+    # Uncomment to provide OAuth Secret. Alternatively, use FALCON_CLIENT_SECRET env variable.
     #client_secret = ABCD
+
     # Uncomment to provide application id. Needs to be different per each fig instance.
     #application_id = my-acme-gcp-1
 
     [gcp]
-    # Use GOOGLE_APPLICATION_CREDENTIALS env variable
+    # GCP section is applicable only when GCP backend is enabled in the [main] section.
 
+    # Use GOOGLE_APPLICATION_CREDENTIALS env variable to configure GCP Backend. GOOGLE_APPLICATION_CREDENTIALS
+    # is an environment variable used to configure GCP Service accounts, it should point out to the credentials
+    # file for given service account.
+
+    [azure]
+    # Azure section is applicable only when AZURE backend is enabled in the [main] section.
+
+    # Uncomment to provide Azure Workspace ID. Alternatively, use WORKSPACE_ID env variable.
+    #workspace_id =
+    # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
+    #primary_key =
 
 ---
 apiVersion: apps/v1
