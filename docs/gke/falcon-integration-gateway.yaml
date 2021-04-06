@@ -28,7 +28,7 @@ data:
 
     [main]
     # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
-    backends=AZURE,GCP
+    backends=GCP
 
     # Uncomment to configure number of threads that process Falcon Events
     # worker_threads = 4
@@ -63,14 +63,6 @@ data:
     # Use GOOGLE_APPLICATION_CREDENTIALS env variable to configure GCP Backend. GOOGLE_APPLICATION_CREDENTIALS
     # is an environment variable used to configure GCP Service accounts, it should point out to the credentials
     # file for given service account.
-
-    [azure]
-    # Azure section is applicable only when AZURE backend is enabled in the [main] section.
-
-    # Uncomment to provide Azure Workspace ID. Alternatively, use WORKSPACE_ID env variable.
-    #workspace_id =
-    # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
-    #primary_key =
 
 ---
 apiVersion: apps/v1
