@@ -47,10 +47,10 @@ If your project has never had API for SCC enabled, chances are you will have to 
 
 ### Step 4: Edit kubernetes pod spec
 
-Kubernetes pod specification file is readily available at [https://github.com/CrowdStrike/falcon-integration-gateway](../falcon-integration-gateway.yaml).
+Kubernetes pod specification file is readily available at [https://github.com/CrowdStrike/falcon-integration-gateway](falcon-integration-gateway.yaml).
 
 ```
-wget https://raw.githubusercontent.com/crowdstrike/falcon-integration-gateway/main/falcon-integration-gateway.yaml
+wget https://raw.githubusercontent.com/crowdstrike/falcon-integration-gateway/main/docs/gke/falcon-integration-gateway.yaml
 ```
 
 Replace the credentials in the pod spec with the actual Falcon and GCP credentials created in the previous steps. To following commands illustrate how to base64 encode the credentials.
