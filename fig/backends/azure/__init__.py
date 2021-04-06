@@ -71,6 +71,9 @@ class Submitter():
 
 
 class Runtime():
+    def __init__(self):
+        log.info("Azure Backend is enabled.")
+
     def process(self, falcon_event):  # pylint: disable=R0201
         Submitter(falcon_event).submit()
 

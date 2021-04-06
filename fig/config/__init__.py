@@ -13,7 +13,7 @@ class FigConfig(configparser.SafeConfigParser):
 
     def __init__(self):
         super().__init__()
-        self.read(['config/defaults.ini', 'config/devel.ini', 'config/config.ini'])
+        self.read(['config/defaults.ini', 'config/config.ini', 'config/devel.ini'])
         self._override_from_env()
 
     def _override_from_env(self):
