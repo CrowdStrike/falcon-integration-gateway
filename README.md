@@ -11,4 +11,4 @@ Status: This is pre-release version (WIP).
 
 ## Developer Guide
 
-Start with learning about the [backends](fig/backends). Instruction may differ slightly depending of your backend of interest.
+Start with learning about the different [backends](fig/backends). Instructions may differ slightly depending on the backend of interest.
