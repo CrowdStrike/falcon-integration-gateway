@@ -3,7 +3,7 @@ from . import gcp
 from ..config import config
 
 ALL_BACKENDS = {
-    'Azure': azure,
+    'AZURE': azure,
     'GCP': gcp
 }
 
