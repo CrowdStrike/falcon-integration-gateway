@@ -11,7 +11,9 @@ apiVersion: v1
 data:
   FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
   FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
-  GOOGLE_APPLICATION_CREDENTIALS: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  WORKSPACE_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  PRIMARY_KEY: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+
 kind: Secret
 type: Opaque
 metadata:
@@ -28,7 +30,7 @@ data:
 
     [main]
     # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
-    backends=AZURE,GCP
+    backends=AZURE
 
     # Uncomment to configure number of threads that process Falcon Events
     # worker_threads = 4
@@ -55,22 +57,16 @@ data:
     #client_secret = ABCD
 
     # Uncomment to provide application id. Needs to be different per each fig instance.
-    #application_id = my-acme-gcp-1
-
-    [gcp]
-    # GCP section is applicable only when GCP backend is enabled in the [main] section.
-
-    # Use GOOGLE_APPLICATION_CREDENTIALS env variable to configure GCP Backend. GOOGLE_APPLICATION_CREDENTIALS
-    # is an environment variable used to configure GCP Service accounts, it should point out to the credentials
-    # file for given service account.
+    #application_id = my-acme-azure-1
 
     [azure]
     # Azure section is applicable only when AZURE backend is enabled in the [main] section.
-
+    
     # Uncomment to provide Azure Workspace ID. Alternatively, use WORKSPACE_ID env variable.
     #workspace_id =
     # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
     #primary_key =
+
 
 ---
 apiVersion: apps/v1
@@ -95,9 +91,6 @@ spec:
               - name: config-volume
                 mountPath: /fig/config/config.ini
                 subPath: config.ini
-              - name: google-application-credentials
-                mountPath: /google-application-credentials.json
-                subPath: google-application-credentials.json
             env:
               - name: FALCON_CLIENT_ID
                 valueFrom:
@@ -109,8 +102,16 @@ spec:
                   secretKeyRef:
                     name: falcon-integration-gateway-creds
                     key: FALCON_CLIENT_SECRET
-              - name: GOOGLE_APPLICATION_CREDENTIALS
-                value: /google-application-credentials.json
+              - name: WORKSPACE_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: WORKSPACE_ID
+              - name: PRIMARY_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-creds
+                    key: PRIMARY_KEY
       volumes:
           - name: config-volume
             configMap:
@@ -118,9 +119,3 @@ spec:
               items:
               - key: config.ini
                 path: config.ini
-          - name: google-application-credentials
-            secret:
-              secretName: falcon-integration-gateway-creds
-              items:
-              - key: GOOGLE_APPLICATION_CREDENTIALS
-                path: google-application-credentials.json

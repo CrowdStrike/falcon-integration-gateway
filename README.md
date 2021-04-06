@@ -6,24 +6,9 @@ Status: This is pre-release version (WIP).
 
 ## Deployment Guide
 
-- [Deployment to GKE](docs/deployment-gke.md)
+- [Deployment to AKS](docs/aks)
+- [Deployment to GKE](docs/gke)
 
 ## Developer Guide
 
-Start with learning about the [backends](fig/backends).
-
-### Local Container Instructions
- - Build the image
-   ```
-   docker build . -t falcon-integration-gateway
-   ```
- - Run the application
-   ```
-   docker run -it --rm \
-       -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
-       -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
-       -e FALCON_CLOUD_REGION="us-1" \
-       -e GOOGLE_APPLICATION_CREDENTIALS=/gcloud/gcloud-secret-falcon-integration-gateway.json \
-       -v ~/.config/gcloud:/gcloud/ \
-       falcon-integration-gateway:latest
-   ```
+Start with learning about the different [backends](fig/backends). Instructions may differ slightly depending on the backend of interest.

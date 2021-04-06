@@ -1,5 +1,7 @@
 # Falcon Integration Gateway for SCC - Deployment Guide to GKE
 
+This guide works through deployment of Falcon Integration Gateway for SCC to GKE. Only the GCP [backend](https://github.com/CrowdStrike/falcon-integration-gateway/tree/main/fig/backends) will be enabled by this guide.
+
 ### Prerequisites:
 
  - Have CrowdStrike CWP Subscription
@@ -47,10 +49,10 @@ If your project has never had API for SCC enabled, chances are you will have to 
 
 ### Step 4: Edit kubernetes pod spec
 
-Kubernetes pod specification file is readily available at [https://github.com/CrowdStrike/falcon-integration-gateway](../falcon-integration-gateway.yaml).
+Kubernetes pod specification file is readily available at [https://github.com/CrowdStrike/falcon-integration-gateway](falcon-integration-gateway.yaml).
 
 ```
-wget https://raw.githubusercontent.com/crowdstrike/falcon-integration-gateway/main/falcon-integration-gateway.yaml
+wget https://raw.githubusercontent.com/crowdstrike/falcon-integration-gateway/main/docs/gke/falcon-integration-gateway.yaml
 ```
 
 Replace the credentials in the pod spec with the actual Falcon and GCP credentials created in the previous steps. To following commands illustrate how to base64 encode the credentials.
