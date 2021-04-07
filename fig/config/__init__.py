@@ -3,6 +3,7 @@ import configparser
 
 
 class FigConfig(configparser.SafeConfigParser):
+    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP'}
     ENV_DEFAULTS = [
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
         ['falcon', 'client_id', 'FALCON_CLIENT_ID'],
@@ -37,9 +38,10 @@ class FigConfig(configparser.SafeConfigParser):
             raise Exception('Malformed configuration: expected events.older_than_days_threshold to be in range 0-10000')
         if int(self.get('main', 'worker_threads')) not in range(1, 128):
             raise Exception('Malformed configuration: expected main.worker_threads to be in range 1-128')
-        if not self.backends.issubset({'AZURE', 'GCP'}) or len(self.backends) < 1:
+        if not self.backends.issubset(self.ALL_BACKENDS) or len(self.backends) < 1:
             raise Exception(
-                'Malformed configuration: expected main.backends to be subset of "AZURE,GCP" and contain at least one')
+                'Malformed configuration: expected main.backends to be subset of "{}" and contain at least one'.format(
+                    self.ALL_BACKENDS))
 
     @property
     def backends(self):

@@ -1,8 +1,10 @@
+from . import aws
 from . import azure
 from . import gcp
 from ..config import config
 
 ALL_BACKENDS = {
+    'AWS': aws,
     'AZURE': azure,
     'GCP': gcp
 }
