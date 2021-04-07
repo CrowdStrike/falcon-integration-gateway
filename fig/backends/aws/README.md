@@ -12,6 +12,12 @@ backends=AWS
 
 [aws]
 # AWS section is applicable only when AWS backend is enabled in the [main] section.
+
+# Uncomment to provide aws region. Alternatively, use AWS_REGION env variable
+#region=eu-west-1
+
+# Uncomment to provide sqs_queue_name.
+#sqs_queue_name=
 ```
 
 ### Developer Guide
@@ -26,5 +32,6 @@ backends=AWS
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e FALCON_CLOUD_REGION="us-1" \
+       -v ~/.aws:/fig/.aws \
        falcon-integration-gateway:latest
    ```
