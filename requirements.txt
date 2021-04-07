@@ -1,3 +1,4 @@
+boto3
 crowdstrike-falconpy
 google-cloud-securitycenter
 google-cloud-resource-manager
