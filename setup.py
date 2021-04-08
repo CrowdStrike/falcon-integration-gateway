@@ -21,6 +21,7 @@ setup(
     py_modules=[splitext(basename(path))[0] for path in glob("fig/*.py")],
     include_package_data=True,
     install_requires=[
+        'boto3',
         'crowdstrike-falconpy',
         'google-cloud-securitycenter',
         'google-cloud-resource-manager',
