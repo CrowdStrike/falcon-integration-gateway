@@ -15,22 +15,17 @@ Make sure only the following permissions are assigned to the key pair:
  * Event streams: READ
  * Hosts: READ
 
-### Step 2: Create new Azure credentials
+### Step 2: Set-up Azure and Log Analytics
 
-TBD TODO
+Create an Azure account at https://azure.microsoft.com/.
 
-```
-WORKSPACE_ID=ASDF
-```
+In your Azure portal, create a new resource group. (Home > Resource groups > Create)
 
-```
-PRIMARY_KEY=ASDF
-```
-### Step 3: Set-up Azure Log Analytics
+Create a new Log Analytics workspace and assign it to your resource group. (Home > Log Analytics workspaces > Create)
 
-TBD TODO
+In your new workspace, navigate to "Agents management" in the settings section. Here you will find your Workspace ID and Primary key. Copy both of these values and use them to set up the FIG in the next step.
 
-### Step 4: Edit kubernetes pod spec
+### Step 3: Edit kubernetes pod spec
 
 Kubernetes pod specification file is readily available at [https://github.com/CrowdStrike/falcon-integration-gateway](falcon-integration-gateway.yaml).
 
@@ -56,7 +51,7 @@ echo -n $WORKSPACE_ID | base64
 echo -n $PRIMARY_KEY | base64
 ```
 
-### Step 5: Deploy to AKS
+### Step 4: Deploy to AKS
 
 Ensure your kubectl command is configured to use AKS environment
 ```
