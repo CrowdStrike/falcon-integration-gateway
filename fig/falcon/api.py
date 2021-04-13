@@ -7,6 +7,14 @@ class ApiError(Exception):
     pass
 
 
+class NoStreamsError(ApiError):
+    def __init__(self, app_id):
+        super().__init__(
+            'Falcon Streaming API not discovered. This may be caused by second instance of this application '
+            'already running in your environment with the same application_id={}, or by missing streaming API '
+            'capability.'.format(app_id))
+
+
 class FalconAPI():
     CLOUD_REGIONS = {
         'us-1': 'api.crowdstrike.com',
@@ -29,10 +37,7 @@ class FalconAPI():
         resources = self._resources(action='listAvailableStreamsOAuth2',
                                     parameters={'appId': config.get('falcon', 'application_id')})
         if not resources:
-            raise ApiError(
-                'Falcon Streaming API not discovered. This may be caused by second instance of this application '
-                'already running in your environment with the same application_id={}, or by missing streaming API '
-                'capability.'.format(app_id))
+            raise NoStreamsError(app_id)
         return (Stream(s) for s in resources)
 
     def refresh_streaming_session(self, app_id, stream):

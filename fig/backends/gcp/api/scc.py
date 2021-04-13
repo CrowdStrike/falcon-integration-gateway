@@ -1,4 +1,5 @@
 import threading
+from google.api_core.exceptions import AlreadyExists
 from google.cloud import securitycenter
 from google.cloud.securitycenter import CreateFindingRequest, Finding, Source
 from google.protobuf.field_mask_pb2 import FieldMask
@@ -60,7 +61,13 @@ class SecurityCommandCenter():
     def get_or_create_finding(self, finding_id, finding: Finding, source: Source):
         existing = self.get_finding(finding, source)
         if len(existing) == 0:
-            return [self.create_finding(finding_id, finding, source)]
+            try:
+                return [self.create_finding(finding_id, finding, source)]
+            except AlreadyExists:
+                existing = self.get_finding(finding, source)
+                if len(existing) == 0:
+                    raise
+
         log.debug("Finding %s already exists in GCP SCC", finding_id)
         return existing[0].finding
 
