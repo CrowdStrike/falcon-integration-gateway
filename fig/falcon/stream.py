@@ -4,7 +4,7 @@ import time
 import threading
 import requests
 
-from .api import FalconAPI
+from .api import FalconAPI, NoStreamsError
 from .models import Event, Stream
 from ..util import StoppableThread
 from ..log import log
@@ -40,8 +40,16 @@ class StreamManagementThread(threading.Thread):
         return stop_event
 
     def get_streams(self, falcon_api):
-        return falcon_api.streams(self.application_id)
-
+        retry_count = 5
+        for attempt in range(retry_count):
+            try:
+                return falcon_api.streams(self.application_id)
+            except NoStreamsError:
+                if attempt == (retry_count - 1):
+                    raise
+                log.info("Falcon returns no available streams. Re-trying in 10 seconds.")
+                time.sleep(10)
+        raise NoStreamsError(self.application_id)
 
 
 class StreamRefreshThread(StoppableThread):
