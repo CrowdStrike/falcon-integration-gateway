@@ -18,6 +18,7 @@ class StreamManagementThread(threading.Thread):
         kwargs['name'] = kwargs.get('name', 'cs_mngmt')
         super().__init__(*args, **kwargs)
         self.output_queue = output_queue
+        self.application_id = config.get('falcon', 'application_id')
 
     def run(self):
         while True:
@@ -33,10 +34,9 @@ class StreamManagementThread(threading.Thread):
     def start_workers(self):
         stop_event = threading.Event()
         falcon_api = FalconAPI()
-        application_id = config.get('falcon', 'application_id')
-        for stream in falcon_api.streams(application_id):
+        for stream in falcon_api.streams(self.application_id):
             StreamingThread(stream, self.output_queue, stop_event=stop_event).start()
-            StreamRefreshThread(application_id, stream, falcon_api, stop_event=stop_event).start()
+            StreamRefreshThread(self.application_id, stream, falcon_api, stop_event=stop_event).start()
         return stop_event
 
 
