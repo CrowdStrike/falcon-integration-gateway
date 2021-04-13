@@ -83,6 +83,6 @@ kubectl apply -f falcon-integration-gateway.yaml
 
 ### Appendix A: Re-using single Falcon Integration Gateway for multiple GCP Organizations/Projects
 
-Falcon Integration Gateway is able to automatically discover GCP projects and organizations it has access to. The access permissions are determined from the service account created in the *Step 2: Create new GCP Service Account*. of this guide.
+Falcon Integration Gateway is able to automatically discover GCP projects and organizations it has access to. The access permissions are determined from the service account created in the *Step 2: Create new GCP Service Account* of this guide.
 
 To enable multi-org access, please create service account in one of your organizations and grant **roles/securitycenter.admin** permission to this service account in every organization that it should manage.
