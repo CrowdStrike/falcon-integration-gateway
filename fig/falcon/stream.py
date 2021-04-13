@@ -34,10 +34,14 @@ class StreamManagementThread(threading.Thread):
     def start_workers(self):
         stop_event = threading.Event()
         falcon_api = FalconAPI()
-        for stream in falcon_api.streams(self.application_id):
+        for stream in self.get_streams(falcon_api):
             StreamingThread(stream, self.output_queue, stop_event=stop_event).start()
             StreamRefreshThread(self.application_id, stream, falcon_api, stop_event=stop_event).start()
         return stop_event
+
+    def get_streams(self, falcon_api):
+        return falcon_api.streams(self.application_id)
+
 
 
 class StreamRefreshThread(StoppableThread):
