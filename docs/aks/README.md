@@ -19,7 +19,11 @@ Make sure only the following permissions are assigned to the key pair:
 
 Sign in to the Azure portal at [https://portal.azure.com/](https://portal.azure.com/)
 
-In your Azure portal, create a new resource group. (Home > Resource groups > Create)
+1. Create a new resource group by selecting `Resource groups`.
+1. Select `New`
+1. Enter a new resource group name
+1. Select `Review + Create`
+1. Select `Create`
 
 Create a new Log Analytics workspace and assign it to your resource group. (Home > Log Analytics workspaces > Create)
 
