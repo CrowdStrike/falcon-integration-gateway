@@ -15,7 +15,7 @@ Make sure only the following permissions are assigned to the key pair:
  * Event streams: READ
  * Hosts: READ
 
-### Step 2: Set-up Azure and Log Analytics
+### Step 2: Configure Azure and Log Analytics
 
 Sign in to the Azure portal at [https://portal.azure.com/](https://portal.azure.com/)
 
