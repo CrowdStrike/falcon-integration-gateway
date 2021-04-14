@@ -28,5 +28,3 @@ class Backends():
         runtime = self.runtime(falcon_event.cloud_provider)
         if runtime:
             runtime.process(falcon_event)
-        else:
-            print(falcon_event.cloud_provider)
