@@ -17,7 +17,7 @@ Make sure only the following permissions are assigned to the key pair:
 
 ### Step 2: Set-up Azure and Log Analytics
 
-Create an Azure account at https://azure.microsoft.com/.
+Sign in to the Azure portal at [https://portal.azure.com/](https://portal.azure.com/)
 
 In your Azure portal, create a new resource group. (Home > Resource groups > Create)
 
