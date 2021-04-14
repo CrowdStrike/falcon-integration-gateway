@@ -31,7 +31,7 @@ Sign in to the Azure portal at [https://portal.azure.com/](https://portal.azure.
 1. Select `Review + Create`
 1. Select `Create`
 
-ssign it to your resource group. (Home > Log Analytics workspaces > Create)
+Assign it to your resource group. (Home > Log Analytics workspaces > Create)
 
 In your new workspace, navigate to "Agents management" in the settings section. Here you will find your Workspace ID and Primary key. Copy both of these values and use them to set up the FIG in the next step.
 
