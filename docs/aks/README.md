@@ -15,13 +15,23 @@ Make sure only the following permissions are assigned to the key pair:
  * Event streams: READ
  * Hosts: READ
 
-### Step 2: Set-up Azure and Log Analytics
+### Step 2: Configure Azure and Log Analytics
 
-Create an Azure account at https://azure.microsoft.com/.
+Sign in to the Azure portal at [https://portal.azure.com/](https://portal.azure.com/)
 
-In your Azure portal, create a new resource group. (Home > Resource groups > Create)
+1. Create a new resource group by selecting `Resource groups`.
+1. Select `New`
+1. Enter a new resource group name
+1. Select `Review + Create`
+1. Select `Create`
 
-Create a new Log Analytics workspace and assign it to your resource group. (Home > Log Analytics workspaces > Create)
+1. Create a new Log Analytics workspace by selecting `Log Analytics workspaces`. You might have to search for it as a resource if it is not in your home menu.
+1. Select `New`
+1. Select the resource group that was previously created and enter a name under `Instance details`
+1. Select `Review + Create`
+1. Select `Create`
+
+Assign it to your resource group. (Home > Log Analytics workspaces > Create)
 
 In your new workspace, navigate to "Agents management" in the settings section. Here you will find your Workspace ID and Primary key. Copy both of these values and use them to set up the FIG in the next step.
 
