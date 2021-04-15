@@ -45,9 +45,13 @@ class FalconCache():
         if not sensor_id:
             return EventDataError("Cannot process event. SensorId field is missing: ")
 
-        if sensor_id not in self._mdm_id or self._mdm_id[sensor_id] == None:
+        if sensor_id not in self._mdm_id or self._mdm_id[sensor_id] is None:
             session = self.falcon_api.init_rtr_session(sensor_id)
-            command = self.falcon_api.execute_rtr_command(session[0]['session_id'], 'reg query', 'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Provisioning\OMADM\MDMDeviceID" DeviceClientId')
+            command = self.falcon_api.execute_rtr_command(
+                session[0]['session_id'], 
+                'reg query', 
+                'reg query "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Provisioning\\OMADM\\MDMDeviceID" DeviceClientId'
+            )
             response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
 
             while not response['complete']:

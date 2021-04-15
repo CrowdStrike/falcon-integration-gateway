@@ -7,7 +7,7 @@ from ...config import config
 
 WORKSPACEONE_TOKEN = config.get('workspaceone', 'workspaceone_token')
 SYSLOG_HOST = config.get('workspaceone', 'syslog_host')
-SYSLOG_PORT = 6514 # TLS syslog port
+SYSLOG_PORT = 6514
 
 
 dictConfig({
@@ -48,7 +48,9 @@ class Submitter():
     def log(self):
         event = self.event.original_event['event']
         meta = self.event.original_event['metadata']
-        msg = 'CEF:0|CrowdStrike|FalconHost|1.0|DetectionSummaryEvent|Detection Summary Event|2|Token=' + WORKSPACEONE_TOKEN + ' UDID=' + self.event.mdm_identifier
+        msg = 'CEF:0|CrowdStrike|FalconHost|1.0|DetectionSummaryEvent|Detection Summary Event|2|'
+        msg += 'Token=' + WORKSPACEONE_TOKEN
+        msg += ' UDID=' + self.event.mdm_identifier
         if ('SensorId' in event):
             msg += ' externalId=' + event['SensorId']
         if ('ProcessId' in event):
@@ -70,8 +72,8 @@ class Submitter():
             msg += ' cs5Label=CommandLine'
         if ('MD5String' in event):
             msg += ' fileHash=' + event['MD5String']
-        if ('MachineDomain' in event): 
-            msg += ' sntdom=' + event['MachineDomain'] 
+        if ('MachineDomain' in event):
+            msg += ' sntdom=' + event['MachineDomain']
         if ('FalconHostLink' in event):
             msg += ' cs6=' + event['FalconHostLink']
             msg += ' cs6Label=FalconHostLink'
