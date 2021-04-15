@@ -56,7 +56,7 @@ class FalconCache():
 
             while not response['complete']:
                 response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
-            if (response['stderr']):
+            if response['stderr']:
                 self._mdm_id[sensor_id] = None
             else:
                 self._mdm_id[sensor_id] = response['stdout'].split(' = ')[1].split('\n')[0]
