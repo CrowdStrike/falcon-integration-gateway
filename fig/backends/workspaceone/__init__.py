@@ -51,50 +51,50 @@ class Submitter():
         msg = 'CEF:0|CrowdStrike|FalconHost|1.0|DetectionSummaryEvent|Detection Summary Event|2|'
         msg += 'Token=' + WORKSPACEONE_TOKEN
         msg += ' UDID=' + self.event.mdm_identifier
-        if ('SensorId' in event):
+        if 'SensorId' in event:
             msg += ' externalId=' + event['SensorId']
-        if ('ProcessId' in event):
+        if 'ProcessId' in event:
             msg += ' cn2=' + str(event['ProcessId'])
             msg += ' cn2Label=ProcessId'
-        if ('ParentProcessId' in event):
+        if 'ParentProcessId' in event:
             msg += ' cn1=' + str(event['ParentProcessId'])
             msg += ' cn1Label=ParentProcessId'
-        if ('UserName' in event):
+        if 'UserName' in event:
             msg += ' suser=' + event['UserName']
-        if ('DetectDescription' in event):
+        if 'DetectDescription' in event:
             msg += ' msg=' + event['DetectDescription']
-        if ('FileName' in event):
+        if 'FileName' in event:
             msg += ' fname=' + event['FileName']
-        if ('FilePath' in event):
+        if 'FilePath' in event:
             msg += ' filePath=' + event['FilePath']
-        if ('CommandLine' in event):
+        if 'CommandLine' in event:
             msg += ' cs5=' + event['CommandLine']
             msg += ' cs5Label=CommandLine'
-        if ('MD5String' in event):
+        if 'MD5String' in event:
             msg += ' fileHash=' + event['MD5String']
-        if ('MachineDomain' in event):
+        if 'MachineDomain' in event:
             msg += ' sntdom=' + event['MachineDomain']
-        if ('FalconHostLink' in event):
+        if 'FalconHostLink' in event:
             msg += ' cs6=' + event['FalconHostLink']
             msg += ' cs6Label=FalconHostLink'
-        if ('offset' in meta):
+        if 'offset' in meta:
             msg += ' cn3=' + str(meta['offset'])
             msg += ' cn3Label=Offset'
-        if ('eventCreationTime' in meta):
+        if 'eventCreationTime' in meta:
             msg += ' rt=' + str(meta['eventCreationTime'])
-        if ('LocalIP' in event):
+        if 'LocalIP' in event:
             msg += ' src=' + event['LocalIP']
-        if ('MACAddress' in event):
+        if 'MACAddress' in event:
             msg += ' smac=' + event['MACAddress']
-        if ('Tactic' in event):
+        if 'Tactic' in event:
             msg += ' cat=' + event['Tactic']
-        if ('Technique' in event):
+        if 'Technique' in event:
             msg += ' act=' + event['Technique']
-        if ('Objective' in event):
+        if 'Objective' in event:
             msg += ' reason=' + event['Objective']
-        if ('PatternDispositionValue' in event):
+        if 'PatternDispositionValue' in event:
             msg += ' outcome=' + str(event['PatternDispositionValue'])
-        if ('PatternDispositionDescription' in event):
+        if 'PatternDispositionDescription' in event:
             msg += ' CSMTRPatternDisposition=' + event['PatternDispositionDescription']
         return msg
 
