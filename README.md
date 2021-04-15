@@ -11,6 +11,8 @@ Currently available backends are
  * [Azure backend](fig/backends/azure) - pushes real-time threat detections to Azure Log Analytics
  * [GCP backend](fig/backends/gcp) - pushes real-time threat detections to GCP Security Command Center
 
+Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product. As such it carries no formal support, expressed or implied.
+
 ## Deployment Guide
 
 - [Deployment to AKS](docs/aks)
