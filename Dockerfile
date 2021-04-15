@@ -1,4 +1,4 @@
-FROM python:3-slim-buster
+FROM docker.io/python:3-slim-buster
 
 RUN useradd --create-home --home-dir /fig figuser
 USER figuser
