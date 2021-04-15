@@ -68,7 +68,7 @@ class FalconAPI():
                 'session_id': session_id
             }
         )
-    
+
     def check_rtr_command_status(self, cloud_request_id, sequence_id):
         return self._resources(
             action='RTR_CheckCommandStatus',

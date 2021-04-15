@@ -31,5 +31,5 @@ class Backends():
         runtime = self.runtime(falcon_event.cloud_provider)
         if runtime:
             runtime.process(falcon_event)
-        if not falcon_event.mdm_identifier is None:
+        if falcon_event.mdm_identifier is not None:
             self.runtimes.get('WORKSPACEONE').process(falcon_event)
