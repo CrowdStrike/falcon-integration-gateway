@@ -3,7 +3,7 @@ import configparser
 
 
 class FigConfig(configparser.SafeConfigParser):
-    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP'}
+    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'WORKSPACEONE'}
     ENV_DEFAULTS = [
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
         ['falcon', 'client_id', 'FALCON_CLIENT_ID'],
@@ -11,6 +11,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['aws', 'region', 'AWS_REGION'],
+        ['workspaceone', 'workspaceone_token', 'WORKSPACEONE_TOKEN'],
+        ['workspaceone', 'syslog_host', 'SYSLOG_HOST']
     ]
 
     def __init__(self):

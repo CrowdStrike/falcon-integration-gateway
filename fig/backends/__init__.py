@@ -1,12 +1,15 @@
 from . import aws
 from . import azure
 from . import gcp
+from . import workspaceone
 from ..config import config
+
 
 ALL_BACKENDS = {
     'AWS': aws,
     'AZURE': azure,
-    'GCP': gcp
+    'GCP': gcp,
+    'WORKSPACEONE': workspaceone
 }
 
 
@@ -28,3 +31,5 @@ class Backends():
         runtime = self.runtime(falcon_event.cloud_provider)
         if runtime:
             runtime.process(falcon_event)
+        if falcon_event.mdm_identifier is not None:
+            self.runtimes.get('WORKSPACEONE').process(falcon_event)

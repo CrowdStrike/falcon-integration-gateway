@@ -17,6 +17,7 @@ class FalconCache():
     def __init__(self, falcon_api):
         self.falcon_api = falcon_api
         self._host_detail = {}
+        self._mdm_id = {}
 
     def device_details(self, sensor_id):
         if not sensor_id:
@@ -40,6 +41,28 @@ class FalconCache():
 
         return self._host_detail[sensor_id]
 
+    def mdm_identifier(self, sensor_id):
+        if not sensor_id:
+            return EventDataError("Cannot process event. SensorId field is missing: ")
+
+        if sensor_id not in self._mdm_id or self._mdm_id[sensor_id] is None:
+            session = self.falcon_api.init_rtr_session(sensor_id)
+            command = self.falcon_api.execute_rtr_command(
+                session[0]['session_id'],
+                'reg query',
+                'reg query "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Provisioning\\OMADM\\MDMDeviceID" DeviceClientId'
+            )
+            response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
+
+            while not response['complete']:
+                response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
+            if response['stderr']:
+                self._mdm_id[sensor_id] = None
+            else:
+                self._mdm_id[sensor_id] = response['stdout'].split(' = ')[1].split('\n')[0]
+
+        return self._mdm_id[sensor_id]
+
 
 class FalconEvent():
     def __init__(self, original_event: Event, cache: FalconCache):
@@ -49,6 +72,10 @@ class FalconEvent():
     @property
     def device_details(self):
         return self.cache.device_details(self.original_event.sensor_id)
+
+    @property
+    def mdm_identifier(self):
+        return self.cache.mdm_identifier(self.original_event.sensor_id)
 
     @property
     def cloud_provider(self):

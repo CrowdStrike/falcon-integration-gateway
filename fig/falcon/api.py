@@ -51,6 +51,33 @@ class FalconAPI():
     def device_details(self, device_id):
         return self._resources(action='GetDeviceDetails', ids=[device_id])
 
+    def init_rtr_session(self, device_id):
+        return self._resources(
+            action='RTR_InitSession',
+            body={
+                'device_id': device_id
+            }
+        )
+
+    def execute_rtr_command(self, session_id, base_command, command_string):
+        return self._resources(
+            action='RTR_ExecuteCommand',
+            body={
+                'base_command': base_command,
+                'command_string': command_string,
+                'session_id': session_id
+            }
+        )
+
+    def check_rtr_command_status(self, cloud_request_id, sequence_id):
+        return self._resources(
+            action='RTR_CheckCommandStatus',
+            parameters={
+                'cloud_request_id': cloud_request_id,
+                'sequence_id': sequence_id,
+            }
+        )
+
     def _resources(self, *args, **kwargs):
         response = self._command(*args, **kwargs)
         body = response['body']
@@ -61,8 +88,9 @@ class FalconAPI():
     def _command(self, *args, **kwargs):
         response = self.client.command(*args, **kwargs)
         body = response['body']
-        if 'errors' in body and len(body['errors']) > 0:
-            raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
-        if 'status_code' not in response or response['status_code'] != 200:
+        if 'errors' in body and body['errors'] is not None:
+            if len(body['errors']) > 0:
+                raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
+        if 'status_code' not in response or (response['status_code'] != 200 and response['status_code'] != 201):
             raise ApiError('Unexpected response code from Falcon API. Response was: {}'.format(response))
         return response
