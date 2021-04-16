@@ -10,7 +10,7 @@ Currently available backends are
  * [AWS backend](fig/backends/aws) - pushes real-time threat detections to AWS Security Hub
  * [Azure backend](fig/backends/azure) - pushes real-time threat detections to Azure Log Analytics
  * [GCP backend](fig/backends/gcp) - pushes real-time threat detections to GCP Security Command Center
- * [WORKSPACEONE backend](fig/backends/workspaceone) -pushes real-time threat detections to VMware Workspace ONE Intelligence
+ * [Workspace ONE backend](fig/backends/workspaceone) -pushes real-time threat detections to VMware Workspace ONE Intelligence
 
 Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product. As such it carries no formal support, expressed or implied.
 
