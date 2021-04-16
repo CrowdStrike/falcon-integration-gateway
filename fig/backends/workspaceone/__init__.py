@@ -5,7 +5,6 @@ from ...log import log
 from ...config import config
 
 
-WORKSPACEONE_TOKEN = config.get('workspaceone', 'workspaceone_token')
 SYSLOG_HOST = config.get('workspaceone', 'syslog_host')
 SYSLOG_PORT = 6514
 
@@ -38,7 +37,8 @@ dictConfig({
 
 
 class Submitter():
-    def __init__(self, event):
+    def __init__(self, token, event):
+        self.workspaceone_token = token
         self.event = event
 
     def submit(self):
@@ -49,7 +49,7 @@ class Submitter():
         event = self.event.original_event['event']
         meta = self.event.original_event['metadata']
         msg = 'CEF:0|CrowdStrike|FalconHost|1.0|DetectionSummaryEvent|Detection Summary Event|2|'
-        msg += 'Token=' + WORKSPACEONE_TOKEN
+        msg += 'Token=' + self.workspaceone_token
         msg += ' UDID=' + self.event.mdm_identifier
         if 'SensorId' in event:
             msg += ' externalId=' + event['SensorId']
@@ -102,9 +102,10 @@ class Submitter():
 class Runtime():
     def __init__(self):
         log.info("Workspace One backend is enabled.")
+        self.workspaceone_token = config.get('workspaceone', 'workspaceone_token')
 
-    def process(self, falcon_event):  # pylint: disable=R0201
-        Submitter(falcon_event).submit()
+    def process(self, falcon_event):
+        Submitter(self.workspaceone_token, falcon_event).submit()
 
 
 __all__ = ['Runtime']
