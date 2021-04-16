@@ -5,40 +5,9 @@ from ...log import log
 from ...config import config
 
 
-WORKSPACEONE_TOKEN = config.get('workspaceone', 'workspaceone_token')
-SYSLOG_HOST = config.get('workspaceone', 'syslog_host')
-SYSLOG_PORT = 6514
-
-
-dictConfig({
-    'version': 1,
-    'formatters': {
-        'simple': {
-            'format': '%(asctime)s django %(name)s: %(levelname)s %(message)s',
-            'datefmt': '%Y-%m-%dT%H:%M:%S'
-        }
-    },
-    'handlers': {
-        'syslog': {
-            'level': 'INFO',
-            'class': 'tlssyslog.handlers.TLSSysLogHandler',
-            'formatter': 'simple',
-            'address': (SYSLOG_HOST, SYSLOG_PORT),
-            'ssl_kwargs': {
-                'cert_reqs': CERT_NONE,
-                'ssl_version': PROTOCOL_TLSv1_2
-            }
-        }
-    },
-    'root': {
-        'handlers': ['syslog'],
-        'level': 'INFO'
-    }
-})
-
-
 class Submitter():
-    def __init__(self, event):
+    def __init__(self, token, event):
+        self.workspaceone_token = token
         self.event = event
 
     def submit(self):
@@ -49,7 +18,7 @@ class Submitter():
         event = self.event.original_event['event']
         meta = self.event.original_event['metadata']
         msg = 'CEF:0|CrowdStrike|FalconHost|1.0|DetectionSummaryEvent|Detection Summary Event|2|'
-        msg += 'Token=' + WORKSPACEONE_TOKEN
+        msg += 'Token=' + self.workspaceone_token
         msg += ' UDID=' + self.event.mdm_identifier
         if 'SensorId' in event:
             msg += ' externalId=' + event['SensorId']
@@ -102,9 +71,37 @@ class Submitter():
 class Runtime():
     def __init__(self):
         log.info("Workspace One backend is enabled.")
+        self.workspaceone_token = config.get('workspaceone', 'workspaceone_token')
+        syslog_host = config.get('workspaceone', 'syslog_host')
+        syslog_port = 6514
+        dictConfig({
+            'version': 1,
+            'formatters': {
+                'simple': {
+                    'format': '%(asctime)s django %(name)s: %(levelname)s %(message)s',
+                    'datefmt': '%Y-%m-%dT%H:%M:%S'
+                }
+            },
+            'handlers': {
+                'syslog': {
+                    'level': 'INFO',
+                    'class': 'tlssyslog.handlers.TLSSysLogHandler',
+                    'formatter': 'simple',
+                    'address': (syslog_host, syslog_port),
+                    'ssl_kwargs': {
+                        'cert_reqs': CERT_NONE,
+                        'ssl_version': PROTOCOL_TLSv1_2
+                    }
+                }
+            },
+            'root': {
+                'handlers': ['syslog'],
+                'level': 'INFO'
+            }
+        })
 
-    def process(self, falcon_event):  # pylint: disable=R0201
-        Submitter(falcon_event).submit()
+    def process(self, falcon_event):
+        Submitter(self.workspaceone_token, falcon_event).submit()
 
 
 __all__ = ['Runtime']
