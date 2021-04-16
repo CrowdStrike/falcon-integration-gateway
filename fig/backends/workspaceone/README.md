@@ -14,7 +14,7 @@ backends=WORKSPACEONE
 # Workspace One section is applicable only when Workspace One backend is enabled in the [main] section.
 
 # Uncomment to provide Workspace One token. Alternatively, use WORKSPACEONE_TOKEN variable
-#workspaceone_token = 
+#token=
 
 # Uncomment to provide syslog host. Alternatively, use SYSLOG_HOST variable
 #syslog_host = 

@@ -71,7 +71,7 @@ class Submitter():
 class Runtime():
     def __init__(self):
         log.info("Workspace One backend is enabled.")
-        self.workspaceone_token = config.get('workspaceone', 'workspaceone_token')
+        self.workspaceone_token = config.get('workspaceone', 'token')
         syslog_host = config.get('workspaceone', 'syslog_host')
         syslog_port = 6514
         dictConfig({

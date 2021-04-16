@@ -11,7 +11,7 @@ class FigConfig(configparser.SafeConfigParser):
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['aws', 'region', 'AWS_REGION'],
-        ['workspaceone', 'workspaceone_token', 'WORKSPACEONE_TOKEN'],
+        ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
         ['workspaceone', 'syslog_host', 'SYSLOG_HOST']
     ]
 
