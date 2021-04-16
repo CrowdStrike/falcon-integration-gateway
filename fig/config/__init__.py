@@ -49,9 +49,9 @@ class FigConfig(configparser.SafeConfigParser):
                 'Malformed configuration: expected main.backends to be subset of "{}" and contain at least one'.format(
                     self.ALL_BACKENDS))
         if 'AWS' in self.backends:
-            if len(config.get('aws', 'region')) == 0:
+            if len(self.get('aws', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected aws.region to be non-empty')
-            if len(config.get('aws', 'sqs_queue_name')) == 0:
+            if len(self.get('aws', 'sqs_queue_name')) == 0:
                 raise Exception('Malformed Configuration: expected aws.sqs_queue_name to be non-empty')
 
     @property
