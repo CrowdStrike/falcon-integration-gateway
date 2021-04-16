@@ -53,6 +53,11 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected aws.region to be non-empty')
             if len(self.get('aws', 'sqs_queue_name')) == 0:
                 raise Exception('Malformed Configuration: expected aws.sqs_queue_name to be non-empty')
+        if 'WORKSPACEONE' in self.backends:
+            if len(self.get('workspaceone', 'token')) == 0:
+                raise Exception('Malformed Configuration: expected workspaceone.token to be non-empty')
+            if len(self.get('workspaceone', 'syslog_host')) == 0:
+                raise Exception('Malformed Configuration: expected workspaceone.syslog_host to be non-empty')
 
     @property
     def backends(self):
