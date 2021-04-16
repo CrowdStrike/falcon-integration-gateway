@@ -12,7 +12,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['aws', 'region', 'AWS_REGION'],
         ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
-        ['workspaceone', 'syslog_host', 'SYSLOG_HOST']
+        ['workspaceone', 'syslog_host', 'SYSLOG_HOST'],
+        ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
     ]
 
     def __init__(self):
@@ -58,6 +59,8 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected workspaceone.token to be non-empty')
             if len(self.get('workspaceone', 'syslog_host')) == 0:
                 raise Exception('Malformed Configuration: expected workspaceone.syslog_host to be non-empty')
+            if int(self.get('workspaceone', 'syslog_port')) not in range(1, 65535):
+                raise Exception('Malformed configuration: expected workspaceone.syslog_port to be in range 1-65335')
 
     @property
     def backends(self):
