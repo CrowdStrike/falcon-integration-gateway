@@ -121,7 +121,7 @@ class StreamingConnection():
             'Connection': 'Keep-Alive'
         }
         log.info("Opening Streaming Connection")
-        url = self.stream.url + '&offset={}'.format(self.last_seen_offset)
+        url = self.stream.url + '&offset={}'.format(self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0)
         self.connection = requests.get(url, headers=headers, stream=True)
         return self.connection
 
