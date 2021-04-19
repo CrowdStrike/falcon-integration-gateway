@@ -75,6 +75,9 @@ class Runtime():
             self.queue = None
             raise
 
+    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+        return falcon_event.cloud_provider == 'AWS_EC2'
+
     def process(self, falcon_event):  # pylint: disable=R0201
         Submitter(self.queue, falcon_event).submit()
 
