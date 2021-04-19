@@ -73,7 +73,7 @@ class Runtime():
         log.info("Workspace One backend is enabled.")
         self.workspaceone_token = config.get('workspaceone', 'token')
         syslog_host = config.get('workspaceone', 'syslog_host')
-        syslog_port = 6514
+        syslog_port = int(config.get('workspaceone', 'syslog_port'))
         dictConfig({
             'version': 1,
             'formatters': {
