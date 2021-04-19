@@ -100,6 +100,9 @@ class Runtime():
             }
         })
 
+    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+        return falcon_event.mdm_identifier is not None
+
     def process(self, falcon_event):
         Submitter(self.workspaceone_token, falcon_event).submit()
 

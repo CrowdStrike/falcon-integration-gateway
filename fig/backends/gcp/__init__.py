@@ -196,6 +196,9 @@ class Runtime():
         log.info("GCP Backend is enabled.")
         self.cache = Cache()
 
+    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+        return falcon_event.cloud_provider == 'GCP'
+
     def process(self, falcon_event):
         Submitter(self.cache, falcon_event).submit()
 
