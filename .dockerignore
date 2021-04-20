@@ -1,0 +1,7 @@
+/.git
+/.github
+/config/devel.ini
+/Dockerfile
+/runtest.sh
+/todo
+/venv
