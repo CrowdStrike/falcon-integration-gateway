@@ -14,4 +14,3 @@ backends=AWS,AZURE,GCP,WORKSPACEONE,CHRONICLE
  * [GCP(Security Command Center)](gcp)
  * [WorkspaceOne](workspaceone)
  * [Chronicle](chronicle)
-
