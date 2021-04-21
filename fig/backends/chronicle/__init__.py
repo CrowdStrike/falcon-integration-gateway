@@ -1,3 +1,4 @@
+from typing_extensions import final
 from ...log import log
 from ...config import config
 from datetime import datetime
@@ -14,7 +15,10 @@ def parse_url(url):
         for i in range(3, len(segments)):
             relevant_url += "/" + segments[i]
         parsed_relevant_url = quote(relevant_url, safe='')
-        final_url = segments[0] + "/" + segments[1] + "/" + segments[2] + "/api2/link?" + cid + "&url=" + parsed_relevant_url
+        final_url = segments[0] + "/"
+        final_url += segments[1] + "/"
+        final_url += segments[2] + "/api2/link?"
+        final_url += cid + "&url=" + parsed_relevant_url
         return final_url.split("_")[0]
     except Exception as e:
         log.error("Failed to parse FalconHostLink: %s", e)
@@ -36,7 +40,7 @@ class Submitter():
         new_url = parse_url(event["FalconHostLink"])
         udm_result = {
             "metadata": {
-                "event_timestamp": timestamp_components[0]+"T"+timestamp_components[1]+"+00:00",
+                "event_timestamp": timestamp_components[0] + "T" + timestamp_components[1] + "+00:00",
                 "event_type": "PROCESS_UNCATEGORIZED",
                 "description": event["DetectDescription"],
                 "product_event_type": meta["eventType"],
