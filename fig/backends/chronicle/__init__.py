@@ -1,4 +1,3 @@
-from typing_extensions import final
 from ...log import log
 from ...config import config
 from datetime import datetime
@@ -55,7 +54,7 @@ class Submitter():
                 "ip": event["LocalIP"]
             },
             "target": {
-                "asset_id": "CrowdStrike.Falcon:"+event["SensorId"],
+                "asset_id": "CrowdStrike.Falcon:" + event["SensorId"],
                 "process": {
                     "command_line": event["CommandLine"],
                     "file": {
