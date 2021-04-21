@@ -1,3 +1,4 @@
+from fig.backends import chronicle
 from . import aws
 from . import azure
 from . import gcp
@@ -9,7 +10,8 @@ ALL_BACKENDS = {
     'AWS': aws,
     'AZURE': azure,
     'GCP': gcp,
-    'WORKSPACEONE': workspaceone
+    'WORKSPACEONE': workspaceone,
+    'CHRONICLE': chronicle
 }
 
 

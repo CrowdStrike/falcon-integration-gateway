@@ -23,6 +23,4 @@ class WorkerThread(threading.Thread):
 
     def process_event(self, event):
         falcon_event = FalconEvent(event, self.cache)
-        if falcon_event.cloud_provider is None and falcon_event.mdm_identifier is None:
-            return
         self.backends.process(falcon_event)
