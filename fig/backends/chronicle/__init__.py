@@ -1,4 +1,3 @@
-from typing import Text
 from ...log import log
 from ...config import config
 from datetime import datetime
@@ -8,17 +7,17 @@ from json import dumps
 
 
 def parse_url(url):
-        try:
-            cid = url.split("_")[-1]
-            segments = url.split("/")
-            relevant_url = ""
-            for i in range (3, len(segments)):
-                relevant_url += "/" + segments[i]
-            parsed_relevant_url = quote(relevant_url, safe='')
-            final_url = segments[0]+"/"+segments[1]+"/"+segments[2]+"/api2/link?"+cid+"&url="+parsed_relevant_url
-            return final_url.split("_")[0]
-        except Exception as e:
-            log.error("Failed to parse FalconHostLink: %s", e)
+    try:
+        cid = url.split("_")[-1]
+        segments = url.split("/")
+        relevant_url = ""
+        for i in range(3, len(segments)):
+            relevant_url += "/" + segments[i]
+        parsed_relevant_url = quote(relevant_url, safe='')
+        final_url = segments[0] + "/" + segments[1] + "/" + segments[2] + "/api2/link?" + cid + "&url=" + parsed_relevant_url
+        return final_url.split("_")[0]
+    except Exception as e:
+        log.error("Failed to parse FalconHostLink: %s", e)
 
 
 class Submitter():
@@ -60,7 +59,7 @@ class Submitter():
                         "md5": event["MD5String"],
                         "sha1": event["SHA1String"],
                         "sha256": event["SHA256String"]
-                    }, 
+                    },
                     "pid": str(event["ProcessId"]),
                     "parent_process": {
                         "command_line": event["ParentCommandLine"],
@@ -70,7 +69,7 @@ class Submitter():
             },
             "security_result": {
                 "action_details": event["PatternDispositionDescription"],
-                "severity_details": event["SeverityName"], 
+                "severity_details": event["SeverityName"],
                 "url_back_to_product": new_url
             }
         }
@@ -78,15 +77,15 @@ class Submitter():
 
     def post_to_chronicle(self, event):
         try:
-            headers = {'Content-Type':'application/json'}
-            payload = {"events":[event]}
+            headers = {'Content-Type': 'application/json'}
+            payload = {"events": [event]}
             response = request(
                 "POST",
                 "https://malachiteingestion-pa.googleapis.com/v1/udmevents?key=" + self.security_key,
-                data = dumps(payload),
+                data=dumps(payload),
                 headers=headers
             )
-            if (response.status_code>=400):
+            if response.status_code >= 400:
                 log.error("Error logging to chronicle: %s", response.text)
         except Exception as e:
             log.error("Error logging to chronicle: %s", e)
