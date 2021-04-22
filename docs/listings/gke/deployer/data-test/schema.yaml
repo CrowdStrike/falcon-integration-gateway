@@ -1,0 +1,16 @@
+properties:
+  falcon.client_id:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+    default: MARKETPLACE_TEST
+  falcon.client_secret:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+    default: MARKETPLACE_TEST
+  cloud.google.application_credentials:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+    default: TUFSS0VUUExBQ0VfVEVTVA==

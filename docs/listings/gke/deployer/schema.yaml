@@ -1,0 +1,61 @@
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: "3.0.0"
+  publishedVersionMetadata:
+    releaseNote: >-
+      A first release.
+
+  clusterConstraints:
+    resources:
+    - replicas: 1
+      requests:
+        cpu: 100m
+        memory: 300Mi
+
+  images:
+    '':  # Primary image has no name.
+      properties:
+        imageRepo:
+          type: REPO_WITH_REGISTRY
+        imageTag:
+          type: TAG
+
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+      default: falcon-integration-gateway
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+      default: falcon-gateway
+  falcon.cloud_region:
+    type: string
+    x-google-marketplace:
+      type: STRING
+    default: us-1
+  falcon.client_id:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  falcon.client_secret:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  cloud.google.application_credentials:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+
+required:
+- name
+- namespace
+- falcon.client_id
+- falcon.client_secret
+- falcon.cloud_region
+- cloud.google.application_credentials
