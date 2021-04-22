@@ -1,9 +1,9 @@
-from ...log import log
-from ...config import config
 from datetime import datetime
 from urllib.parse import quote
-from requests import request
 from json import dumps
+from requests import request
+from ...log import log
+from ...config import config
 
 
 def parse_url(url):
@@ -19,8 +19,9 @@ def parse_url(url):
         final_url += segments[2] + "/api2/link?"
         final_url += cid + "&url=" + parsed_relevant_url
         return final_url.split("_")[0]
-    except Exception as e:
-        log.error("Failed to parse FalconHostLink: %s", e)
+    except IndexError as error:
+        log.error("Failed to parse FalconHostLink: %s", error)
+        return None
 
 
 class Submitter():
@@ -79,26 +80,23 @@ class Submitter():
         return udm_result
 
     def post_to_chronicle(self, event):
-        try:
-            headers = {'Content-Type': 'application/json'}
-            payload = {"events": [event]}
-            response = request(
-                "POST",
-                "https://malachiteingestion-pa.googleapis.com/v1/udmevents?key=" + self.security_key,
-                data=dumps(payload),
-                headers=headers
-            )
-            if response.status_code >= 400:
-                log.error("Error logging to chronicle: %s", response.text)
-        except Exception as e:
-            log.error("Error logging to chronicle: %s", e)
+        headers = {'Content-Type': 'application/json'}
+        payload = {"events": [event]}
+        response = request(
+            "POST",
+            "https://malachiteingestion-pa.googleapis.com/v1/udmevents?key=" + self.security_key,
+            data=dumps(payload),
+            headers=headers
+        )
+        if response.status_code >= 400:
+            log.error("Error logging to chronicle: %s", response.text)
 
 
 class Runtime():
     def __init__(self):
         log.info("Chronicle backend is enabled.")
 
-    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+    def is_relevant(self, falcon_event):  # pylint: disable=R0201,W0613
         return True
 
     def process(self, falcon_event):  # pylint: disable=R0201
