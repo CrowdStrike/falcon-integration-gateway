@@ -11,7 +11,7 @@ Currently available backends are
  * [Azure backend](fig/backends/azure) - pushes events to Azure Log Analytics
  * [GCP backend](fig/backends/gcp) - pushes events to GCP Security Command Center
  * [Workspace ONE backend](fig/backends/workspaceone) - pushes events to VMware Workspace ONE Intelligence
- * [Chronicle backend](fig/backends/chronicle) - pushed events to Chronicle Backstory
+ * [Chronicle backend](fig/backends/chronicle) - pushes events to Chronicle Backstory
 
 Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product. As such it carries no formal support, expressed or implied.
 
