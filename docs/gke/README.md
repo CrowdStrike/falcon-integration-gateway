@@ -31,7 +31,7 @@ export KEY_LOCATION="./gcloud-secret-${SERVICE_ACCOUNT}.json"
 
 # Create service account for this project
 gcloud iam service-accounts create $SERVICE_ACCOUNT  --display-name \
- "Service Account for [USER]"  --project $PROJECT_ID
+ "Service Account for falcon-integration-gateway"  --project $PROJECT_ID
 
 # Create key for the service account
 gcloud iam service-accounts keys create $KEY_LOCATION  --iam-account \
