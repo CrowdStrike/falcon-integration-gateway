@@ -38,7 +38,7 @@ properties:
     type: string
     x-google-marketplace:
       type: STRING
-      default: us-1
+    default: us-1
   falcon.client_id:
     type: string
     x-google-marketplace:

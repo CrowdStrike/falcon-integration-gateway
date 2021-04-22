@@ -56,6 +56,11 @@ spec:
               value: /google-application-credentials.json
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          command:
+            - "bash"
+          args:
+            - "-c"
+            - '[ "$FALCON_CLIENT_ID" == "MARKETPLACE_TEST" ] && tail -f /dev/null; python3 -m fig'
       volumes:
         - name: config-volume
           configMap:
