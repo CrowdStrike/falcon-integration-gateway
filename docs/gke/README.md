@@ -89,7 +89,7 @@ To enable multi-org access, please create service account in one of your organiz
 
 ### Appendix B: Per-project level permissions on GCP side
 
-Falcon Integration Gateway needs to be granted `securitycenter.admin` role on the organization level, meaning that the access to the SCC cannot be restricted per GCP project or GCP folder. This is caused by access model of GCP SCC and outside of scope of this project. Please refer to the following excerpt of [GCP SCC FAQ](https://cloud.google.com/security-command-center/docs/faq):
+Falcon Integration Gateway needs to be granted `securitycenter.admin` role on the organization level, meaning that the access to Google Security Command Center (SCC) cannot be restricted per GCP project or GCP folder. This is caused by the access model of SCC and is outside of scope of this project. Please refer to the following excerpt of [GCP SCC FAQ](https://cloud.google.com/security-command-center/docs/faq):
 
 > Can I limit who views which projects?
 > Currently, permissions for Security Command Center are at the organization level. Folder and project level permissions will be added in a future release. For more information, see [Access control](https://cloud.google.com/security-command-center/docs/access-control).
