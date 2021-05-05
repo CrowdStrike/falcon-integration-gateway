@@ -86,3 +86,10 @@ kubectl apply -f falcon-integration-gateway.yaml
 Falcon Integration Gateway is able to automatically discover GCP projects and organizations it has access to. The access permissions are determined from the service account created in the *Step 2: Create new GCP Service Account* of this guide.
 
 To enable multi-org access, please create service account in one of your organizations and grant **roles/securitycenter.admin** permission to this service account in every organization that it should manage.
+
+### Appendix B: Per-project level permissions on GCP side
+
+Falcon Integration Gateway needs to be granted `securitycenter.admin` role on the organization level, meaning that the access to Google Security Command Center (SCC) cannot be restricted per GCP project or GCP folder. This is caused by the access model of SCC and is outside of scope of this project. Please refer to the following excerpt of [GCP SCC FAQ](https://cloud.google.com/security-command-center/docs/faq):
+
+> Can I limit who views which projects?
+> Currently, permissions for Security Command Center are at the organization level. Folder and project level permissions will be added in a future release. For more information, see [Access control](https://cloud.google.com/security-command-center/docs/access-control).
