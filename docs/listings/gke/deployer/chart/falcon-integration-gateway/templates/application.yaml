@@ -7,6 +7,8 @@ metadata:
     app.kubernetes.io/name: "{{ .Release.Name }}"
   annotations:
     marketplace.cloud.google.com/deploy-info: '{"partner_id": "partner", "product_id": "falcon-integration-gateway", "partner_name": "CrowdStrike"}'
+    kubernetes-engine.cloud.google.com/icon: >-
+      data:image/png;base64,{{ .Files.Get "logo.png" | b64enc }}
 spec:
   descriptor:
     type: falcon-integration-gateway
