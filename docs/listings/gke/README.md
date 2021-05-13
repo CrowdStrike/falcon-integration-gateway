@@ -19,6 +19,5 @@ mpdev install \
 ## How to run sanity test?
 ```
 mpdev verify \
-      --deployer=$REGISTRY/$APP_NAME/deployer \
-
+      --deployer=$REGISTRY/$APP_NAME/deployer
 ```
