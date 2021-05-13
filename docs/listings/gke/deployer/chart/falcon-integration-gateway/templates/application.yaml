@@ -5,6 +5,7 @@ metadata:
   namespace: "{{ .Release.Namespace }}"
   labels:
     app.kubernetes.io/name: "{{ .Release.Name }}"
+    {{- include "falcon-integration-gateway.labels" . | nindent 4 }}
   annotations:
     marketplace.cloud.google.com/deploy-info: '{"partner_id": "partner", "product_id": "falcon-integration-gateway", "partner_name": "CrowdStrike"}'
     kubernetes-engine.cloud.google.com/icon: >-
