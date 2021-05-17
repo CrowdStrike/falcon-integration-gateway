@@ -1,6 +1,6 @@
 from logging import INFO, Formatter, getLogger
-from tlssyslog.handlers import TLSSysLogHandler
 from ssl import CERT_NONE, PROTOCOL_TLSv1_2
+from tlssyslog.handlers import TLSSysLogHandler
 from ....config import config
 
 serverlog = getLogger('ws1')
