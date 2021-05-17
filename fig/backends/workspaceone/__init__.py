@@ -1,6 +1,3 @@
-from logging.config import dictConfig
-from logging import info
-from ssl import CERT_NONE, PROTOCOL_TLSv1_2
 from .serverlog import serverlog
 from ...log import log
 from ...config import config
