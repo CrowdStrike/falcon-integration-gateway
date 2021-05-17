@@ -1,6 +1,7 @@
 from logging.config import dictConfig
 from logging import info
 from ssl import CERT_NONE, PROTOCOL_TLSv1_2
+from .serverlog import serverlog
 from ...log import log
 from ...config import config
 
@@ -12,7 +13,7 @@ class Submitter():
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
-        info(self.log())
+        serverlog.info(self.log())
 
     def log(self):
         event = self.event.original_event['event']
@@ -72,33 +73,6 @@ class Runtime():
     def __init__(self):
         log.info("Workspace One backend is enabled.")
         self.workspaceone_token = config.get('workspaceone', 'token')
-        syslog_host = config.get('workspaceone', 'syslog_host')
-        syslog_port = int(config.get('workspaceone', 'syslog_port'))
-        dictConfig({
-            'version': 1,
-            'formatters': {
-                'simple': {
-                    'format': '%(asctime)s django %(name)s: %(levelname)s %(message)s',
-                    'datefmt': '%Y-%m-%dT%H:%M:%S'
-                }
-            },
-            'handlers': {
-                'syslog': {
-                    'level': 'INFO',
-                    'class': 'tlssyslog.handlers.TLSSysLogHandler',
-                    'formatter': 'simple',
-                    'address': (syslog_host, syslog_port),
-                    'ssl_kwargs': {
-                        'cert_reqs': CERT_NONE,
-                        'ssl_version': PROTOCOL_TLSv1_2
-                    }
-                }
-            },
-            'root': {
-                'handlers': ['syslog'],
-                'level': 'INFO'
-            }
-        })
 
     def is_relevant(self, falcon_event):  # pylint: disable=R0201
         return falcon_event.mdm_identifier is not None
