@@ -59,3 +59,8 @@ required:
 - falcon.client_secret
 - falcon.cloud_region
 - cloud.google.application_credentials
+
+form:
+- widget: Deployment Guide
+  description: |-
+    <a href="https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/docs/listings/gke/UserGuide.md">Deployment Guide</a>
