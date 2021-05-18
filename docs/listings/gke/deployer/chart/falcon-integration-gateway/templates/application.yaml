@@ -27,8 +27,6 @@ spec:
 
       Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product.
       As such it carries no formal support, expressed or implied.
-
-      Learn more about the upstream project at https://github.com/CrowdStrike/falcon-integration-gateway/
     links:
     - description: 'User Guide: Deploying Falcon Integration Gateway from GKE Marketplace'
       url: https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/docs/listings/gke/UserGuide.md
