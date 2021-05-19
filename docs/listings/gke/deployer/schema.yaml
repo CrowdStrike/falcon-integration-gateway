@@ -61,6 +61,6 @@ required:
 - cloud.google.application_credentials
 
 form:
-- widget: Deployment Guide
+- widget: help
   description: |-
     <a href="https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/docs/listings/gke/UserGuide.md">Deployment Guide</a>
