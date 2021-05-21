@@ -48,7 +48,7 @@ base64 $KEY_LOCATION
 
 ### Step 3: Navigate to Falcon Integration Gateway Listing Page
 
-[Marketplace Link](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway)
+[Marketplace Link](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc)
 
 ![overview](assets/overview.png)
 
