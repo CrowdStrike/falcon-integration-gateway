@@ -43,9 +43,12 @@ class FigConfig(configparser.SafeConfigParser):
             raise Exception('Malformed configuration: expected events.older_than_days_threshold to be in range 0-10000')
         if int(self.get('main', 'worker_threads')) not in range(1, 128):
             raise Exception('Malformed configuration: expected main.worker_threads to be in range 1-128')
+        self.validate_falcon()
+        self.validate_backends()
+
+    def validate_falcon(self):
         if int(self.get('falcon', 'reconnect_retry_count')) not in range(1, 10000):
             raise Exception('Malformed configuration: expected falcon.reconnect_retry_count to be in range 0-10000')
-        self.validate_backends()
 
     def validate_backends(self):
         if not self.backends.issubset(self.ALL_BACKENDS) or len(self.backends) < 1:
