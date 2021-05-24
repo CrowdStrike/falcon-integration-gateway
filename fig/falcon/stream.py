@@ -40,7 +40,7 @@ class StreamManagementThread(threading.Thread):
         return stop_event
 
     def get_streams(self, falcon_api):
-        retry_count = 5
+        retry_count = int(config.get('falcon', 'reconnect_retry_count'))
         for attempt in range(retry_count):
             try:
                 return falcon_api.streams(self.application_id)
