@@ -17,8 +17,11 @@ Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike prod
 
 ## Deployment Guide
 
-- [Deployment to AKS](docs/aks)
-- [Deployment to GKE](docs/gke)
+ * Azure backend
+   * [Deployment to AKS](docs/aks)
+ * GCP SCC backend
+   * [Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))
+   * [Deployment to GKE](docs/gke) (manual)
 
 ## Developer Guide
 
