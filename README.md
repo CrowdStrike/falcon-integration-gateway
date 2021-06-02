@@ -15,10 +15,12 @@ Currently available backends are
 
 Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product. As such it carries no formal support, expressed or implied.
 
-## Deployment Guide
+## Deployment Guides
 
  * Azure backend
    * [Deployment to AKS](docs/aks)
+ * Chronicle backend
+   * [Deployment to Kubernetes](docs/chronicle)
  * GCP SCC backend
    * [Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))
    * [Deployment to GKE](docs/gke) (manual)
