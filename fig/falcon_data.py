@@ -31,36 +31,47 @@ class FalconCache():
             if len(resources) == 0:
                 raise FalconAPIDataError('Cannot process event for device {}, device not known'.format(sensor_id))
             detail = self.falcon_api.device_details(sensor_id)[0]
-
-            if not detail.get('service_provider'):
-                # No need to cache device detail if we know that it is not relevant to the clouds.
-                # Let's just cache the information about the device existence and irrelevance.
-                detail = {}
-
             self._host_detail[sensor_id] = detail
 
         return self._host_detail[sensor_id]
 
-    def mdm_identifier(self, sensor_id):
+    def mdm_identifier(self, sensor_id, event_platform):
         if not sensor_id:
             return EventDataError("Cannot process event. SensorId field is missing: ")
 
         if sensor_id not in self._mdm_id or self._mdm_id[sensor_id] is None:
             session = self.falcon_api.init_rtr_session(sensor_id)
-            command = self.falcon_api.execute_rtr_command(
-                session[0]['session_id'],
-                'reg query',
-                'reg query "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Provisioning\\OMADM\\MDMDeviceID" DeviceClientId'
-            )
-            response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
-
-            while not response['complete']:
+            if event_platform == 'Windows':
+                command = self.falcon_api.execute_rtr_command(
+                    'RTR_ExecuteCommand',
+                    session[0]['session_id'],
+                    'reg query',
+                    'reg query "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Provisioning\\OMADM\\MDMDeviceID" DeviceClientId'
+                )
                 response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
-            if response['stderr']:
-                self._mdm_id[sensor_id] = None
+                while not response['complete']:
+                    response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
+                if response['stderr']:
+                    self._mdm_id[sensor_id] = None
+                else:
+                    self._mdm_id[sensor_id] = response['stdout'].split(' = ')[1].split('\n')[0]
+            elif event_platform == 'Mac':
+                command = self.falcon_api.execute_rtr_command(
+                    'RTR_ExecuteAdminCommand',
+                    session[0]['session_id'],
+                    'runscript',
+                    "runscript -Raw=```system_profiler SPHardwareDataType | awk '/UUID/ { print $3; }'```"
+                )
+                response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
+                while not response['complete']:
+                    response = self.falcon_api.check_rtr_command_status(command[0]['cloud_request_id'], 0)[0]
+                if response['stderr']:
+                    self._mdm_id[sensor_id] = None
+                else:
+                    self._mdm_id[sensor_id] = response['stdout'].split('\n')[0]
             else:
-                self._mdm_id[sensor_id] = response['stdout'].split(' = ')[1].split('\n')[0]
-
+                self._mdm_id[sensor_id] = None
+        
         return self._mdm_id[sensor_id]
 
 
@@ -75,7 +86,8 @@ class FalconEvent():
 
     @property
     def mdm_identifier(self):
-        return self.cache.mdm_identifier(self.original_event.sensor_id)
+        device_details = self.cache.device_details(self.original_event.sensor_id)
+        return self.cache.mdm_identifier(self.original_event.sensor_id, device_details['platform_name'])
 
     @property
     def cloud_provider(self):

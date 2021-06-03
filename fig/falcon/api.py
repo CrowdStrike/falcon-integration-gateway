@@ -59,9 +59,9 @@ class FalconAPI():
             }
         )
 
-    def execute_rtr_command(self, session_id, base_command, command_string):
+    def execute_rtr_command(self, action, session_id, base_command, command_string):
         return self._resources(
-            action='RTR_ExecuteCommand',
+            action=action,
             body={
                 'base_command': base_command,
                 'command_string': command_string,
