@@ -71,7 +71,7 @@ class FalconCache():
                     self._mdm_id[sensor_id] = response['stdout'].split('\n')[0]
             else:
                 self._mdm_id[sensor_id] = None
-        
+
         return self._mdm_id[sensor_id]
 
 
