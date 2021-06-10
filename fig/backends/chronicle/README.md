@@ -16,6 +16,8 @@ backends=CHRONICLE
 # Uncomment to provide Google security key. Alternatively, use GOOGLE_SECURITY_KEY variable
 #security_key =
 
+# Uncomment to provide Chronicle region (us, europe, asia-southeast1). Alternatively, use CHRONICLE_REGION variable
+#region =
 ```
 
 ### Developer Guide
@@ -30,6 +32,7 @@ backends=CHRONICLE
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e GOOGLE_SECURITY_KEY="$GOOGLE_SECURITY_KEY" \
+       -e CHRONICLE_REGION="$CHRONICLE_REGION" \
        -e FALCON_CLOUD_REGION="us-1" \
        falcon-integration-gateway:latest
    ```
