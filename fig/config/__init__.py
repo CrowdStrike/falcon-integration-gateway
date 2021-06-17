@@ -15,7 +15,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
         ['workspaceone', 'syslog_host', 'SYSLOG_HOST'],
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
-        ['chronicle', 'security_key', 'GOOGLE_SECURITY_KEY']
+        ['chronicle', 'security_key', 'GOOGLE_SECURITY_KEY'],
+        ['chronicle', 'region', 'CHRONICLE_REGION']
     ]
 
     def __init__(self):
@@ -72,6 +73,11 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected workspaceone.syslog_host to be non-empty')
             if int(self.get('workspaceone', 'syslog_port')) not in range(1, 65535):
                 raise Exception('Malformed configuration: expected workspaceone.syslog_port to be in range 1-65335')
+        if 'CHRONICLE' in self.backends:
+            if len(self.get('chronicle', 'security_key')) == 0:
+                raise Exception('Malformed Configuration: expected chronicle.security_key to be non-empty')
+            if len(self.get('chronicle', 'region')) == 0:
+                raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
 
     @property
     def backends(self):

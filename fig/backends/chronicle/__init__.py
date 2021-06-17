@@ -28,6 +28,7 @@ class Submitter():
     def __init__(self, event):
         self.event = event
         self.security_key = config.get('chronicle', 'security_key')
+        self.region = config.get('chronicle', 'region')
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
@@ -80,16 +81,18 @@ class Submitter():
         return udm_result
 
     def post_to_chronicle(self, event):
+        # Only Chronicle's US region doesn't have an API prefix
+        prefix = self.region
+        if self.region == 'us':
+            prefix = ''
+
+        url = "https://" + prefix + "malachiteingestion-pa.googleapis.com/v1/udmevents?key=" + self.security_key
         headers = {'Content-Type': 'application/json'}
         payload = {"events": [event]}
-        response = request(
-            "POST",
-            "https://malachiteingestion-pa.googleapis.com/v1/udmevents?key=" + self.security_key,
-            data=dumps(payload),
-            headers=headers
-        )
+
+        response = request("POST", url, data=dumps(payload), headers=headers)
         if response.status_code >= 400:
-            log.error("Error logging to chronicle: %s", response.text)
+            log.error("Error logging to Chronicle: %s", response.text)
 
 
 class Runtime():
