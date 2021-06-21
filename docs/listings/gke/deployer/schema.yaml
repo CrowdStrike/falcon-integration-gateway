@@ -35,19 +35,23 @@ properties:
       type: NAMESPACE
       default: falcon-gateway
   falcon.cloud_region:
+    title: Falcon Cloud Region
     type: string
     x-google-marketplace:
       type: STRING
     default: us-1
   falcon.client_id:
+    title: "Falcon API OAuth2 Credentials: Client ID"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
   falcon.client_secret:
+    title: "Falcon API OAuth2 Credentials: Client Secret"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
   cloud.google.application_credentials:
+    title: "GCP Service Account key for accessing SCC (base64 encoded)"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
