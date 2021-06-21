@@ -40,6 +40,11 @@ properties:
     x-google-marketplace:
       type: STRING
     default: us-1
+    enum:
+    - 'us-1'
+    - 'us-2'
+    - 'eu-1'
+    - 'us-gov-1'
   falcon.client_id:
     title: "Falcon API OAuth2 Credentials: Client ID"
     type: string
