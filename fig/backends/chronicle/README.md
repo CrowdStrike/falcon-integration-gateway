@@ -13,7 +13,7 @@ backends=CHRONICLE
 [chronicle]
 # Chronicle section is applicable only when Chronicle backend is enabled in the [main] section
 
-# Uncomment to provide Google security key. Alternatively, use GOOGLE_SECURITY_KEY variable
+# Uncomment to provide Google security key. Alternatively, use GOOGLE_SECURITY_KEY env variable
 #security_key =
 
 # Uncomment to provide Chronicle region (us, europe, asia-southeast1). Alternatively, use CHRONICLE_REGION variable
