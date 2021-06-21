@@ -35,19 +35,31 @@ properties:
       type: NAMESPACE
       default: falcon-gateway
   falcon.cloud_region:
+    title: Falcon Cloud Region
     type: string
     x-google-marketplace:
       type: STRING
     default: us-1
+    enum:
+    - 'us-1'
+    - 'us-2'
+    - 'eu-1'
+    - 'us-gov-1'
   falcon.client_id:
+    title: "Falcon API OAuth2 Credentials: Client ID"
+    description: "API keypair used to authenticate with Falcon Platform and to initiate streaming session. Only the following permissions are required: READ 'Event streams' and READ 'Hosts'"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
   falcon.client_secret:
+    title: "Falcon API OAuth2 Credentials: Client Secret"
+    description: "API keypair used to authenticate with Falcon Platform and to initiate streaming session. Only the following permissions are required: READ 'Event streams' and READ 'Hosts'"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
   cloud.google.application_credentials:
+    title: "GCP Service Account key for accessing SCC (base64 encoded)"
+    description: "This service account will be used to create Falcon Findings in GCP Security Command Center. Falcon Integration Gateway is able to automatically discover GCP projects and organizations it has access to. Consult the User Guide for more information."
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
