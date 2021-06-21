@@ -41,6 +41,13 @@ echo -n $FALCON_CLIENT_SECRET | base64
 echo -n $GOOGLE_SECURITY_KEY | base64
 ```
 
+Set the region of your Chronicle cloud.
+
+```
+    # Uncomment to provide Chronicle region (us, europe, asia-southeast1). Alternatively, use CHRONICLE_REGION variable
+    region = us
+```
+
 ### Step 5: Deploy to kubernetes
 
 Ensure your kubectl command is configured to use kubernetes
