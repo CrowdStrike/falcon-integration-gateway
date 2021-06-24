@@ -22,7 +22,7 @@ spec:
   - group: v1
     kind: Secret
   descriptor:
-    type: falcon-integration-gateway-chronicle
+    type: falcon-integration-gateway
     version: '3.0.0'
     description: |-
       Falcon Integration Gateway (FIG) forwards threat detection findings from CrowdStrike Falcon

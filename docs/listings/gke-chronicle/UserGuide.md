@@ -29,7 +29,7 @@ TODO insert screenshot
 
 Configure button leads you to application configuration page.
  - Fill in Falcon OAuth2 API credentials obtained in Step 1 of this guide.
- - Fill in base64 encoded Chronicle Security Key
+ - Fill in Chronicle Security Key and Chronicle Region
 
 TODO insert screenshot
 

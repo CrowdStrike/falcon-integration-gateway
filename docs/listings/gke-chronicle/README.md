@@ -13,7 +13,7 @@
 ```
 mpdev install \
       --deployer=$REGISTRY/$APP_NAME/deployer \
-      --parameters='{"name": "falcon-integration-gateway-chronicle", "namespace": "test-ns", "falcon.cloud_region": "us-1", "falcon.client_id": "'${client_id}'", "falcon.client_secret": "'${client_secret}'", "chronicle.google_security_key": "'$chronicle_creds'" }'
+      --parameters='{"name": "falcon-integration-gateway", "namespace": "test-ns", "falcon.cloud_region": "us-1", "falcon.client_id": "'${client_id}'", "falcon.client_secret": "'${client_secret}'", "chronicle.google_security_key": "'$chronicle_creds'" }'
 ```
 
 ## How to run sanity test?

@@ -28,22 +28,32 @@ properties:
     type: string
     x-google-marketplace:
       type: NAME
-      default: falcon-integration-gateway-chronicle
+      default: falcon-integration-gateway
   namespace:
     type: string
     x-google-marketplace:
       type: NAMESPACE
       default: falcon-gateway
   falcon.cloud_region:
+    title: Falcon Cloud Region
     type: string
     x-google-marketplace:
       type: STRING
     default: us-1
+    enum:
+    - 'us-1'
+    - 'us-2'
+    - 'eu-1'
+    - 'us-gov-1'
   falcon.client_id:
+    title: "Falcon API OAuth2 Credentials: Client ID"
+    description: "API keypair used to authenticate with Falcon Platform and to initiate streaming session. Only the following permissions are required: READ 'Event streams' and READ 'Hosts'"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
   falcon.client_secret:
+    title: "Falcon API OAuth2 Credentials: Client Secret"
+    description: "API keypair used to authenticate with Falcon Platform and to initiate streaming session. Only the following permissions are required: READ 'Event streams' and READ 'Hosts'"
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
@@ -53,6 +63,7 @@ properties:
       type: STRING
     default: us
   chronicle.google_security_key:
+    description: "This security key will be used to push Falcon detections findings to Chronicle. Consult the User Guide for more information."
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
