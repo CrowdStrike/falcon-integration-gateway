@@ -65,7 +65,9 @@ class Submitter():
             'ProcessName': self.event.original_event['event']['FileName'],
             'ProcessPath': self.event.original_event['event']['FilePath'],
             'CommandLine': self.event.original_event['event']['CommandLine'],
-            'DetectName': self.event.detect_name
+            'DetectName': self.event.detect_name,
+            'AccountId': self.event.cloud_provider_account_id,
+            'InstanceId': self.event.instance_id
         }]
         return dumps(json_data)
 
