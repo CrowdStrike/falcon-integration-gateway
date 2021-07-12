@@ -21,3 +21,11 @@ mpdev install \
 mpdev verify \
       --deployer=$REGISTRY/$APP_NAME/deployer
 ```
+
+## How to update marketplace listing?
+
+[Documentation](https://cloud.google.com/marketplace/docs/partners/kubernetes/maintaining-product)
+
+### Minor version updates
+
+For every update, you need to push the latest deployer image to the staging repo and update the patch version of your listing (e.g., '3.0.4', '3.0.5'). The update would contain new content, and therefore must have a bumped version number. Once updated, please click the "Update images" button in Partner Portal, and resubmit your draft for a review. Let me know if you have any questions.
