@@ -23,7 +23,7 @@ Create new credentials for programmatic access to chronicle.
 
 [Marketplace Link](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-chronicle)
 
-TODO insert screenshot
+![overview](assets/overview.png)
 
 ### Step 4: Configure the application
 
@@ -31,10 +31,10 @@ Configure button leads you to application configuration page.
  - Fill in Falcon OAuth2 API credentials obtained in Step 1 of this guide.
  - Fill in Chronicle Security Key and Chronicle Region
 
-TODO insert screenshot
+![configure](assets/configure.png)
 
 ### Step 5: Hit deploy button
 
-### Step 6: Verify the install
+![starting](assets/starting.png)
 
-Open your chronicle environment and search for Falcon Detections.
+![application](assets/application.png)
