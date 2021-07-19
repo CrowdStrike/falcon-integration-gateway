@@ -1,16 +1,16 @@
 from datetime import datetime
-import boto3
 import traceback
+import boto3
+from botocore.exceptions import ClientError
 from ...config import config
 from ...log import log
-from botocore.exceptions import ClientError
 
 
 class Submitter():
     def __init__(self, event):
         self.event = event
 
-    def find_instance(self, instance_id, mac_address):
+    def find_instance(self, instance_id, mac_address):  # pylint: disable=R0201
         # Instance IDs are unique to the region, not the account, so we have to check them all
 
         ec2_client = boto3.client("ec2")
@@ -26,26 +26,26 @@ class Submitter():
                     ins_mac = iface.mac_address.lower().replace(":", "").replace("-", "")
                     if det_mac == ins_mac:
                         found = True
-                if found:
+                if found:  # pylint: disable=R1723
                     break
                 else:
                     ec2instance = False
             except ClientError:
                 continue
             except Exception:
-                tb = traceback.format_exc()
-                log.error(str(tb))
+                trace = traceback.format_exc()
+                log.error(str(trace))
                 continue
 
         return ec2instance
 
-    def sendToSecurityHub(self, manifest):
+    def submit_to_securityhub(self, manifest):
         client = boto3.client('securityhub', region_name=config.get('aws', 'region'))
         check_response = {}
         found = False
         try:
             check_response = client.get_findings(Filters={'Id': [{'Value': manifest["Id"], 'Comparison': 'EQUALS'}]})
-            for finding in check_response["Findings"]:
+            for _ in check_response["Findings"]:
                 found = True
         except Exception:
             pass
@@ -82,7 +82,7 @@ class Submitter():
                 log.info(f"Instance {i_id} with MAC address {mac} not found in regions searched. Alert not processed.")
 
         if send:
-            response = self.sendToSecurityHub(sh_payload)
+            response = self.submit_to_securityhub(sh_payload)
             if not response:
                 log.info("Detection already submitted to Security Hub. Alert not processed.")
             else:
@@ -92,19 +92,19 @@ class Submitter():
 
     def create_payload(self):
         region = config.get('aws', 'region')
-        accountID = boto3.client("sts").get_caller_identity().get('Account')
-        severityProduct = self.event.severity_value
-        severityNormalized = severityProduct * 20
+        account_id = boto3.client("sts").get_caller_identity().get('Account')
+        severity_product = self.event.severity_value
+        severity_normalized = severity_product * 20
         payload = {
             "SchemaVersion": "2018-10-08",
             "ProductArn": "arn:aws:securityhub:{}:517716713836:product/crowdstrike/crowdstrike-falcon".format(region),
-            "AwsAccountId": accountID,
+            "AwsAccountId": account_id,
             "SourceUrl": self.event.falcon_link,
             "GeneratorId": "Falcon Host",
             "CreatedAt": datetime.utcfromtimestamp(float(self.event.event_create_time) / 1000.).isoformat() + 'Z',
             "UpdatedAt": ((datetime.utcfromtimestamp(datetime.timestamp(datetime.now()))).isoformat() + 'Z'),
             "RecordState": "ACTIVE",
-            "Severity": {"Product": severityProduct, "Normalized": severityNormalized}
+            "Severity": {"Product": severity_product, "Normalized": severity_normalized}
         }
 
         # Instance ID based detail
