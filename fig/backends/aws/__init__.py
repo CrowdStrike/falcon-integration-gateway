@@ -12,6 +12,7 @@ class Submitter():
 
     def find_instance(self, instance_id, mac_address):  # pylint: disable=R0201
         # Instance IDs are unique to the region, not the account, so we have to check them all
+        report_region = config.get('aws', 'region')
         ec2instance = None
         ec2_client = boto3.client("ec2")
         regions = [region["RegionName"] for region in ec2_client.describe_regions()["Regions"]]
@@ -35,7 +36,7 @@ class Submitter():
                 log.exception(str(trace))
                 continue
 
-        return region, ec2instance
+        return report_region, ec2instance
 
     @staticmethod
     def send_to_securityhub(manifest):
