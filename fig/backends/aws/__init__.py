@@ -62,6 +62,7 @@ class Submitter():
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
+        det_region = config.get('aws', 'region')
         send = False
         try:
             if self.event.instance_id:
