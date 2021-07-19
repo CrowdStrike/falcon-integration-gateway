@@ -79,7 +79,7 @@ class Submitter():
         except AttributeError:
             # Instance ID was not provided by the detection
             log.info("Instance ID not provided by detection. Alert not processed.")
-            pass
+
         if send:
             response = self.send_to_securityhub(sh_payload)
             if not response:
