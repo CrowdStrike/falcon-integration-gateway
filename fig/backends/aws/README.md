@@ -1,6 +1,8 @@
 # AWS Backend
 
-Integration with AWS
+Integration with AWS Security Hub.
+
+Single Falcon Integration Gateway can be used to send reports from all AWS regions to single AWS Security Hub region.
 
 ### Example Configuration file
 
