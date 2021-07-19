@@ -114,8 +114,16 @@ class FalconEvent():
         return self.original_event.creation_time
 
     @property
+    def event_create_time(self):
+        return self.original_event['metadata']['eventCreationTime']
+
+    @property
     def severity(self):
         return self.original_event['event']['SeverityName']
+
+    @property
+    def severity_value(self):
+        return self.original_event['event']['Severity']
 
     @property
     def detect_description(self):
