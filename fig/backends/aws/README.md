@@ -15,9 +15,6 @@ backends=AWS
 
 # Uncomment to provide aws region. Alternatively, use AWS_REGION env variable
 #region=eu-west-1
-
-# Uncomment to provide sqs_queue_name.
-#sqs_queue_name=
 ```
 
 ### Developer Guide
