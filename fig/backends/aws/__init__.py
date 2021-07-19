@@ -48,7 +48,7 @@ class Submitter():
             check_response = client.get_findings(Filters={'Id': [{'Value': manifest["Id"], 'Comparison': 'EQUALS'}]})
             for _ in check_response["Findings"]:
                 found = True
-        except Exception:  # pylint: disable=W0703
+        except ClientError:
             pass
 
         import_response = False
