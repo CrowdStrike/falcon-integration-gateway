@@ -39,6 +39,7 @@ class Submitter():
 
         return ec2instance
 
+    @classmethod
     def send_to_securityhub(self, manifest):
         client = boto3.client('securityhub', region_name=config.get('aws', 'region'))
         check_response = {}
@@ -79,7 +80,7 @@ class Submitter():
                 # Not our instance
                 i_id = self.event.instance_id
                 mac = self.event.device_details["mac_address"]
-                log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed." % (i_id, mac))
+                log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed.", i_id, mac)
 
         if send:
             response = self.send_to_securityhub(sh_payload)
@@ -92,7 +93,11 @@ class Submitter():
 
     def create_payload(self):
         region = config.get('aws', 'region')
-        account_id = boto3.client("sts").get_caller_identity().get('Account')
+        try:
+            account_id = boto3.client("sts").get_caller_identity().get('Account')
+        except KeyError:
+            # Failed to get endpoint_resolver the first time, try it again
+            account_id = boto3.client("sts").get_caller_identity().get('Account')
         severity_product = self.event.severity_value
         severity_normalized = severity_product * 20
         payload = {
