@@ -27,7 +27,7 @@ class Submitter():
                     if det_mac == ins_mac:
                         found = True
                 if found:  # pylint: disable=R1723
-                    return ec2instance
+                    return region, ec2instance
             except ClientError:
                 continue
             except Exception:  # pylint: disable=W0703
@@ -35,7 +35,7 @@ class Submitter():
                 log.exception(str(trace))
                 continue
 
-        return ec2instance
+        return region, ec2instance
 
     @staticmethod
     def send_to_securityhub(manifest):
@@ -61,11 +61,10 @@ class Submitter():
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
-        sh_payload = self.create_payload()
         send = False
         try:
             if self.event.instance_id:
-                instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
+                det_region, instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
                 try:
                     for _ in instance.network_interfaces:
                         # Only send alerts for instances we can find
@@ -81,6 +80,7 @@ class Submitter():
             log.info("Instance ID not provided by detection. Alert not processed.")
 
         if send:
+            sh_payload = self.create_payload(det_region)
             response = self.send_to_securityhub(sh_payload)
             if not response:
                 log.info("Detection already submitted to Security Hub. Alert not processed.")
@@ -89,7 +89,7 @@ class Submitter():
                     submit_msg = f"Detection submitted to Security Hub. (Request ID: {response['ResponseMetadata']['RequestId']})"
                     log.info(submit_msg)
 
-    def create_payload(self):
+    def create_payload(self, instance_region):
         region = config.get('aws', 'region')
         try:
             account_id = boto3.client("sts").get_caller_identity().get('Account')
@@ -111,11 +111,11 @@ class Submitter():
         }
 
         # Instance ID based detail
-        if self.event.instance_id:
+        try:
             payload["Id"] = f"{self.event.instance_id}{self.event.event_id}"
             payload["Title"] = "Falcon Alert. Instance: %s" % self.event.instance_id
-            payload["Resources"] = [{"Type": "AwsEc2Instnace", "Id": self.event.instance_id, "Region": region}]
-        else:
+            payload["Resources"] = [{"Type": "AwsEc2Instnace", "Id": self.event.instance_id, "Region": instance_region}]
+        except AttributeError:
             payload["Id"] = f"UnknownInstanceID:{self.event.event_id}"
             payload["Title"] = "Falcon Alert"
             payload["Resources"] = [{"Type": "Other",
