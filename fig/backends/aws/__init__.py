@@ -12,7 +12,7 @@ class Submitter():
 
     def find_instance(self, instance_id, mac_address):  # pylint: disable=R0201
         # Instance IDs are unique to the region, not the account, so we have to check them all
-
+        ec2instance = None
         ec2_client = boto3.client("ec2")
         regions = [region["RegionName"] for region in ec2_client.describe_regions()["Regions"]]
         for region in regions:
@@ -27,14 +27,12 @@ class Submitter():
                     if det_mac == ins_mac:
                         found = True
                 if found:  # pylint: disable=R1723
-                    break
-                else:
-                    ec2instance = False
+                    return ec2instance
             except ClientError:
                 continue
             except Exception:  # pylint: disable=W0703
                 trace = traceback.format_exc()
-                log.error(str(trace))
+                log.exception(str(trace))
                 continue
 
         return ec2instance
@@ -57,11 +55,7 @@ class Submitter():
                 import_response = client.batch_import_findings(Findings=[manifest])
             except ClientError as err:
                 # Boto3 issue communicating with SH, throw the error in the log
-                log.error(str(err))
-            except Exception:  # pylint: disable=W0703
-                # Unknown error / issue, log the result
-                trace = traceback.format_exc()
-                log.error(str(trace))
+                log.exception(str(err))
 
         return import_response
 
@@ -69,19 +63,23 @@ class Submitter():
         log.info("Processing detection: %s", self.event.detect_description)
         sh_payload = self.create_payload()
         send = False
-        if self.event.instance_id:
-            instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
-            try:
-                for _ in instance.network_interfaces:
-                    # Only send alerts for instances we can find
-                    send = True
+        try:
+            if self.event.instance_id:
+                instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
+                try:
+                    for _ in instance.network_interfaces:
+                        # Only send alerts for instances we can find
+                        send = True
 
-            except ClientError:
-                # Not our instance
-                i_id = self.event.instance_id
-                mac = self.event.device_details["mac_address"]
-                log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed.", i_id, mac)
-
+                except ClientError:
+                    # Not our instance
+                    i_id = self.event.instance_id
+                    mac = self.event.device_details["mac_address"]
+                    log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed.", i_id, mac)
+        except AttributeError:
+            # Instance ID was not provided by the detection
+            log.info("Instance ID not provided by detection. Alert not processed.")
+            pass
         if send:
             response = self.send_to_securityhub(sh_payload)
             if not response:
