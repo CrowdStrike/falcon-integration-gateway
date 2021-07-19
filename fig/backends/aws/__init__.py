@@ -32,14 +32,14 @@ class Submitter():
                     ec2instance = False
             except ClientError:
                 continue
-            except Exception:
+            except Exception:  # pylint: disable=W0703
                 trace = traceback.format_exc()
                 log.error(str(trace))
                 continue
 
         return ec2instance
 
-    def submit_to_securityhub(self, manifest):
+    def send_to_securityhub(self, manifest):
         client = boto3.client('securityhub', region_name=config.get('aws', 'region'))
         check_response = {}
         found = False
@@ -47,7 +47,7 @@ class Submitter():
             check_response = client.get_findings(Filters={'Id': [{'Value': manifest["Id"], 'Comparison': 'EQUALS'}]})
             for _ in check_response["Findings"]:
                 found = True
-        except Exception:
+        except Exception:  # pylint: disable=W0703
             pass
 
         import_response = False
@@ -57,10 +57,10 @@ class Submitter():
             except ClientError as err:
                 # Boto3 issue communicating with SH, throw the error in the log
                 log.error(str(err))
-            except Exception:
+            except Exception:  # pylint: disable=W0703
                 # Unknown error / issue, log the result
-                tb = traceback.format_exc()
-                log.error(str(tb))
+                trace = traceback.format_exc()
+                log.error(str(trace))
 
         return import_response
 
@@ -71,7 +71,7 @@ class Submitter():
         if self.event.instance_id:
             instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
             try:
-                for iface in instance.network_interfaces:
+                for _ in instance.network_interfaces:
                     # Only send alerts for instances we can find
                     send = True
 
@@ -79,10 +79,10 @@ class Submitter():
                 # Not our instance
                 i_id = self.event.instance_id
                 mac = self.event.device_details["mac_address"]
-                log.info(f"Instance {i_id} with MAC address {mac} not found in regions searched. Alert not processed.")
+                log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed." % (i_id, mac))
 
         if send:
-            response = self.submit_to_securityhub(sh_payload)
+            response = self.send_to_securityhub(sh_payload)
             if not response:
                 log.info("Detection already submitted to Security Hub. Alert not processed.")
             else:
