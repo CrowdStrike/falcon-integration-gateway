@@ -165,13 +165,6 @@ class Submitter():
 class Runtime():
     def __init__(self):
         log.info("AWS Backend is enabled.")
-        # try:
-        #     aws_client = boto3.resource('sqs', region_name=config.get('aws', 'region'))
-        #     self.queue = aws_client.get_queue_by_name(QueueName=config.get('aws', 'sqs_queue_name'))
-        # except BaseException:  # pylint: disable=W0703
-        #     log.exception("Cannot configure AWS SQS Queue")
-        #     self.queue = None
-        #     raise
 
     def is_relevant(self, falcon_event):  # pylint: disable=R0201
         return falcon_event.cloud_provider == 'AWS_EC2'
