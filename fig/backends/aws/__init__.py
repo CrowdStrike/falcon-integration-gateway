@@ -66,6 +66,10 @@ class Submitter():
         try:
             if self.event.instance_id:
                 det_region, instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
+                if instance is None:
+                    log.warning("Instance %s with MAC address %s not found in regions searched. Alert not processed.",
+                                self.event.instance_id, self.event.device_details["mac_address"])
+                    return
                 try:
                     for _ in instance.network_interfaces:
                         # Only send alerts for instances we can find
