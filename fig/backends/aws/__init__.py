@@ -50,7 +50,7 @@ class Submitter():
         except Exception:
             pass
 
-        import_response = False  # {"message": "Finding already submitted to Security Hub. Alert not processed."}
+        import_response = False
         if not found:
             try:
                 import_response = client.batch_import_findings(Findings=[manifest])
