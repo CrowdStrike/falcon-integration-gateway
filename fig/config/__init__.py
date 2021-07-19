@@ -64,8 +64,6 @@ class FigConfig(configparser.SafeConfigParser):
         if 'AWS' in self.backends:
             if len(self.get('aws', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected aws.region to be non-empty')
-            if len(self.get('aws', 'sqs_queue_name')) == 0:
-                raise Exception('Malformed Configuration: expected aws.sqs_queue_name to be non-empty')
         if 'WORKSPACEONE' in self.backends:
             if len(self.get('workspaceone', 'token')) == 0:
                 raise Exception('Malformed Configuration: expected workspaceone.token to be non-empty')
