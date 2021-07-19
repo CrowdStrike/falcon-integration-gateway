@@ -39,8 +39,8 @@ class Submitter():
 
         return ec2instance
 
-    @classmethod
-    def send_to_securityhub(self, manifest):
+    @staticmethod
+    def send_to_securityhub(manifest):
         client = boto3.client('securityhub', region_name=config.get('aws', 'region'))
         check_response = {}
         found = False
