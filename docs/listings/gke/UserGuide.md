@@ -67,3 +67,7 @@ Configure button leads you to application configuration page.
 Navigate to [GCP Security Command Center](https://console.cloud.google.com/security/command-center/findings) to confirm that new **Findings Source** called **CrowdStrike Falcon** has appeared.
 
 ![scc](assets/scc.png)
+
+Detail of Finding created.
+
+![scc](assets/scc-detail.png)

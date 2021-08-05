@@ -81,6 +81,16 @@ Deploy the pod
 kubectl apply -f falcon-integration-gateway.yaml
 ```
 
+### Step 6: Verify the install
+
+Navigate to [GCP Security Command Center](https://console.cloud.google.com/security/command-center/findings) to confirm that new **Findings Source** called **CrowdStrike Falcon** has appeared.
+
+![scc](../listings/gke/assets/scc.png)
+
+Detail of Finding created.
+
+![scc](../listings/gke/assets/scc-detail.png)
+
 ### Appendix A: Re-using single Falcon Integration Gateway for multiple GCP Organizations/Projects
 
 Falcon Integration Gateway is able to automatically discover GCP projects and organizations it has access to. The access permissions are determined from the service account created in the *Step 2: Create new GCP Service Account* of this guide.
