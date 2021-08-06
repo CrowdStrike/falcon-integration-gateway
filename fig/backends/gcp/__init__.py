@@ -41,25 +41,16 @@ class Cache():
         return self._sources[org_id]
 
     def organization_parent_of(self, project_id):
-        project = self.projects[project_id]
-        if 'type' not in project.parent or project.parent['type'] != 'organization':
-            raise APIDataError('Could not determine parent organization for gcp project {}'.format(project_id))
-        return project.parent['id']
+        project = self.project(project_id)
+        return api.project_get_parent_org(project)
 
     def project_number_accesible(self, project_number: int) -> bool:
-        if project_number in self.projects:
-            return True
-        self._refresh_projects()
-        return project_number in self.projects
+        return self.project(project_number) is not None
 
-    @property
-    def projects(self):
-        if not self._projects:
-            self._refresh_projects()
-        return self._projects
-
-    def _refresh_projects(self):
-        self._projects = api.projects()
+    def project(self, project_number: int):
+        if project_number not in self._projects:
+            self._projects[project_number] = api.project(project_number)
+        return self._projects[project_number]
 
     def submit_finding(self, finding_id, finding: Finding, org_id: str):
         if org_id not in self._findings:
