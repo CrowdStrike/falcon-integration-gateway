@@ -24,7 +24,7 @@ setup(
         'boto3',
         'crowdstrike-falconpy',
         'google-cloud-securitycenter',
-        'google-cloud-resource-manager',
+        'google-cloud-resource-manager < 0.40',
         'tls-syslog'
     ],
     extras_require={
