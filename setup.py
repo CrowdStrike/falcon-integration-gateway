@@ -25,7 +25,8 @@ setup(
         'crowdstrike-falconpy',
         'google-cloud-securitycenter',
         'google-cloud-resource-manager < 0.40',
-        'tls-syslog'
+        'tls-syslog',
+        'humiolib',
     ],
     extras_require={
         'devel': [

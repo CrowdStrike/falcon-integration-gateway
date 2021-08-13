@@ -3,3 +3,4 @@ crowdstrike-falconpy
 google-cloud-securitycenter
 google-cloud-resource-manager < 0.40
 tls-syslog
+humiolib
