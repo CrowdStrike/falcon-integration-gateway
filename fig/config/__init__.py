@@ -17,9 +17,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
         ['chronicle', 'security_key', 'GOOGLE_SECURITY_KEY'],
         ['chronicle', 'region', 'CHRONICLE_REGION'],
-        ['humio' 'ingest_token', 'HUMIO_INGEST_TOKEN'],
+        ['humio', 'ingest_token', 'HUMIO_INGEST_TOKEN'],
         ['humio', 'host', 'HUMIO_HOST'],
-        ['humio', 'port', 'HUMIO_PORT'],
     ]
 
     def __init__(self):
@@ -84,8 +83,6 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected humio.ingest_token to be non-empty')
             if len(self.get('humio', 'host')) == 0:
                 raise Exception('Malformed Configuration: expected humio.host to be non-empty')
-            if int(self.get('humio', 'port')) not in range(1, 65535):
-                raise Exception('Malformed configuration: expected humio.port to be in range 1-65335')
 
     @property
     def backends(self):
