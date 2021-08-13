@@ -72,3 +72,13 @@ Deploy the pod
 ```
 kubectl apply -f falcon-integration-gateway.yaml
 ```
+
+### Step 5: Verify the install
+
+Navigate to Azure Sentinel Logs and search for `FalconDetection`.
+
+![azure](../assets/azure1.png)
+
+Detail of Finding created.
+
+![azure](../assets/azure2.png)
