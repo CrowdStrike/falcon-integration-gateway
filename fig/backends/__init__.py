@@ -2,6 +2,7 @@ from fig.backends import chronicle
 from . import aws
 from . import azure
 from . import gcp
+from . import humio
 from . import workspaceone
 from ..config import config
 
@@ -10,6 +11,7 @@ ALL_BACKENDS = {
     'AWS': aws,
     'AZURE': azure,
     'GCP': gcp,
+    'HUMIO': humio,
     'WORKSPACEONE': workspaceone,
     'CHRONICLE': chronicle
 }

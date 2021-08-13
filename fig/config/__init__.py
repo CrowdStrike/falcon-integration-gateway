@@ -3,7 +3,7 @@ import configparser
 
 
 class FigConfig(configparser.SafeConfigParser):
-    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE'}
+    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'HUMIO', 'WORKSPACEONE', 'CHRONICLE'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     ENV_DEFAULTS = [
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
@@ -17,6 +17,7 @@ class FigConfig(configparser.SafeConfigParser):
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
         ['chronicle', 'security_key', 'GOOGLE_SECURITY_KEY'],
         ['chronicle', 'region', 'CHRONICLE_REGION']
+        # TODO humio configuration (authentication)
     ]
 
     def __init__(self):
@@ -76,6 +77,7 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected chronicle.security_key to be non-empty')
             if len(self.get('chronicle', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
+        # TODO validate humio configuration
 
     @property
     def backends(self):
