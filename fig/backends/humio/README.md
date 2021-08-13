@@ -11,7 +11,16 @@ Integration with Humio - sends events to Humio
 backends=HUMIO
 
 [humio]
-# TODO ingestion token configuration
+# Humio section is applicable only when Humio backend is enabled in the [main] section
+
+# Uncomment to provide your Humio host (defaults to cloud.humio.com). Alternatively, use HUMIO_HOST env variable
+# host =
+
+# Uncomment to provide your Humio port (defaults to 443). Alternatively, use HUMIO_PORT env variable
+# port =
+
+# Uncomment to provide ingest token. Alternatively, use HUMIO_INGEST_TOKEN env variable
+# ingest_token =
 ```
 
 ### Developer Guide
@@ -26,7 +35,7 @@ backends=HUMIO
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e FALCON_CLOUD_REGION="us-1" \
-       -e HUMION_TOKEN="$HUMIO_TOKEN" \
+       -e HUMION_INGEST_TOKEN="$HUMIO_TOKEN" \
        falcon-integration-gateway:latest
    ```
 
