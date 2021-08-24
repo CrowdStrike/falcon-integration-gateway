@@ -1,5 +1,5 @@
 boto3
 crowdstrike-falconpy
 google-cloud-securitycenter
-google-cloud-resource-manager < 1.2
+google-cloud-resource-manager < 0.40
 tls-syslog
