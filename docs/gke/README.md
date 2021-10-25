@@ -14,8 +14,8 @@ This guide works through deployment of Falcon Integration Gateway for SCC to GKE
 Create new API key pair at [CrowdStrike Falcon](https://falcon.crowdstrike.com/support/api-clients-and-keys). This key pair will be used to read falcon events and supplementary information from CrowdStrike Falcon.
 
 Make sure only the following permissions are assigned to the key pair:
- * Event streams: READ
- * Hosts: READ
+ * **Event streams**: READ
+ * **Hosts**: READ
 
 ### Step 2: Create new GCP Service Account
 
