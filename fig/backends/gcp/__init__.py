@@ -1,6 +1,7 @@
 import re
 from functools import lru_cache
 from google.cloud.securitycenter import Asset, Finding, SecurityCenterClient
+import google.api_core.exceptions
 from ...log import log
 from . import api
 
@@ -45,7 +46,10 @@ class Cache():
         return api.project_get_parent_org(project)
 
     def project_number_accesible(self, project_number: int) -> bool:
-        return self.project(project_number) is not None
+        try:
+            return self.project(project_number) is not None
+        except google.api_core.exceptions.PermissionDenied:
+            return False
 
     def project(self, project_number: int):
         if project_number not in self._projects:
@@ -79,7 +83,7 @@ class Submitter():
         log.info("Processing detection: %s", self.event.detect_description)
         if not self.cache.project_number_accesible(self.gcp_project_number):
             log.warning(
-                "Falcon Detection belongs to project %s, but google service account has no acess to this project",
+                "Cannot access GCP project (number=%s) to report malicious behaviour to GCP Security Command Center. Please grant 'roles/securitycenter.admin' role to this service account in every GCP organization that needs to have CrowdStrike detections forwarded to SCC.",
                 self.gcp_project_number)
             return
 
