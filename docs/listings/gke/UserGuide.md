@@ -11,8 +11,8 @@
  - Navigate to [API Clients and Keys](https://falcon.crowdstrike.com/support/api-clients-and-keys) within CrowdStrike Falcon platform.
  - Use Add new API client* button in the top right corner to create a new key pair
  - Make sure only the following permissions are assigned to the key pair:
-  - Event streams: READ
-  - Hosts: READ
+   - **Event streams**: READ
+   - **Hosts**: READ
  
 ![api keys](assets/api_keys.png)
  
