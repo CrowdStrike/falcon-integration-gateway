@@ -1,6 +1,7 @@
 import re
 from functools import lru_cache
 from google.cloud.securitycenter import Asset, Finding, SecurityCenterClient
+import google.api_core.exceptions
 from ...log import log
 from . import api
 
@@ -45,7 +46,10 @@ class Cache():
         return api.project_get_parent_org(project)
 
     def project_number_accesible(self, project_number: int) -> bool:
-        return self.project(project_number) is not None
+        try:
+            return self.project(project_number) is not None
+        except google.api_core.exceptions.PermissionDenied:
+            return False
 
     def project(self, project_number: int):
         if project_number not in self._projects:
