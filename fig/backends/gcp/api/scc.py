@@ -72,7 +72,6 @@ class SecurityCommandCenter():
         return existing[0].finding
 
     def get_finding(self, finding: Finding, source: Source):
-        _ = finding
         return list(self.client.list_findings(
             request={
                 'parent': source.name,
