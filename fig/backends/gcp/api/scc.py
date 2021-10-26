@@ -62,7 +62,7 @@ class SecurityCommandCenter():
         existing = self.get_finding(finding, source)
         if len(existing) == 0:
             try:
-                return [self.create_finding(finding_id, finding, source)]
+                return [self.create_finding(request={'parent': finding_id, 'finding_id': finding, 'finding': source})]
             except AlreadyExists:
                 existing = self.get_finding(finding, source)
                 if len(existing) == 0:
