@@ -83,7 +83,7 @@ class Submitter():
         log.info("Processing detection: %s", self.event.detect_description)
         if not self.cache.project_number_accesible(self.gcp_project_number):
             log.warning(
-                "Falcon Detection belongs to project %s, but google service account has no acess to this project",
+                "Cannot access GCP project (number=%s) to report malicious behaviour to GCP Security Command Center. Please grant 'roles/securitycenter.admin' role to this service account in every GCP organization that needs to have CrowdStrike detections forwarded to SCC.",
                 self.gcp_project_number)
             return
 
