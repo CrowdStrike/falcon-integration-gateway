@@ -1,4 +1,4 @@
-![CrowdStrike](docs/assets/cs-logo.png)
+![CrowdStrike](https://raw.githubusercontent.com/CrowdStrike/falcon-integration-gateway/main/docs/assets/cs-logo.png)
 
 # falcon-integration-gateway [![Python Lint](https://github.com/CrowdStrike/falcon-integration-gateway/actions/workflows/linting.yml/badge.svg)](https://github.com/CrowdStrike/falcon-integration-gateway/actions/workflows/linting.yml) [![Container Build on Quay](https://quay.io/repository/crowdstrike/falcon-integration-gateway/status "Docker Repository on Quay")](https://quay.io/repository/crowdstrike/falcon-integration-gateway)
 
