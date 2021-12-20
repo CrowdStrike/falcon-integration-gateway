@@ -1,3 +1,5 @@
+![CrowdStrike](docs/assets/cs-logo.png)
+
 # falcon-integration-gateway [![Python Lint](https://github.com/CrowdStrike/falcon-integration-gateway/actions/workflows/linting.yml/badge.svg)](https://github.com/CrowdStrike/falcon-integration-gateway/actions/workflows/linting.yml) [![Container Build on Quay](https://quay.io/repository/crowdstrike/falcon-integration-gateway/status "Docker Repository on Quay")](https://quay.io/repository/crowdstrike/falcon-integration-gateway)
 
 Falcon Integration Gateway (FIG) forwards threat detection findings from CrowdStrike Falcon platform to the [backend](fig/backends) of your choice.
@@ -15,6 +17,47 @@ Currently available backends are:
 | Chronicle | Pushes events to Google Chronicle | <ul><li>[Deployment to GKE](docs/listings/gke-chronicle/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-chronicle))</li><li>[Deployment to GKE](docs/chronicle) (manual)</li></ul> | [Chronicle backend](fig/backends/chronicle) |
 | GCP | Pushes events to GCP Security Command Center | <ul><li>[Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))</li><li>[Deployment to GKE](docs/gke) (manual)</li></ul> | [GCP backend](fig/backends/gcp) |
 | Workspace ONE | Pushes events to VMware Workspace ONE Intelligence | *Coming Soon* | [Workspace ONE backend](fig/backends/workspaceone) |
+
+## Installation and Removal
+![PyPI - Status](https://img.shields.io/pypi/status/falcon-integration-gateway)
+![PyPI](https://img.shields.io/pypi/v/falcon-integration-gateway)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/falcon-integration-gateway) 
+<!--![PyPI - Downloads](https://img.shields.io/pypi/dm/falcon-integration-gateway)-->
+
+Falcon Integration Gateway (FIG) is available on the [Python Package Index](https://pypi.org/project/falcon-integration-gateway/).
+
+### Installation
+FIG can be installed with a single command.
+
+```shell
+python3 -m pip install falcon-integration-gateway
+```
+or
+```shell
+pip3 install falcon-integration-gateway
+```
+
+### Upgrades
+Upgrading to the latest release is also straightforward.
+
+```shell
+python3 -m pip install falcon-integration-gateway --upgrade
+```
+or
+```shell
+pip3 install falcon-integration-gateway --upgrade
+```
+
+### Removal
+To remove Falcon Integration Gateway, execute the following command.
+
+```shell
+python3 -m pip uninstall falcon-integration-gateway
+```
+or
+```shell
+pip3 uninstall falcon-integration-gateway
+```
 
 ## Statement of Support
 Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product. As such it carries no formal support, expressed or implied.
