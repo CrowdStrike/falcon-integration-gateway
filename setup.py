@@ -15,7 +15,7 @@ setup(
     description="The CrowdStrike Demo Falcon Integration Gateway for GCP",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/crowdstrike/falcon-itegration-gateway",
+    url="https://github.com/crowdstrike/falcon-integration-gateway",
     packages=find_packages("fig"),
     package_dir={"": "fig"},
     py_modules=[splitext(basename(path))[0] for path in glob("fig/*.py")],
