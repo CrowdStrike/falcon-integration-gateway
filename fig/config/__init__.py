@@ -76,6 +76,9 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected chronicle.security_key to be non-empty')
             if len(self.get('chronicle', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
+        if 'AZURE' in self.backends:
+            if len(self.get('azure', 'workspace_id')) == 0:
+                raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
 
     @property
     def backends(self):
