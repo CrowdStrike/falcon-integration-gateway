@@ -79,6 +79,8 @@ class FigConfig(configparser.SafeConfigParser):
         if 'AZURE' in self.backends:
             if len(self.get('azure', 'workspace_id')) == 0:
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
+            if len(self.get('azure', 'primary_key')) == 0:
+                raise Exception('Malformed Configuration: expected azure.primary_key to be non-empty')
 
     @property
     def backends(self):
