@@ -9,7 +9,7 @@
 ### Step 1: Obtain OAuth2 API credentials for CrowdStrike Falcon
 
  - Navigate to [API Clients and Keys](https://falcon.crowdstrike.com/support/api-clients-and-keys) within CrowdStrike Falcon platform.
- - Use Add new API client* button in the top right corner to create a new key pair
+ - Use *Add new API client* button in the top right corner to create a new key pair
  - Make sure only the following permissions are assigned to the key pair:
    - **Event streams**: READ
    - **Hosts**: READ
