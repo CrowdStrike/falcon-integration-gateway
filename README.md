@@ -18,7 +18,19 @@ Currently available backends are:
 | GCP | Pushes events to GCP Security Command Center | <ul><li>[Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))</li><li>[Deployment to GKE](docs/gke) (manual)</li></ul> | [GCP backend](fig/backends/gcp) |
 | Workspace ONE | Pushes events to VMware Workspace ONE Intelligence | *Coming Soon* | [Workspace ONE backend](fig/backends/workspaceone) |
 
-## Installation and Removal
+## Deployment
+
+There are 3 options available for the deployment.
+
+### Installation to kubernetes using the existing deployment guides
+
+Please refer to various deployment guides to the above table.
+
+### Installation to kubernetes using the helm chart
+
+Please refer to [helm chart documentation](https://github.com/CrowdStrike/falcon-helm/tree/main/helm-charts/falcon-integration-gateway)
+
+### Manual Installation and Removal
 ![PyPI - Status](https://img.shields.io/pypi/status/falcon-integration-gateway)
 ![PyPI](https://img.shields.io/pypi/v/falcon-integration-gateway)
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/falcon-integration-gateway) 
