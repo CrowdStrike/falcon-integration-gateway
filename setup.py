@@ -25,7 +25,9 @@ setup(
         'crowdstrike-falconpy',
         'google-cloud-securitycenter',
         'google-cloud-resource-manager >= 1.0.2',
-        'tls-syslog'
+        'tls-syslog',
+        'google-auth',
+        'google-api-python-client'
     ],
     extras_require={
         'devel': [

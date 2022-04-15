@@ -1,9 +1,13 @@
 from datetime import datetime
+import ipaddress
 from urllib.parse import quote
 from json import dumps
-from requests import request
+from google.oauth2 import service_account
+from google.auth.transport.requests import AuthorizedSession
 from ...log import log
 from ...config import config
+
+SCOPES = ['https://www.googleapis.com/auth/malachite-ingestion']
 
 
 def parse_url(url):
@@ -24,16 +28,23 @@ def parse_url(url):
         return None
 
 
+# Computes the size of a string in bytes
+def utf8len(my_string):
+    return len(my_string.encode('utf-8'))
+
+
 class Submitter():
-    def __init__(self, event):
-        self.event = event
-        self.security_key = config.get('chronicle', 'security_key')
+    def __init__(self):
         self.region = config.get('chronicle', 'region')
+        self.customer_id = config.get('chronicle', 'customer_id')
+        self.http_client = self.build_http_client()
 
-    def submit(self):
+    def submit(self, event):
+        self.event = event
         log.info("Processing detection: %s", self.event.detect_description)
-        self.post_to_chronicle(self.udm())
+        self.post_to_chronicle(self.udm(), self.region, self.customer_id)
 
+    # Maps detection events into UDM
     def udm(self):
         event = self.event.original_event['event']
         meta = self.event.original_event['metadata']
@@ -46,17 +57,18 @@ class Submitter():
                 "description": event["DetectDescription"],
                 "product_event_type": meta["eventType"],
                 "product_log_id": event["DetectId"],
-                "product_name": "Falcon"
+                "product_name": "Falcon",
+                "vendor_name": "CrowdStrike"
             },
             "principal": {
+                "asset_id": "CrowdStrike.Falcon:" + event["SensorId"],
                 "hostname": event["ComputerName"],
                 "user": {
                     "userid": event["UserName"]
                 },
-                "ip": event["LocalIP"]
+                "ip": self.check_ip(event["LocalIP"])
             },
             "target": {
-                "asset_id": "CrowdStrike.Falcon:" + event["SensorId"],
                 "process": {
                     "command_line": event["CommandLine"],
                     "file": {
@@ -80,30 +92,51 @@ class Submitter():
         }
         return udm_result
 
-    def post_to_chronicle(self, event):
+    def check_ip(self, data):
+        try:
+            ipaddress.ip_address(data)
+            return data
+        except ValueError:
+            return "127.0.0.1"
+
+    # Posts detection to Chronicle
+    def post_to_chronicle(self, detection, region, customer_id):
         # Only Chronicle's US region doesn't have an API prefix
-        prefix = self.region
-        if self.region == 'us':
+        prefix = region + '-'
+        if region == 'us':
             prefix = ''
-
-        url = "https://" + prefix + "malachiteingestion-pa.googleapis.com/v1/udmevents?key=" + self.security_key
+        # Set up the url and header
+        url = "https://" + prefix + "malachiteingestion-pa.googleapis.com/v2/udmevents:batchCreate"
         headers = {'Content-Type': 'application/json'}
-        payload = {"events": [event]}
+        # Format the events field
+        payload = {"customer_id": customer_id, "events": [detection]}
+        # Post to Chronicle
+        response = self.http_client.post(url, data=dumps(payload), headers=headers)
+        # Log any errors
+        if response.status_code < 200 or response.status_code > 299:
+            log.error(f"Error posting detection to Chronicle: {response.text}")
+            log.error(f"Faulty detection: {dumps(payload, indent=4, sort_keys=True)}")
+        else:
+            log.info(f"Successfully posted detection to Chronicle:\t Byte count: {utf8len(dumps(payload))}")
 
-        response = request("POST", url, data=dumps(payload), headers=headers)
-        if response.status_code >= 400:
-            log.error("Error logging to Chronicle: %s", response.text)
+    def build_http_client(self):
+        service_account_file = config.get('chronicle', 'service_account_file')
+        # get google token
+        credentials = service_account.Credentials.from_service_account_file(service_account_file, scopes=SCOPES)
+        # Build an HTTP client to make authorized OAuth requests.
+        return AuthorizedSession(credentials)
 
 
 class Runtime():
     def __init__(self):
         log.info("Chronicle backend is enabled.")
+        self.submitter = Submitter()
 
     def is_relevant(self, falcon_event):  # pylint: disable=R0201,W0613
         return True
 
     def process(self, falcon_event):  # pylint: disable=R0201
-        Submitter(falcon_event).submit()
+        self.submitter.submit(falcon_event)
 
 
 __all__ = ['Runtime']

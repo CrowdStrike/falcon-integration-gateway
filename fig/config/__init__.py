@@ -15,7 +15,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
         ['workspaceone', 'syslog_host', 'SYSLOG_HOST'],
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
-        ['chronicle', 'security_key', 'GOOGLE_SECURITY_KEY'],
+        ['chronicle', 'service_account', 'GOOGLE_SERVICE_ACCOUNT_FILE'],
+        ['chronicle', 'customer_id', 'GOOGLE_CUSTOMER_ID'],
         ['chronicle', 'region', 'CHRONICLE_REGION']
     ]
 
@@ -72,10 +73,12 @@ class FigConfig(configparser.SafeConfigParser):
             if int(self.get('workspaceone', 'syslog_port')) not in range(1, 65535):
                 raise Exception('Malformed configuration: expected workspaceone.syslog_port to be in range 1-65335')
         if 'CHRONICLE' in self.backends:
-            if len(self.get('chronicle', 'security_key')) == 0:
-                raise Exception('Malformed Configuration: expected chronicle.security_key to be non-empty')
+            if len(self.get('chronicle', 'service_account_file')) == 0:
+                raise Exception('Malformed Configuration: expected chronicle.service_account_file to be non-empty')
             if len(self.get('chronicle', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
+            if len(self.get('chronicle', 'customer_id')) == 0:
+                raise Exception('Malformed Configuration: expected chronicle.customer_id to be non-empty')
         if 'AZURE' in self.backends:
             if len(self.get('azure', 'workspace_id')) == 0:
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
