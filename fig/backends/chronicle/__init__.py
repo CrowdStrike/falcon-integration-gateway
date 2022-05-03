@@ -38,6 +38,7 @@ class Submitter():
         self.region = config.get('chronicle', 'region')
         self.customer_id = config.get('chronicle', 'customer_id')
         self.http_client = self.build_http_client()
+        self.event = None
 
     def submit(self, event):
         self.event = event
@@ -91,8 +92,9 @@ class Submitter():
             }
         }
         return udm_result
-
-    def check_ip(self, data):
+    
+    @staticmethod
+    def check_ip(data):
         try:
             ipaddress.ip_address(data)
             return data
@@ -114,12 +116,13 @@ class Submitter():
         response = self.http_client.post(url, data=dumps(payload), headers=headers)
         # Log any errors
         if response.status_code < 200 or response.status_code > 299:
-            log.error(f"Error posting {detection['metadata']['product_log_id']} to Chronicle: {response.text}")
-            log.error(f"Faulty detection: {dumps(payload, indent=4, sort_keys=True)}")
+            log.error("Error posting %s to Chronicle: %s", detection['metadata']['product_log_id'], response.text)
+            log.error("Faulty detection: %s", dumps(payload, indent=4, sort_keys=True))
         else:
-            log.info(f"Successfully posted {detection['metadata']['product_log_id']} to Chronicle:\t Byte count: {utf8len(dumps(payload))}")
+            log.info("Successfully posted %s to Chronicle:\t Byte count: %s", detection['metadata']['product_log_id'], utf8len(dumps(payload)))
 
-    def build_http_client(self):
+    @staticmethod
+    def build_http_client():
         service_account_file = config.get('chronicle', 'service_account_file')
         # get google token
         credentials = service_account.Credentials.from_service_account_file(service_account_file, scopes=SCOPES)
