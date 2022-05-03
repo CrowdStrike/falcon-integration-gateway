@@ -41,7 +41,7 @@ class Submitter():
 
     def submit(self, event):
         self.event = event
-        log.info("Processing detection: %s", self.event.detect_description)
+        log.info("Processing detection: %s", self.event.original_event['event']['DetectId'])
         self.post_to_chronicle(self.udm(), self.region, self.customer_id)
 
     # Maps detection events into UDM
@@ -114,10 +114,10 @@ class Submitter():
         response = self.http_client.post(url, data=dumps(payload), headers=headers)
         # Log any errors
         if response.status_code < 200 or response.status_code > 299:
-            log.error(f"Error posting detection to Chronicle: {response.text}")
+            log.error(f"Error posting {detection['metadata']['product_log_id']} to Chronicle: {response.text}")
             log.error(f"Faulty detection: {dumps(payload, indent=4, sort_keys=True)}")
         else:
-            log.info(f"Successfully posted detection to Chronicle:\t Byte count: {utf8len(dumps(payload))}")
+            log.info(f"Successfully posted {detection['metadata']['product_log_id']} to Chronicle:\t Byte count: {utf8len(dumps(payload))}")
 
     def build_http_client(self):
         service_account_file = config.get('chronicle', 'service_account_file')
