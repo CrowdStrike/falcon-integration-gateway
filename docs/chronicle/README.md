@@ -15,9 +15,9 @@ Make sure only the following permissions are assigned to the key pair:
  * Event streams: READ
  * Hosts: READ
 
-### Step 2: Create new Chronicle Security Key
+### Step 2: Obtain Chroncle Service Account file. 
 
-Create new credentials for programmatic access to chronicle.
+Your Chronicle Support representative will provide you with a JSON Service Account file. This file will need to be in the path specified in the pod spec.
 
 ### Step 3: Edit kubernetes pod spec
 
@@ -35,10 +35,6 @@ echo -n $FALCON_CLIENT_ID | base64
 
 ```
 echo -n $FALCON_CLIENT_SECRET | base64
-```
-
-```
-echo -n $GOOGLE_SERVICE_ACCOUNT_FILE | base64
 ```
 
 ```
