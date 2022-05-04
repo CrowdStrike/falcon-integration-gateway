@@ -11,6 +11,7 @@ apiVersion: v1
 data:
   FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
   FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  GOOGLE_CUSTOMER_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
 kind: Secret
 type: Opaque
 metadata:
@@ -102,6 +103,11 @@ spec:
                   secretKeyRef:
                     name: falcon-integration-gateway-chronicle-creds
                     key: FALCON_CLIENT_SECRET
+              - name: GOOGLE_CUSTOMER_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: falcon-integration-gateway-chronicle-creds
+                    key: GOOGLE_CUSTOMER_ID     
       volumes:
           - name: config-volume
             configMap:
