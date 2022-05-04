@@ -49,11 +49,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "falcon-integration-gateway.fullname" . }}-creds
                   key: FALCON_CLIENT_SECRET
-            - name: GOOGLE_SECURITY_KEY
+            - name: GOOGLE_CUSTOMER_ID
               valueFrom:
                 secretKeyRef:
                   name: {{ include "falcon-integration-gateway.fullname" . }}-creds
-                  key: GOOGLE_SECURITY_KEY
+                  key: GOOGLE_CUSTOMER_ID
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           command:
