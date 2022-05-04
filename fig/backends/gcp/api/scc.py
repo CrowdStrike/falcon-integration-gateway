@@ -2,7 +2,7 @@ import threading
 from google.api_core.exceptions import AlreadyExists
 from google.cloud import securitycenter
 from google.cloud.securitycenter import CreateFindingRequest, Finding, Source
-from google.protobuf.field_mask_pb2 import FieldMask
+from google.protobuf.field_mask_pb2 import FieldMask  # pylint: disable=no-name-in-module
 from ....log import log
 
 
