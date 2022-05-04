@@ -15,7 +15,7 @@ Make sure only the following permissions are assigned to the key pair:
  * Event streams: READ
  * Hosts: READ
 
-### Step 2: Obtain Chroncle Service Account file. 
+### Step 2: Obtain Chronicle Service Account file. 
 
 Your Chronicle Support representative will provide you with a JSON Service Account file. This file will need to be in the path specified in the pod spec.
 
