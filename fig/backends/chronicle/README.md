@@ -13,8 +13,11 @@ backends=CHRONICLE
 [chronicle]
 # Chronicle section is applicable only when Chronicle backend is enabled in the [main] section
 
-# Uncomment to provide Google security key. Alternatively, use GOOGLE_SECURITY_KEY env variable
-#security_key =
+# Uncomment to provide Google Service Account filepath. Alternatively, use GOOGLE_SERVICE_ACCOUNT_FILE variable
+#service_account = apikeys-demo.json
+
+# Uncomment to provide Chronicle Customer ID. Alternatively, use GOOGLE_CUSTOMER_ID variable
+#customer_id = XXX
 
 # Uncomment to provide Chronicle region (us, europe, asia-southeast1). Alternatively, use CHRONICLE_REGION variable
 #region =
@@ -31,7 +34,8 @@ backends=CHRONICLE
    docker run -it --rm \
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
-       -e GOOGLE_SECURITY_KEY="$GOOGLE_SECURITY_KEY" \
+       -e GOOGLE_SERVICE_ACCOUNT_FILE="$GOOGLE_SERVICE_ACCOUNT_FILE" \
+       -e GOOGLE_CUSTOMER_ID="$GOOGLE_CUSTOMER_ID" \
        -e CHRONICLE_REGION="$CHRONICLE_REGION" \
        -e FALCON_CLOUD_REGION="us-1" \
        falcon-integration-gateway:latest

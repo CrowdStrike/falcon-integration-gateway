@@ -38,7 +38,11 @@ echo -n $FALCON_CLIENT_SECRET | base64
 ```
 
 ```
-echo -n $GOOGLE_SECURITY_KEY | base64
+echo -n $GOOGLE_SERVICE_ACCOUNT_FILE | base64
+```
+
+```
+echo -n $GOOGLE_CUSTOMER_ID | base64
 ```
 
 Set the region of your Chronicle cloud.
