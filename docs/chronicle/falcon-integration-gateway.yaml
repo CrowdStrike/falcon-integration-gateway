@@ -11,8 +11,6 @@ apiVersion: v1
 data:
   FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
   FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
-  # Chronicle security key
-  GOOGLE_SECURITY_KEY: REPLACE_ME_WITH_BASE64_ENCODED_STR=
 kind: Secret
 type: Opaque
 metadata:
@@ -61,8 +59,11 @@ data:
     [chronicle]
     # Chronicle section is applicable only when Chronicle backend is enabled in the [main] section
 
-    # Uncomment to provide Google security key. Alternatively, use GOOGLE_SECURITY_KEY env variable
-    #security_key =
+    # Uncomment to provide Google Service Account filepath. Alternatively, use GOOGLE_SERVICE_ACCOUNT_FILE variable
+    #service_account = apikeys-demo.json
+
+    # Uncomment to provide Chronicle Customer ID. Alternatively, use GOOGLE_CUSTOMER_ID variable
+    #customer_id = XXX
 
     # Uncomment to provide Chronicle region (us, europe, asia-southeast1). Alternatively, use CHRONICLE_REGION variable
     #region =
@@ -101,11 +102,6 @@ spec:
                   secretKeyRef:
                     name: falcon-integration-gateway-chronicle-creds
                     key: FALCON_CLIENT_SECRET
-              - name: GOOGLE_SECURITY_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: falcon-integration-gateway-chronicle-creds
-                    key: GOOGLE_SECURITY_KEY
       volumes:
           - name: config-volume
             configMap:
