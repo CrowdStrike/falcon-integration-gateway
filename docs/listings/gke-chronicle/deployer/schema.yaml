@@ -63,7 +63,7 @@ properties:
       type: STRING
     default: us
   chronicle.google_customer_id:
-    description: "This customre id will be used to push Falcon detections findings to Chronicle. Consult the User Guide for more information."
+    description: "This customer id will be used to push Falcon detections findings to Chronicle. Consult the User Guide for more information."
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
