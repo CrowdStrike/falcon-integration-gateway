@@ -4,7 +4,7 @@
 
 chronicle:
   enabled: true
-  google_security_key:
+  google_customer_id:
   region:
 
 falcon:

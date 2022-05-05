@@ -9,7 +9,7 @@ properties:
     x-google-marketplace:
       type: MASKED_FIELD
     default: MARKETPLACE_TEST
-  chronicle.google_security_key:
+  chronicle.google_customer_id:
     type: string
     x-google-marketplace:
       type: MASKED_FIELD

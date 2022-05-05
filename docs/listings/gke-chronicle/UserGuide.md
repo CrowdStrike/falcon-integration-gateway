@@ -15,9 +15,9 @@
  
 ![api keys](../gke/assets/api_keys.png)
  
-### Step 2: Create new Chronicle Security Key
+### Step 2: Obtain Chroncile Service Account file & Customer ID.
 
-Create new credentials for programmatic access to chronicle.
+Your Chronicle support representative can provide this file.
 
 ### Step 3: Navigate to Falcon Integration Gateway Listing Page
 
@@ -29,7 +29,7 @@ Create new credentials for programmatic access to chronicle.
 
 Configure button leads you to application configuration page.
  - Fill in Falcon OAuth2 API credentials obtained in Step 1 of this guide.
- - Fill in Chronicle Security Key and Chronicle Region
+ - Fill in Chronicle Customer ID and Chronicle Region
 
 ![configure](assets/configure.png)
 

@@ -62,8 +62,8 @@ properties:
     x-google-marketplace:
       type: STRING
     default: us
-  chronicle.google_security_key:
-    description: "This security key will be used to push Falcon detections findings to Chronicle. Consult the User Guide for more information."
+  chronicle.google_customer_id:
+    description: "This customer id will be used to push Falcon detections findings to Chronicle. Consult the User Guide for more information."
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
@@ -74,7 +74,7 @@ required:
 - falcon.client_id
 - falcon.client_secret
 - falcon.cloud_region
-- chronicle.google_security_key
+- chronicle.google_customer_id
 - chronicle.region
 
 form:
