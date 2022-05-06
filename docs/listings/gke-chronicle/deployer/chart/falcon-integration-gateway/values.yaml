@@ -6,7 +6,7 @@ chronicle:
   enabled: true
   google_customer_id:
   region:
-  google_service_account_file
+  google_service_account_file:
 
 falcon:
   client_id:
