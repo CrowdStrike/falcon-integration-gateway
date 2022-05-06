@@ -14,3 +14,8 @@ properties:
     x-google-marketplace:
       type: MASKED_FIELD
     default: TUFSS0VUUExBQ0VfVEVTVA==
+  chronicle.google_service_account_file:
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+    default: TUFSS0VUUExBQ0VfVEVTVA==
