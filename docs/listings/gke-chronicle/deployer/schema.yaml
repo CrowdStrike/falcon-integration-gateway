@@ -67,6 +67,12 @@ properties:
     type: string
     x-google-marketplace:
       type: MASKED_FIELD
+  chronicle.google_service_account_file:
+    title: "GCP Service Account key for accessing Chronicle (base64 encoded)"
+    description: "This service account will be used to create Findings in Chronicle. Consult the User Guide for more information."
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
 
 required:
 - name
