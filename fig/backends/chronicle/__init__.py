@@ -123,7 +123,7 @@ class Submitter():
 
     @staticmethod
     def build_http_client():
-        service_account_file = config.get('chronicle', 'service_account_file')
+        service_account_file = config.get('chronicle', 'service_account')
         # get google token
         credentials = service_account.Credentials.from_service_account_file(service_account_file, scopes=SCOPES)
         # Build an HTTP client to make authorized OAuth requests.
