@@ -38,6 +38,9 @@ spec:
             - name: config-volume
               mountPath: /fig/config/config.ini
               subPath: config.ini
+            - name: google-application-credentials
+              mountPath: /google-application-credentials.json
+              subPath: google-application-credentials.json
           env:
             - name: FALCON_CLIENT_ID
               valueFrom:
@@ -54,6 +57,8 @@ spec:
                 secretKeyRef:
                   name: {{ include "falcon-integration-gateway.fullname" . }}-creds
                   key: GOOGLE_CUSTOMER_ID
+            - name: GOOGLE_SERVICE_ACCOUNT_FILE
+              value: /google-application-credentials.json
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           command:
@@ -68,6 +73,12 @@ spec:
             items:
             - key: config.ini
               path: config.ini
+        - name: google-application-credentials
+          secret:
+            secretName: {{ include "falcon-integration-gateway.fullname" . }}-creds
+            items:
+            - key: GOOGLE_SERVICE_ACCOUNT_FILE
+              path: google-application-credentials.json
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
