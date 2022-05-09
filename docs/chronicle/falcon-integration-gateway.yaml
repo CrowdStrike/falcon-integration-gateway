@@ -112,7 +112,7 @@ spec:
                   secretKeyRef:
                     name: falcon-integration-gateway-chronicle-creds
                     key: GOOGLE_CUSTOMER_ID
-              - name: GOOGLE_SERVICE_ACCOUNT
+              - name: GOOGLE_SERVICE_ACCOUNT_FILE
                 value: /google-application-credentials.json      
       volumes:
           - name: config-volume
