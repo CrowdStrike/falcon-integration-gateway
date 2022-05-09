@@ -17,7 +17,7 @@ Make sure only the following permissions are assigned to the key pair:
 
 ### Step 2: Obtain Chronicle Service Account file. 
 
-Your Chronicle Support representative will provide you with a JSON Service Account file. This file will need to be in the path specified in the pod spec.
+Your Chronicle Support representative will provide you with a JSON Service Account file. This file will be b64 encoded and written to the pod. 
 
 ### Step 3: Edit kubernetes pod spec
 
