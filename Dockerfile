@@ -1,4 +1,4 @@
-FROM docker.io/python:3-slim-buster
+FROM docker.io/python:3-slim-bullseye
 
 RUN : \
     && apt-get update \
