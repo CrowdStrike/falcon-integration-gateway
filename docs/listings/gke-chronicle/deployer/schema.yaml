@@ -3,9 +3,13 @@ x-google-marketplace:
 
   applicationApiVersion: v1beta1
 
-  publishedVersion: "3.0.8"
+  publishedVersion: "3.1.0"
   publishedVersionMetadata:
     releaseNote: >-
+      3.1
+      Updated to the latest Google Cloud API (SCC & Chronicle)
+
+      3.0
       A first release.
 
   clusterConstraints:
