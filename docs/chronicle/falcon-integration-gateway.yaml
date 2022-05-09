@@ -12,6 +12,7 @@ data:
   FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
   FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
   GOOGLE_CUSTOMER_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  GOOGLE_SERVICE_ACCOUNT_FILE: REPLACE_ME_WITH_BASE64_ENCODED_STR=
 kind: Secret
 type: Opaque
 metadata:
@@ -92,6 +93,9 @@ spec:
               - name: config-volume
                 mountPath: /fig/config/config.ini
                 subPath: config.ini
+              - name: google-application-credentials
+                mountPath: /google-application-credentials.json
+                subPath: google-application-credentials.json  
             env:
               - name: FALCON_CLIENT_ID
                 valueFrom:
@@ -107,7 +111,9 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: falcon-integration-gateway-chronicle-creds
-                    key: GOOGLE_CUSTOMER_ID     
+                    key: GOOGLE_CUSTOMER_ID
+              - name: GOOGLE_SERVICE_ACCOUNT_FILE
+                value: /google-application-credentials.json      
       volumes:
           - name: config-volume
             configMap:
@@ -115,3 +121,9 @@ spec:
               items:
               - key: config.ini
                 path: config.ini
+          - name: google-application-credentials
+            secret:
+              secretName: falcon-integration-gateway-chronicle-creds
+              items:
+              - key: GOOGLE_SERVICE_ACCOUNT_FILE
+                path: google-application-credentials.json      
