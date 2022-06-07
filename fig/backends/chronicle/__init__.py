@@ -135,10 +135,10 @@ class Runtime():
         log.info("Chronicle backend is enabled.")
         self.submitter = Submitter()
 
-    def is_relevant(self, falcon_event):  # pylint: disable=R0201,W0613
+    def is_relevant(self, falcon_event):
         return True
 
-    def process(self, falcon_event):  # pylint: disable=R0201
+    def process(self, falcon_event):
         self.submitter.submit(falcon_event)
 
 
