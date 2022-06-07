@@ -77,10 +77,10 @@ class Runtime():
     def __init__(self):
         log.info("Azure Backend is enabled.")
 
-    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+    def is_relevant(self, falcon_event):
         return falcon_event.cloud_provider == 'AZURE'
 
-    def process(self, falcon_event):  # pylint: disable=R0201
+    def process(self, falcon_event):
         Submitter(falcon_event).submit()
 
 

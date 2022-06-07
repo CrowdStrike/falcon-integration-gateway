@@ -27,7 +27,7 @@ class StreamManagementThread(threading.Thread):
                 while not workers_died_event.is_set():
                     time.sleep(60)
                 log.debug("Restarting stream session")
-            except Exception:  # pylint: disable=W0703
+            except Exception:  # pylint: disable=broad-except
                 log.exception("Could not restart stream session")
                 sys.exit(1)  # TODO implement re-try mechanism
 

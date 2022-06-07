@@ -71,7 +71,7 @@ class Runtime():
         log.info("Workspace One backend is enabled.")
         self.workspaceone_token = config.get('workspaceone', 'token')
 
-    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+    def is_relevant(self, falcon_event):
         return falcon_event.mdm_identifier is not None
 
     def process(self, falcon_event):

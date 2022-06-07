@@ -10,7 +10,7 @@ class Submitter():
     def __init__(self, event):
         self.event = event
 
-    def find_instance(self, instance_id, mac_address):  # pylint: disable=R0201
+    def find_instance(self, instance_id, mac_address):
         # Instance IDs are unique to the region, not the account, so we have to check them all
         report_region = config.get('aws', 'region')
         ec2instance = None
@@ -175,10 +175,10 @@ class Runtime():
     def __init__(self):
         log.info("AWS Backend is enabled.")
 
-    def is_relevant(self, falcon_event):  # pylint: disable=R0201
+    def is_relevant(self, falcon_event):
         return falcon_event.cloud_provider == 'AWS_EC2'
 
-    def process(self, falcon_event):  # pylint: disable=R0201
+    def process(self, falcon_event):
         Submitter(falcon_event).submit()
 
 
