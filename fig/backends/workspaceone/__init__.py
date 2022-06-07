@@ -67,6 +67,8 @@ class Submitter():
 
 
 class Runtime():
+    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+
     def __init__(self):
         log.info("Workspace One backend is enabled.")
         self.workspaceone_token = config.get('workspaceone', 'token')

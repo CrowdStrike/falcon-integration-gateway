@@ -10,9 +10,12 @@ class Event(dict):
         super().__init__(event)
 
     def irrelevant(self):
-        return self['metadata']['eventType'] != 'DetectionSummaryEvent' \
-            or self.severity < int(config.get('events', 'severity_threshold')) \
+        return self.severity < int(config.get('events', 'severity_threshold')) \
             or self.creation_time < self.cut_off_date()
+
+    @property
+    def event_type(self):
+        return self['metadata']['eventType']
 
     @property
     def offset(self):

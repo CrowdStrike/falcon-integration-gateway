@@ -172,6 +172,8 @@ class Submitter():
 
 
 class Runtime():
+    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+
     def __init__(self):
         log.info("AWS Backend is enabled.")
 

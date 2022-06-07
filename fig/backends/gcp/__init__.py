@@ -187,6 +187,8 @@ class Submitter():
 
 
 class Runtime():
+    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+
     def __init__(self):
         log.info("GCP Backend is enabled.")
         self.cache = Cache()
