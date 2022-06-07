@@ -25,5 +25,9 @@ class Backends():
 
     def process(self, falcon_event):
         for runtime in self.runtimes:
-            if runtime.is_relevant(falcon_event):
+            if falcon_event.original_event.event_type in runtime.RELEVANT_EVENT_TYPES and runtime.is_relevant(falcon_event):
                 runtime.process(falcon_event)
+
+    @property
+    def relevant_event_types(self):
+        return set(typ for r in self.runtimes for typ in r.RELEVANT_EVENT_TYPES)

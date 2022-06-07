@@ -15,7 +15,7 @@ if __name__ == "__main__":
     falcon_cache = FalconCache(FalconAPI())
     backends = Backends()
 
-    StreamManagementThread(output_queue=falcon_events).start()
+    StreamManagementThread(output_queue=falcon_events, relevant_event_types=backends.relevant_event_types).start()
 
     for i in range(int(config.get('main', 'worker_threads'))):
         WorkerThread(name='worker-' + str(i),

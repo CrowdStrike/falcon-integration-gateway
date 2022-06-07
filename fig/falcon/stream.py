@@ -14,10 +14,11 @@ from ..config import config
 class StreamManagementThread(threading.Thread):
     """Thread that spins-out sub-threads to manage CrowdStrike Falcon Streaming API"""
 
-    def __init__(self, output_queue, *args, **kwargs):
+    def __init__(self, output_queue, relevant_event_types, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_mngmt')
         super().__init__(*args, **kwargs)
         self.output_queue = output_queue
+        self.relevant_event_types = relevant_event_types
         self.application_id = config.get('falcon', 'application_id')
 
     def run(self):
@@ -35,7 +36,7 @@ class StreamManagementThread(threading.Thread):
         stop_event = threading.Event()
         falcon_api = FalconAPI()
         for stream in self.get_streams(falcon_api):
-            StreamingThread(stream, self.output_queue, stop_event=stop_event).start()
+            StreamingThread(stream, self.output_queue, self.relevant_event_types, stop_event=stop_event).start()
             StreamRefreshThread(self.application_id, stream, falcon_api, stop_event=stop_event).start()
         return stop_event
 
@@ -79,11 +80,12 @@ class StreamRefreshThread(StoppableThread):
 
 
 class StreamingThread(StoppableThread):
-    def __init__(self, stream: Stream, queue, *args, **kwargs):
+    def __init__(self, stream: Stream, queue, relevant_event_types, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
         self.conn = StreamingConnection(stream, queue.last_offset())
         self.queue = queue
+        self.relevant_event_types = relevant_event_types
 
     def run(self):
         try:
@@ -104,7 +106,7 @@ class StreamingThread(StoppableThread):
 
     def process_event(self, event):
         event = Event(event)
-        if not event.irrelevant():
+        if event.event_type in self.relevant_event_types and not event.irrelevant():
             self.queue.put(event)
 
 

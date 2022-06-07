@@ -74,6 +74,8 @@ class Submitter():
 
 
 class Runtime():
+    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+
     def __init__(self):
         log.info("Azure Backend is enabled.")
 
