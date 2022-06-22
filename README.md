@@ -15,6 +15,7 @@ Currently available backends are:
 | AWS | Pushes events to AWS Security Hub | *Coming Soon* | [AWS backend](fig/backends/aws) |
 | Azure | Pushes events to Azure Log Analytics | <ul><li>[Deployment to AKS](docs/aks)</li></ul> | [Azure backend](fig/backends/azure) |
 | Chronicle | Pushes events to Google Chronicle | <ul><li>[Deployment to GKE](docs/listings/gke-chronicle/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-chronicle))</li><li>[Deployment to GKE](docs/chronicle) (manual)</li></ul> | [Chronicle backend](fig/backends/chronicle) |
+| CloudTrail Lake | Pushes events to AWS CloudTrail Lake | *Coming Soon* | [CloudTrail Lake backend](fig/backends/cloudtrail_lake) |
 | GCP | Pushes events to GCP Security Command Center | <ul><li>[Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))</li><li>[Deployment to GKE](docs/gke) (manual)</li></ul> | [GCP backend](fig/backends/gcp) |
 | Workspace ONE | Pushes events to VMware Workspace ONE Intelligence | *Coming Soon* | [Workspace ONE backend](fig/backends/workspaceone) |
 
@@ -33,7 +34,7 @@ Please refer to [helm chart documentation](https://github.com/CrowdStrike/falcon
 ### Manual Installation and Removal
 ![PyPI - Status](https://img.shields.io/pypi/status/falcon-integration-gateway)
 ![PyPI](https://img.shields.io/pypi/v/falcon-integration-gateway)
-![PyPI - Wheel](https://img.shields.io/pypi/wheel/falcon-integration-gateway) 
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/falcon-integration-gateway)
 <!--![PyPI - Downloads](https://img.shields.io/pypi/dm/falcon-integration-gateway)-->
 
 Falcon Integration Gateway (FIG) is available on the [Python Package Index](https://pypi.org/project/falcon-integration-gateway/).

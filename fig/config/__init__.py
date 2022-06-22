@@ -3,7 +3,7 @@ import configparser
 
 
 class FigConfig(configparser.SafeConfigParser):
-    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL-LAKE'}
+    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL_LAKE'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     ENV_DEFAULTS = [
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
@@ -18,9 +18,9 @@ class FigConfig(configparser.SafeConfigParser):
         ['chronicle', 'service_account', 'GOOGLE_SERVICE_ACCOUNT_FILE'],
         ['chronicle', 'customer_id', 'GOOGLE_CUSTOMER_ID'],
         ['chronicle', 'region', 'CHRONICLE_REGION'],
-        ['cloudtrail-lake', 'account_id', 'ACCOUNT_ID'],
-        ['cloudtrail-lake', 'ingestion_channel_id', 'INGESTION_CHANNEL_ID'],
-        ['cloudtrail-lake', 'role_arn', 'ROLE_ARN']
+        ['cloudtrail_lake', 'account_id', 'ACCOUNT_ID'],
+        ['cloudtrail_lake', 'ingestion_channel_id', 'INGESTION_CHANNEL_ID'],
+        ['cloudtrail_lake', 'role_arn', 'ROLE_ARN']
     ]
 
     def __init__(self):
@@ -82,13 +82,13 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
             if len(self.get('chronicle', 'customer_id')) == 0:
                 raise Exception('Malformed Configuration: expected chronicle.customer_id to be non-empty')
-        if 'CLOUDTRAIL-LAKE' in self.backends:
-            if len(self.get('cloudtrail-lake', 'account_id')) == 0:
-                raise Exception('Malformed Configuration: expected cloudtrail-lake.account_id_file to be non-empty')
-            if len(self.get('cloudtrail-lake', 'ingestion_channel_id')) == 0:
-                raise Exception('Malformed Configuration: expected cloudtrail-lake.ingestion_channel_id to be non-empty')
-            if len(self.get('cloudtrail-lake', 'role_arn')) == 0:
-                raise Exception('Malformed Configuration: expected cloudtrail-lake.role_arn to be non-empty')
+        if 'CLOUDTRAIL_LAKE' in self.backends:
+            if len(self.get('cloudtrail_lake', 'account_id')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.account_id_file to be non-empty')
+            if len(self.get('cloudtrail_lake', 'ingestion_channel_id')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.ingestion_channel_id to be non-empty')
+            if len(self.get('cloudtrail_lake', 'role_arn')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.role_arn to be non-empty')
         if 'AZURE' in self.backends:
             if len(self.get('azure', 'workspace_id')) == 0:
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
