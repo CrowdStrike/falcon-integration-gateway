@@ -3,6 +3,7 @@ from . import aws
 from . import azure
 from . import gcp
 from . import workspaceone
+from . import cloudtrail_lake
 from ..config import config
 
 
@@ -11,7 +12,8 @@ ALL_BACKENDS = {
     'AZURE': azure,
     'GCP': gcp,
     'WORKSPACEONE': workspaceone,
-    'CHRONICLE': chronicle
+    'CHRONICLE': chronicle,
+    'CLOUDTRAIL_LAKE': cloudtrail_lake
 }
 
 

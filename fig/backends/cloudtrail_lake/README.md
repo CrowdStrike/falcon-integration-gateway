@@ -1,4 +1,4 @@
-# AWS Backend
+# AWS CloudTrail Lake Backend
 
 Integration with AWS CloudTrail Lake.
 
@@ -8,10 +8,10 @@ Integration with AWS CloudTrail Lake.
 ```
 [main]
 # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
-backends=CLOUDTRAIL-LAKE
+backends=CLOUDTRAIL_LAKE
 
-[cloudtrail-lake]
-# AWS CloudTrail Lake section is applicable only when CLOUDTRAIL-LAKE backend is enabled in the [main] section.
+[cloudtrail_lake]
+# AWS CloudTrail Lake section is applicable only when CLOUDTRAIL_LAKE backend is enabled in the [main] section.
 
 # Uncomment to provide the aws account ID. Alternatively, use ACCOUNT_ID env variable.
 #account_id =

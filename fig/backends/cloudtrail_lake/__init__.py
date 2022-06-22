@@ -6,6 +6,7 @@ from botocore.exceptions import ClientError
 from ...config import config
 from ...log import log
 
+
 class Submitter():
     def __init__(self, event):
         self.event = events
