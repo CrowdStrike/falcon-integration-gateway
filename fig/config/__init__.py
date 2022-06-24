@@ -84,7 +84,7 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected chronicle.customer_id to be non-empty')
         if 'CLOUDTRAIL_LAKE' in self.backends:
             if len(self.get('cloudtrail_lake', 'account_id')) == 0:
-                raise Exception('Malformed Configuration: expected cloudtrail_lake.account_id_file to be non-empty')
+                raise Exception('Malformed Configuration: expected cloudtrail_lake to be non-empty')
             if len(self.get('cloudtrail_lake', 'ingestion_channel_id')) == 0:
                 raise Exception('Malformed Configuration: expected cloudtrail_lake.ingestion_channel_id to be non-empty')
             if len(self.get('cloudtrail_lake', 'role_arn')) == 0:
