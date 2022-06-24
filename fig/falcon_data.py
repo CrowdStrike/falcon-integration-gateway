@@ -132,3 +132,11 @@ class FalconEvent():
     @property
     def detect_name(self):
         return self.original_event['event']['DetectName']
+
+    @property
+    def service_name(self):
+        return self.original_event['event']['ServiceName']
+
+    @property
+    def audit_key_values(self):
+        return 'AuditKeyValues' in self.original_event['event']
