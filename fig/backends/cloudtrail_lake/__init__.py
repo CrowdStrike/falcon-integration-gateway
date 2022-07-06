@@ -1,7 +1,7 @@
 # import traceback
 # import boto3
 # from botocore.exceptions import ClientError
-import json
+# import json
 from ...config import config
 from ...log import log
 
@@ -36,6 +36,7 @@ class Submitter():
             "eventTime": event_time,
             "eventName": event['OperationName'],
             "userAgent": "falcon-integration-gateway",
+            "eventSource": "CrowdStrike",
             "additionalEventData": {
                 "raw": self.event.original_event
             },
@@ -47,7 +48,8 @@ class Submitter():
 
     def submit(self):
         log.info("Posting event to cloudtrail lake.")
-        print(json.dumps(self.open_audit_event(), indent=4))
+        # print(json.dumps(self.open_audit_event(), indent=4))
+        print(self.open_audit_event())
 
 
 class Runtime():
