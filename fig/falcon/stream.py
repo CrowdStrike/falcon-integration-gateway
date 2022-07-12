@@ -84,7 +84,7 @@ class StreamingThread(StoppableThread):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
         self.stream = stream
-        self.conn = StreamingConnection(self.stream, queue.last_offset())
+        self.conn = StreamingConnection(self.stream, queue.last_offset(self.stream.feed_id))
         self.queue = queue
         self.relevant_event_types = relevant_event_types
 
