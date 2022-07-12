@@ -15,6 +15,7 @@ class Submitter():
 
     # Map event into Open Audit Event format
     def open_audit_event(self):
+        uid = self.event.original_event.uid
         event = self.event.original_event['event']
         metadata = self.event.original_event['metadata']
         event_time = self.event.time.isoformat(timespec='seconds') + 'Z'
@@ -30,8 +31,8 @@ class Submitter():
             }
 
         event_data = {
-            "eventVersion": "1.0",
-            "UUID": "TBD",
+            "version": metadata['version'],
+            "UID": uid,
             "userIdentity": user_identity,
             "eventTime": event_time,
             "eventName": event['OperationName'],

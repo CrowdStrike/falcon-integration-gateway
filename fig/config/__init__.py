@@ -20,7 +20,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['chronicle', 'region', 'CHRONICLE_REGION'],
         ['cloudtrail_lake', 'account_id', 'ACCOUNT_ID'],
         ['cloudtrail_lake', 'ingestion_channel_id', 'INGESTION_CHANNEL_ID'],
-        ['cloudtrail_lake', 'role_arn', 'ROLE_ARN']
+        ['cloudtrail_lake', 'role_arn', 'ROLE_ARN'],
+        ['cloudtrail_lake', 'region', 'REGION']
     ]
 
     def __init__(self):
@@ -89,6 +90,8 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected cloudtrail_lake.ingestion_channel_id to be non-empty')
             if len(self.get('cloudtrail_lake', 'role_arn')) == 0:
                 raise Exception('Malformed Configuration: expected cloudtrail_lake.role_arn to be non-empty')
+            if len(self.get('cloudtrail_lake', 'region')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.region to be non-empty')
         if 'AZURE' in self.backends:
             if len(self.get('azure', 'workspace_id')) == 0:
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')

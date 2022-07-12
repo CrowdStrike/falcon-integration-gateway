@@ -83,7 +83,8 @@ class StreamingThread(StoppableThread):
     def __init__(self, stream: Stream, queue, relevant_event_types, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
-        self.conn = StreamingConnection(stream, queue.last_offset())
+        self.stream = stream
+        self.conn = StreamingConnection(self.stream, queue.last_offset())
         self.queue = queue
         self.relevant_event_types = relevant_event_types
 
@@ -105,7 +106,7 @@ class StreamingThread(StoppableThread):
                 self.conn.close()
 
     def process_event(self, event):
-        event = Event(event)
+        event = Event(event, self.stream.feed_id)
         if event.event_type in self.relevant_event_types and not event.irrelevant():
             self.queue.put(event)
 
