@@ -22,27 +22,27 @@ class Submitter():
 
         user_identity = {
             "type": metadata['eventType'],
-            "principleId": event['UserId']
+            "principleId": event['UserId'],
+            "details": {"AuditKeyValues": "empty"}
         }
 
+        # Not all events have AuditKeyValues
         if self.event.audit_key_values:
-            user_identity['details'] = {
-                "AuditKeyValues": event['AuditKeyValues']
-            }
+            user_identity['details']['AuditKeyValues'] = event['AuditKeyValues']
 
         event_data = {
             "version": metadata['version'],
-            "UID": uid,
             "userIdentity": user_identity,
-            "eventTime": event_time,
-            "eventName": event['OperationName'],
             "userAgent": "falcon-integration-gateway",
             "eventSource": "CrowdStrike",
+            "eventName": event['OperationName'],
+            "eventTime": event_time,
+            "UID": uid,
+            "sourceIPAddress": event['UserIp'],
+            "recipientAccountId": self.account_id,
             "additionalEventData": {
                 "raw": self.event.original_event
-            },
-            "sourceIPAddress": event['UserIp'],
-            "recipientAccountId": self.account_id
+            }
         }
 
         return event_data
