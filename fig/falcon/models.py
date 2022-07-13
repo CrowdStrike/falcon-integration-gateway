@@ -8,7 +8,12 @@ class Event(dict):
     def __init__(self, event_string, feed_id):
         event = json.loads(event_string.decode('utf-8'))
         self.feed_id = feed_id
-        super().__init__(event, self.feed_id)
+        super().__init__(event)
+
+    def __eq__(self, other):
+        if not isinstance(other, Event):
+            return False
+        return super().__eq__(self, other) and self.feed_id == other.feed_id
 
     def irrelevant(self):
         return self.severity < int(config.get('events', 'severity_threshold')) \
