@@ -1,6 +1,6 @@
 # import traceback
-# import boto3
-# from botocore.exceptions import ClientError
+import boto3
+from botocore.exceptions import ClientError
 # import json
 from ...config import config
 from ...log import log
@@ -47,10 +47,42 @@ class Submitter():
 
         return event_data
 
+    @staticmethod
+    def send_to_cloudtraillake(event_data, ingestion_channel_id):
+        client = boto3.client('cloudtraildata', region_name=config.get('cloudtrail_lake', 'region'))
+        response = False
+        try:
+            response = client.put_audit_events(
+                auditEvents=[
+                    {
+                        'id': 'NOT SURE YET',
+                        'eventData': event_data
+                    },
+                ],
+                ingestionChannelArn=ingestion_channel_id
+            )
+        except ClientError as err:
+            log.exception(str(err))
+
+        return response
+
     def submit(self):
-        log.info("Posting event to cloudtrail lake.")
+        log.info("Processing user activity event: %s", self.event.original_event['event']['OperationName'])
+        event_data = self.open_audit_event()
+        ingestion_channel_id = self.ingestion_channel_id
+        response = self.send_to_cloudtraillake(event_data, ingestion_channel_id)
+
+        # Check response for errors
+        if not response:
+            log.error("Exception Error occured while sending event to CloudTrail Lake.")
+        else:
+            if response['failed']:
+                log.error("Failed Response recieved for: %s", response['failed'])
+            else:
+                log.info("Successfully sent event to CloudTrail Lake. (Event ID: %s)", response['successful']['id'])
+
         # print(json.dumps(self.open_audit_event(), indent=4))
-        print(self.open_audit_event())
+        # print(self.open_audit_event())
 
 
 class Runtime():

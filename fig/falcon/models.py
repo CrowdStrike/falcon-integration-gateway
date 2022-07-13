@@ -8,7 +8,7 @@ class Event(dict):
     def __init__(self, event_string, feed_id):
         event = json.loads(event_string.decode('utf-8'))
         self.feed_id = feed_id
-        super().__init__(event)
+        super().__init__(event, self.feed_id)
 
     def irrelevant(self):
         return self.severity < int(config.get('events', 'severity_threshold')) \
