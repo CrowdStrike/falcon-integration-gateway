@@ -4,7 +4,7 @@ Integration with AWS CloudTrail Lake.
 
 ### Example Configuration file
 
-[config/config.ini](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/config/config.ini) configures Falcon Integration Gateway. Below is a minimal configuration example for AWS:
+[config/config.ini](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/config/config.ini) configures Falcon Integration Gateway. Below is a minimal configuration example for AWS CloudTrail Lake:
 ```
 [main]
 # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
@@ -21,6 +21,9 @@ backends=CLOUDTRAIL_LAKE
 
 # Uncomment to provide the Role ARN to push events. Alternatively, use ROLE_ARN env variable.
 #role_arn =
+
+# Uncomment to provide aws region (Default: us-east-1). Alternatively, use REGION env variable
+#region = us-east-1
 ```
 
 ### Developer Guide
@@ -38,5 +41,6 @@ backends=CLOUDTRAIL_LAKE
        -e ACCOUNT_ID="$ACCOUNT_ID" \
        -e INGESTION_CHANNEL_ID="$INGESTION_CHANNEL_ID" \
        -e ROLE_ARN="$ROLE_ARN" \
+       -e REGION="$REGION" \
        falcon-integration-gateway:latest
    ```
