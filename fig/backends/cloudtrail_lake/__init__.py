@@ -12,7 +12,7 @@ class Submitter():
         self.event = event
         # self.last_seen_offset = last_seen_offset
         self.account_id = account_id
-        self.channel_id = config.get('cloudtrail_lake', 'channel_id')
+        self.channel_arn = config.get('cloudtrail_lake', 'channel_arn')
 
     def open_audit_event(self):
         '''
@@ -62,7 +62,7 @@ class Submitter():
                         'eventData': dumps(event_data)
                     }
                 ],
-                ingestionChannelArn=self.channel_id
+                channelArn=self.channel_arn
             )
         except ClientError as err:
             log.exception(str(err))

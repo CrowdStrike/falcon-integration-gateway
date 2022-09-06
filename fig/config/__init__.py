@@ -18,7 +18,7 @@ class FigConfig(configparser.SafeConfigParser):
         ['chronicle', 'service_account', 'GOOGLE_SERVICE_ACCOUNT_FILE'],
         ['chronicle', 'customer_id', 'GOOGLE_CUSTOMER_ID'],
         ['chronicle', 'region', 'CHRONICLE_REGION'],
-        ['cloudtrail_lake', 'channel_id', 'CHANNEL_ID']
+        ['cloudtrail_lake', 'channel_arn', 'CHANNEL_ARN']
     ]
 
     def __init__(self):
@@ -81,8 +81,8 @@ class FigConfig(configparser.SafeConfigParser):
             if len(self.get('chronicle', 'customer_id')) == 0:
                 raise Exception('Malformed Configuration: expected chronicle.customer_id to be non-empty')
         if 'CLOUDTRAIL_LAKE' in self.backends:
-            if len(self.get('cloudtrail_lake', 'channel_id')) == 0:
-                raise Exception('Malformed Configuration: expected cloudtrail_lake.channel_id to be non-empty')
+            if len(self.get('cloudtrail_lake', 'channel_arn')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.channel_arn to be non-empty')
         if 'AZURE' in self.backends:
             if len(self.get('azure', 'workspace_id')) == 0:
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
