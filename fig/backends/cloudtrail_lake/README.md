@@ -13,17 +13,8 @@ backends=CLOUDTRAIL_LAKE
 [cloudtrail_lake]
 # AWS CloudTrail Lake section is applicable only when CLOUDTRAIL_LAKE backend is enabled in the [main] section.
 
-# Uncomment to provide the aws account ID. Alternatively, use ACCOUNT_ID env variable.
-#account_id =
-
-# Uncomment to provide the Ingestion Channel ID. Alternatively, use INGESTION_CHANNEL_ID env variable.
-#ingestion_channel_id =
-
-# Uncomment to provide the Role ARN to push events. Alternatively, use ROLE_ARN env variable.
-#role_arn =
-
-# Uncomment to provide aws region (Default: us-east-1). Alternatively, use REGION env variable
-#region = us-east-1
+# Uncomment to provide the Channel ID. Alternatively, use CHANNEL_ID env variable.
+#channel_id =
 ```
 
 ### Developer Guide
@@ -38,9 +29,7 @@ backends=CLOUDTRAIL_LAKE
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e FALCON_CLOUD_REGION="us-1" \
-       -e ACCOUNT_ID="$ACCOUNT_ID" \
-       -e INGESTION_CHANNEL_ID="$INGESTION_CHANNEL_ID" \
-       -e ROLE_ARN="$ROLE_ARN" \
-       -e REGION="$REGION" \
+       -e CHANNEL_ID="$CHANNEL_ID" \
+       -v ~/.aws:/fig/.aws \
        falcon-integration-gateway:latest
    ```

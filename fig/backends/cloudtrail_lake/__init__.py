@@ -1,20 +1,23 @@
-# import traceback
+# import logging
 import boto3
+from json import dumps
 from botocore.exceptions import ClientError
-# import json
 from ...config import config
 from ...log import log
+# from .cloudtrail_offset import LastEventOffset
 
 
 class Submitter():
-    def __init__(self, event):
+    def __init__(self, event, account_id):
         self.event = event
-        self.ingestion_channel_id = config.get('cloudtrail_lake', 'ingestion_channel_id')
-        self.role_arn = config.get('cloudtrail_lake', 'role_arn')
-        self.account_id = config.get('cloudtrail_lake', 'account_id')
+        # self.last_seen_offset = last_seen_offset
+        self.account_id = account_id
+        self.channel_id = config.get('cloudtrail_lake', 'channel_id')
 
-    # Map event into Open Audit Event format
     def open_audit_event(self):
+        '''
+        Map the audit event and return a dict of the data.
+        '''
         uid = self.event.original_event.uid
         event = self.event.original_event['event']
         metadata = self.event.original_event['metadata']
@@ -22,8 +25,8 @@ class Submitter():
 
         user_identity = {
             "type": metadata['eventType'],
-            "principleId": event['UserId'],
-            "details": {"AuditKeyValues": "empty"}
+            "principalId": event['UserId'],
+            "details": {"AuditKeyValues": "n/a"}
         }
 
         # Not all events have AuditKeyValues
@@ -34,7 +37,7 @@ class Submitter():
             "version": metadata['version'],
             "userIdentity": user_identity,
             "userAgent": "falcon-integration-gateway",
-            "eventSource": "CrowdStrike",
+            "eventSource": "crowdstrike",
             "eventName": event['OperationName'],
             "eventTime": event_time,
             "UID": uid,
@@ -47,19 +50,19 @@ class Submitter():
 
         return event_data
 
-    @staticmethod
-    def send_to_cloudtraillake(event_data, ingestion_channel_id):
-        client = boto3.client('cloudtraildata', region_name=config.get('cloudtrail_lake', 'region'))
+    def send_to_cloudtraillake(self, event_data):
+        # Authenticate to AWS
+        client = boto3.client('cloudtraildata')
         response = False
         try:
             response = client.put_audit_events(
                 auditEvents=[
                     {
-                        'id': 'NOT SURE YET',
-                        'eventData': event_data
-                    },
+                        'id': event_data['UID'],
+                        'eventData': dumps(event_data)
+                    }
                 ],
-                ingestionChannelArn=ingestion_channel_id
+                ingestionChannelArn=self.channel_id
             )
         except ClientError as err:
             log.exception(str(err))
@@ -69,20 +72,21 @@ class Submitter():
     def submit(self):
         log.info("Processing user activity event: %s", self.event.original_event['event']['OperationName'])
         event_data = self.open_audit_event()
-        ingestion_channel_id = self.ingestion_channel_id
-        response = self.send_to_cloudtraillake(event_data, ingestion_channel_id)
+        # response = self.send_to_cloudtraillake(event_data)
 
-        # Check response for errors
-        if not response:
-            log.error("Exception Error occured while sending event to CloudTrail Lake.")
-        else:
-            if response['failed']:
-                log.error("Failed Response recieved for: %s", response['failed'])
-            else:
-                log.info("Successfully sent event to CloudTrail Lake. (Event ID: %s)", response['successful']['id'])
+        # # Check response for errors
+        # if not response:
+        #     log.error("Exception Error occured while sending event to CloudTrail Lake.")
+        # else:
+        #     if response['failed']:
+        #         log.error("Failed Response recieved for: %s", response['failed'])
+        #     else:
+        #         log.info("Successfully sent event to CloudTrail Lake. (Request ID: %s)", response['ResponseMetadata']['RequestId'])
+        #         # Update the last seen offset for this feed
+        #         self.last_seen_offset.update_last_seen_offsets(self.event.feed_id, self.event.offset)
 
         # print(json.dumps(self.open_audit_event(), indent=4))
-        # print(self.open_audit_event())
+        print(event_data)
 
 
 class Runtime():
@@ -90,19 +94,23 @@ class Runtime():
 
     def __init__(self):
         log.info("AWS CloudTrail Lake Backend is enabled.")
-
-    # def is_relevant(self, falcon_event):
-    #     if falcon_event.service_name.lower() == "crowdstrike authentication":
-    #         log.info(vars(falcon_event))
-    #         print()
-    #         return True
-    #     return False
+        # Get AWS Account ID:
+        self.account_id = boto3.client("sts").get_caller_identity().get('Account')
+        # self.last_seen_offsets = LastEventOffset().get_last_seen_offsets()
 
     def is_relevant(self, falcon_event):
+        # feed_id = falcon_event.original_event.feed_id
+        # offset = falcon_event.original_event.offset
+        # log.info("Feed id: %s | Offset: %s", feed_id, offset)
+        # if falcon_event.service_name.lower() == "crowdstrike authentication":
+        #     if offset > self.last_seen_offsets.get(feed_id, 0):
+        #         return True
+        # return False
         return falcon_event.service_name.lower() == "crowdstrike authentication"
 
     def process(self, falcon_event):
-        Submitter(falcon_event).submit()
+        # Submitter(falcon_event, self.last_seen_offsets).submit()
+        Submitter(falcon_event, self.account_id).submit()
 
 
 __all__ = ['Runtime']
