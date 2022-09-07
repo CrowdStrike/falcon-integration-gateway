@@ -1,6 +1,5 @@
-# import logging
-import boto3
 from json import dumps
+import boto3
 from botocore.exceptions import ClientError
 from ...config import config
 from ...log import log
@@ -91,9 +90,6 @@ class Submitter():
                 self.last_event_offset.update_last_seen_offsets(self.event.original_event.feed_id,
                                                                 self.event.original_event.offset)
 
-        # print(json.dumps(self.open_audit_event(), indent=4))
-        # print(event_data)
-
 
 class Runtime():
     RELEVANT_EVENT_TYPES = ['AuthActivityAuditEvent']
@@ -108,19 +104,16 @@ class Runtime():
         self.last_seen_offsets = self.last_event_offset.get_last_seen_offsets()
 
     def is_relevant(self, falcon_event):
+        if falcon_event.service_name.lower() != "crowdstrike authentication":
+            return False
+
         feed_id = falcon_event.original_event.feed_id
         offset = falcon_event.original_event.offset
-        # log.info("Feed id: %s | Offset: %s", feed_id, offset)
         if offset > self.last_seen_offsets.get(feed_id, 0):
-            log.info("SENDING event with feed_id: %s offset: %s", feed_id, offset)
             return True
-        else:
-            log.info("Skipping event with feed_id: %s offset: %s", feed_id, offset)
         return False
-        # return falcon_event.service_name.lower() == "crowdstrike authentication"
 
     def process(self, falcon_event):
-        # Submitter(falcon_event, self.last_seen_offsets).submit()
         Submitter(falcon_event, self.account_id, self.last_event_offset).submit()
 
 

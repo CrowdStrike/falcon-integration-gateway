@@ -1,10 +1,11 @@
+import ast
 import threading
 import boto3
 from botocore.exceptions import ClientError
 from ...log import log
 
 
-_offset_lock = threading.Lock()
+_offset_lock = threading.RLock()
 
 
 class LastEventOffset():
@@ -17,8 +18,8 @@ class LastEventOffset():
         self.last_seen_offsets = {}
         self.param_name = 'last_seen_offsets'
         self.client = boto3.client('ssm')
-        # Ensure SSM parameter exists
         self.validate_ssm_parameter()
+        self.cache = None
 
     def validate_ssm_parameter(self):
         '''
@@ -40,46 +41,44 @@ class LastEventOffset():
 
     def get_last_seen_offsets(self):
         '''
-        Get the last seen offset for each feed.
+        Get the last seen offset for all feeds via local cache or SSM parameter store.
         '''
-        try:
-            response = self.client.get_parameter(Name=self.param_name)
-            last_seen_offsets = eval(response['Parameter']['Value'])
-        except ClientError as err:
-            log.exception("Failed to get last seen offset with error: %s", str(err))
-        return last_seen_offsets
+        with _offset_lock:
+            if self.cache is None:
+                self.cache = self._get_remote()
+            return self.cache
 
     def update_last_seen_offsets(self, feed_id, offset):
         '''
         Update the last seen offset for a given feed.
         '''
-        try:
-            _offset_lock.acquire()
-            self.last_seen_offsets = self.get_last_seen_offsets()
-            if offset > self.last_seen_offsets.get(feed_id, 0):
-                self.last_seen_offsets[feed_id] = offset
-                self.client.put_parameter(
-                    Name=self.param_name,
-                    Value=str(self.last_seen_offsets),
-                    Type='String',
-                    Overwrite=True
-                )
+        with _offset_lock:
+            if self.get_last_seen_offsets().get(feed_id, 0) < offset:
+                self.cache[feed_id] = offset
+                self._put_remote(self.cache)
                 log.info("Updated last seen offset for feed %s to %s", feed_id, offset)
-        except ClientError as err:
-            log.exception("Failed to update last seen offset with error: %s", str(err))
-        finally:
-            _offset_lock.release()
 
-        # with _offset_lock:
-        #     self.last_seen_offsets[feed_id] = offset
-        #     if self.last_seen_offsets[feed_id] > self.get_last_seen_offsets().get(feed_id, 0):
-        #         try:
-        #             self.client.put_parameter(
-        #                 Name=self.param_name,
-        #                 Value=str(self.last_seen_offsets),
-        #                 Type='String',
-        #                 Overwrite=True
-        #             )
-        #             log.info("Updated last seen offset for feed %s to %s", feed_id, offset)
-        #         except ClientError as err:
-        #             log.exception("Failed to update last seen offset with error: %s", str(err))
+    def _put_remote(self, value):
+        '''
+        Put a value to the SSM parameter store.
+        '''
+        try:
+            self.client.put_parameter(
+                Name=self.param_name,
+                Value=str(value),
+                Type='String',
+                Overwrite=True
+            )
+        except ClientError as err:
+            log.exception("Failed to put value to SSM parameter with error: %s", str(err))
+
+    def _get_remote(self):
+        '''
+        Get a value from the SSM parameter store.
+        '''
+        try:
+            response = self.client.get_parameter(Name=self.param_name)
+            return ast.literal_eval(response['Parameter']['Value'])
+        except ClientError as err:
+            log.exception("Failed to get value from SSM parameter with error: %s", str(err))
+            return {}
