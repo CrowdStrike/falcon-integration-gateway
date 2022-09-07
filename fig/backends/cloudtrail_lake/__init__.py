@@ -4,13 +4,13 @@ from json import dumps
 from botocore.exceptions import ClientError
 from ...config import config
 from ...log import log
-# from .cloudtrail_offset import LastEventOffset
+from .cloudtrail_offset import LastEventOffset
 
 
 class Submitter():
-    def __init__(self, event, account_id):
+    def __init__(self, event, account_id, last_event_offset):
         self.event = event
-        # self.last_seen_offset = last_seen_offset
+        self.last_event_offset = last_event_offset
         self.account_id = account_id
         self.channel_arn = config.get('cloudtrail_lake', 'channel_arn')
 
@@ -51,8 +51,10 @@ class Submitter():
         return event_data
 
     def send_to_cloudtraillake(self, event_data):
-        # Authenticate to AWS
-        client = boto3.client('cloudtraildata')
+        '''
+        Sends the event to CloudTrail Lake. Returns the response.
+        '''
+        client = boto3.client('cloudtrail-data')
         response = False
         try:
             response = client.put_audit_events(
@@ -70,23 +72,27 @@ class Submitter():
         return response
 
     def submit(self):
+        '''
+        Submit events to CloudTrail Lake and updates the last seen offset.
+        '''
         log.info("Processing user activity event: %s", self.event.original_event['event']['OperationName'])
         event_data = self.open_audit_event()
-        # response = self.send_to_cloudtraillake(event_data)
+        response = self.send_to_cloudtraillake(event_data)
 
-        # # Check response for errors
-        # if not response:
-        #     log.error("Exception Error occured while sending event to CloudTrail Lake.")
-        # else:
-        #     if response['failed']:
-        #         log.error("Failed Response recieved for: %s", response['failed'])
-        #     else:
-        #         log.info("Successfully sent event to CloudTrail Lake. (Request ID: %s)", response['ResponseMetadata']['RequestId'])
-        #         # Update the last seen offset for this feed
-        #         self.last_seen_offset.update_last_seen_offsets(self.event.feed_id, self.event.offset)
+        # Check response for errors
+        if not response:
+            log.error("Exception Error occured while sending event to CloudTrail Lake.")
+        else:
+            if response['failed']:
+                log.error("Failed Response recieved for: %s", response['failed'])
+            else:
+                log.info("Successfully sent event to CloudTrail Lake. (Request ID: %s)", response['ResponseMetadata']['RequestId'])
+                # Update the last seen offset for this feed
+                self.last_event_offset.update_last_seen_offsets(self.event.original_event.feed_id,
+                                                                self.event.original_event.offset)
 
         # print(json.dumps(self.open_audit_event(), indent=4))
-        print(event_data)
+        # print(event_data)
 
 
 class Runtime():
@@ -96,21 +102,26 @@ class Runtime():
         log.info("AWS CloudTrail Lake Backend is enabled.")
         # Get AWS Account ID:
         self.account_id = boto3.client("sts").get_caller_identity().get('Account')
-        # self.last_seen_offsets = LastEventOffset().get_last_seen_offsets()
+        # Instantiate the last seen offset object
+        self.last_event_offset = LastEventOffset()
+        # Get the last seen offset for each feed
+        self.last_seen_offsets = self.last_event_offset.get_last_seen_offsets()
 
     def is_relevant(self, falcon_event):
-        # feed_id = falcon_event.original_event.feed_id
-        # offset = falcon_event.original_event.offset
+        feed_id = falcon_event.original_event.feed_id
+        offset = falcon_event.original_event.offset
         # log.info("Feed id: %s | Offset: %s", feed_id, offset)
-        # if falcon_event.service_name.lower() == "crowdstrike authentication":
-        #     if offset > self.last_seen_offsets.get(feed_id, 0):
-        #         return True
-        # return False
-        return falcon_event.service_name.lower() == "crowdstrike authentication"
+        if offset > self.last_seen_offsets.get(feed_id, 0):
+            log.info("SENDING event with feed_id: %s offset: %s", feed_id, offset)
+            return True
+        else:
+            log.info("Skipping event with feed_id: %s offset: %s", feed_id, offset)
+        return False
+        # return falcon_event.service_name.lower() == "crowdstrike authentication"
 
     def process(self, falcon_event):
         # Submitter(falcon_event, self.last_seen_offsets).submit()
-        Submitter(falcon_event, self.account_id).submit()
+        Submitter(falcon_event, self.account_id, self.last_event_offset).submit()
 
 
 __all__ = ['Runtime']
