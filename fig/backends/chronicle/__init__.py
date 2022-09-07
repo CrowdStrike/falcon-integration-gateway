@@ -49,7 +49,7 @@ class Submitter():
     def udm(self):
         event = self.event.original_event['event']
         meta = self.event.original_event['metadata']
-        timestamp_components = str(datetime.fromtimestamp(event["UTCTimestamp"])).split()
+        timestamp_components = str(datetime.fromtimestamp(meta["eventCreationTime"]/1000)).split()
         new_url = parse_url(event["FalconHostLink"])
         udm_result = {
             "metadata": {
