@@ -1,5 +1,6 @@
 from fig.backends import chronicle
 from . import aws
+from . import aws_sqs
 from . import azure
 from . import gcp
 from . import workspaceone
@@ -8,6 +9,7 @@ from ..config import config
 
 ALL_BACKENDS = {
     'AWS': aws,
+    'AWS_SQS': aws_sqs,
     'AZURE': azure,
     'GCP': gcp,
     'WORKSPACEONE': workspaceone,

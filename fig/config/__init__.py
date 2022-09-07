@@ -3,7 +3,7 @@ import configparser
 
 
 class FigConfig(configparser.SafeConfigParser):
-    ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE'}
+    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     ENV_DEFAULTS = [
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
@@ -12,6 +12,8 @@ class FigConfig(configparser.SafeConfigParser):
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['aws', 'region', 'AWS_REGION'],
+        ['aws_sqs', 'region', 'AWS_REGION'],
+        ['aws_sqs', 'sqs_queue_name', 'AWS_SQS'],
         ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
         ['workspaceone', 'syslog_host', 'SYSLOG_HOST'],
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
@@ -65,6 +67,11 @@ class FigConfig(configparser.SafeConfigParser):
         if 'AWS' in self.backends:
             if len(self.get('aws', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected aws.region to be non-empty')
+        if 'AWS_SQS' in self.backends:
+            if len(self.get('aws_sqs', 'region')) == 0:
+                raise Exception('Malformed Configuration: expected aws_sqs.region to be non-empty')
+            if len(self.get('aws_sqs', 'sqs_queue_name')) == 0:
+                raise Exception('Malformed Configuration: expected aws_sqs.sqs_queue_name to be non-empty')
         if 'WORKSPACEONE' in self.backends:
             if len(self.get('workspaceone', 'token')) == 0:
                 raise Exception('Malformed Configuration: expected workspaceone.token to be non-empty')

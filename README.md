@@ -13,6 +13,7 @@ Currently available backends are:
 | Backend | Description | Deployment Guide(s) | Developer Guide(s) |
 |:--------|:------------|:--------------------|:-------------------|
 | AWS | Pushes events to AWS Security Hub | *Coming Soon* | [AWS backend](fig/backends/aws) |
+| AWS_SQS | Pushes events to AWS SQS | *Coming Soon* | [AWS SQS backend](fig/backends/aws_sqs) |
 | Azure | Pushes events to Azure Log Analytics | <ul><li>[Deployment to AKS](docs/aks)</li></ul> | [Azure backend](fig/backends/azure) |
 | Chronicle | Pushes events to Google Chronicle | <ul><li>[Deployment to GKE](docs/listings/gke-chronicle/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-chronicle))</li><li>[Deployment to GKE](docs/chronicle) (manual)</li></ul> | [Chronicle backend](fig/backends/chronicle) |
 | GCP | Pushes events to GCP Security Command Center | <ul><li>[Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))</li><li>[Deployment to GKE](docs/gke) (manual)</li></ul> | [GCP backend](fig/backends/gcp) |
