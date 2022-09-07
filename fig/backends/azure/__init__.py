@@ -39,7 +39,7 @@ def post_data(workspace_id, primary_key, body, log_type):
         'Log-Type': log_type,
         'x-ms-date': rfc1123date
     }
-    response = post(uri, data=body, headers=headers)
+    response = post(uri, data=body, headers=headers, timeout=60)
     if (response.status_code < 200 or response.status_code > 299):
         log.error("Failed to send detection to Log Analytics: %s", response.text)
 
