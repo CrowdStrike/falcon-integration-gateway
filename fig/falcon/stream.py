@@ -106,7 +106,7 @@ class StreamingThread(StoppableThread):
 
     def process_event(self, event):
         event = Event(event)
-        if event.event_type in self.relevant_event_types and not event.irrelevant():
+        if (self.relevant_event_types is None or event.event_type in self.relevant_event_types) and not event.irrelevant():
             self.queue.put(event)
 
 

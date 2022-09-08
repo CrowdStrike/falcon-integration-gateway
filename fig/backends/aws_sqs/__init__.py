@@ -23,7 +23,7 @@ class Submitter():
 
 
 class Runtime():
-    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+    RELEVANT_EVENT_TYPES = "ALL"
 
     def __init__(self):
         log.info("AWS SQS Backend is enabled.")
