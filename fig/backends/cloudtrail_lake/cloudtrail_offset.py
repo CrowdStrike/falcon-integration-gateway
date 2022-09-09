@@ -37,7 +37,7 @@ class LastEventOffset():
                     Overwrite=True
                 )
             else:
-                log.exception(str(err))
+                raise err
 
     def get_last_seen_offsets(self):
         '''

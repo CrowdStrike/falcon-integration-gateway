@@ -97,7 +97,10 @@ class Runtime():
     def __init__(self):
         log.info("AWS CloudTrail Lake Backend is enabled.")
         # Get AWS Account ID:
-        self.account_id = boto3.client("sts").get_caller_identity().get('Account')
+        try:
+            self.account_id = boto3.client('sts').get_caller_identity().get('Account')
+        except ClientError as err:
+            raise err
         # Instantiate the last seen offset object
         self.last_event_offset = LastEventOffset()
         # Get the last seen offset for each feed

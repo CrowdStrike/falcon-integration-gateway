@@ -6,9 +6,16 @@ class FigConfig(configparser.SafeConfigParser):
     ALL_BACKENDS = {'AWS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL_LAKE'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     ENV_DEFAULTS = [
+        ['main', 'backends', 'FIG_BACKENDS'],
+        ['main', 'worker_threads', 'FIG_WORKER_THREADS'],
+        ['logging', 'log_level', 'FIG_LOG_LEVEL'],
+        ['events', 'severity_threshold', 'FIG_SEVERITY_THRESHOLD'],
+        ['events', 'older_than_days_threshold', 'FIG_OLDER_THAN_DAYS_THRESHOLD'],
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
         ['falcon', 'client_id', 'FALCON_CLIENT_ID'],
         ['falcon', 'client_secret', 'FALCON_CLIENT_SECRET'],
+        ['falcon', 'reconnect_retry_count', 'FALCON_RECONNECT_RETRY_COUNT'],
+        ['falcon', 'application_id', 'FALCON_APPLICATION_ID'],
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['aws', 'region', 'AWS_REGION'],
