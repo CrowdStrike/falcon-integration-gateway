@@ -8,9 +8,9 @@ class FigConfig(configparser.SafeConfigParser):
     ENV_DEFAULTS = [
         ['main', 'backends', 'FIG_BACKENDS'],
         ['main', 'worker_threads', 'FIG_WORKER_THREADS'],
-        ['logging', 'log_level', 'FIG_LOG_LEVEL'],
-        ['events', 'severity_threshold', 'FIG_SEVERITY_THRESHOLD'],
-        ['events', 'older_than_days_threshold', 'FIG_OLDER_THAN_DAYS_THRESHOLD'],
+        ['logging', 'level', 'LOG_LEVEL'],
+        ['events', 'severity_threshold', 'EVENTS_SEVERITY_THRESHOLD'],
+        ['events', 'older_than_days_threshold', 'EVENTS_OLDER_THAN_DAYS_THRESHOLD'],
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
         ['falcon', 'client_id', 'FALCON_CLIENT_ID'],
         ['falcon', 'client_secret', 'FALCON_CLIENT_SECRET'],
