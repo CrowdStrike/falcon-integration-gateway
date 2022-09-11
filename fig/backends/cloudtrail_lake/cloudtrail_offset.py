@@ -2,6 +2,7 @@ import ast
 import threading
 import boto3
 from botocore.exceptions import ClientError
+from ...config import config
 from ...log import log
 
 
@@ -17,7 +18,7 @@ class LastEventOffset():
     def __init__(self):
         self.last_seen_offsets = {}
         self.param_name = 'last_seen_offsets'
-        self.client = boto3.client('ssm')
+        self.client = boto3.client('ssm', region_name=config.get('cloudtrail_lake', 'region'))
         self.validate_ssm_parameter()
         self.cache = None
 

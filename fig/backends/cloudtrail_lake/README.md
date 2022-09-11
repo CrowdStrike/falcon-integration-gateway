@@ -13,7 +13,7 @@ backends=CLOUDTRAIL_LAKE
 [cloudtrail_lake]
 # AWS CloudTrail Lake section is applicable only when CLOUDTRAIL_LAKE backend is enabled in the [main] section.
 
-# Uncomment to provide the Channel ARN. Alternatively, use CHANNEL_ARN env variable.
+# Uncomment to provide the Channel ARN. Alternatively, use CLOUDTRAIL_LAKE_CHANNEL_ARN env variable.
 #channel_arn =
 ```
 
@@ -29,7 +29,8 @@ backends=CLOUDTRAIL_LAKE
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
        -e FALCON_CLOUD_REGION="us-1" \
-       -e CHANNEL_ARN="$CHANNEL_ARN" \
+       -e CLOUDTRAIL_LAKE_CHANNEL_ARN="$CLOUDTRAIL_LAKE_CHANNEL_ARN" \
+       -e CLOUDTRAIL_LAKE_REGION="$CLOUDTRAIL_LAKE_REGION" \
        -v ~/.aws:/fig/.aws \
        falcon-integration-gateway:latest
    ```

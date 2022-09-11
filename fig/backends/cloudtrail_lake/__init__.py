@@ -12,6 +12,7 @@ class Submitter():
         self.last_event_offset = last_event_offset
         self.account_id = account_id
         self.channel_arn = config.get('cloudtrail_lake', 'channel_arn')
+        self.region = config.get('cloudtrail_lake', 'region')
 
     def open_audit_event(self):
         '''
@@ -53,7 +54,7 @@ class Submitter():
         '''
         Sends the event to CloudTrail Lake. Returns the response.
         '''
-        client = boto3.client('cloudtrail-data')
+        client = boto3.client('cloudtrail-data', region_name=self.region)
         response = False
         try:
             response = client.put_audit_events(
