@@ -54,7 +54,7 @@ class Submitter():
         '''
         Sends the event to CloudTrail Lake. Returns the response.
         '''
-        client = boto3.client('cloudtrail-data', region_name=self.region)
+        client = boto3.client('cloudtraildata', region_name=self.region)
         response = False
         try:
             response = client.put_audit_events(
