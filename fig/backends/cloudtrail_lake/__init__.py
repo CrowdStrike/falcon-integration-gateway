@@ -14,7 +14,7 @@ class Submitter():
         self.channel_arn = config.get('cloudtrail_lake', 'channel_arn')
         self.region = config.get('cloudtrail_lake', 'region')
 
-    def open_audit_event(self):
+    def cloudtrail_lake_audit_event(self):
         '''
         Map the audit event and return a dict of the data.
         '''
@@ -75,8 +75,11 @@ class Submitter():
         '''
         Submit events to CloudTrail Lake and updates the last seen offset.
         '''
-        log.info("Processing user activity event: %s", self.event.original_event['event']['OperationName'])
-        event_data = self.open_audit_event()
+        operation_name = self.event.original_event['event']['OperationName']
+        uid = self.event.original_event.uid
+        log.info("Processing user activity event: %s ID: %s", operation_name, uid)
+
+        event_data = self.cloudtrail_lake_audit_event()
         response = self.send_to_cloudtraillake(event_data)
 
         # Check response for errors
@@ -86,7 +89,8 @@ class Submitter():
             if response['failed']:
                 log.error("Failed Response recieved for: %s", response['failed'])
             else:
-                log.info("Successfully sent event to CloudTrail Lake. (Request ID: %s)", response['ResponseMetadata']['RequestId'])
+                log.info("Successfully sent event ID: %s to CloudTrail Lake. (Request ID: %s)",
+                         uid, response['ResponseMetadata']['RequestId'])
                 # Update the last seen offset for this feed
                 self.last_event_offset.update_last_seen_offsets(self.event.original_event.feed_id,
                                                                 self.event.original_event.offset)

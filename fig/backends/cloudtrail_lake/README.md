@@ -15,6 +15,9 @@ backends=CLOUDTRAIL_LAKE
 
 # Uncomment to provide the Channel ARN. Alternatively, use CLOUDTRAIL_LAKE_CHANNEL_ARN env variable.
 #channel_arn =
+
+# Uncomment to provide the AWS region. Alternatively, use CLOUDTRAIL_LAKE_REGION env variable.
+# region =
 ```
 
 ### Developer Guide

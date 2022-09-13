@@ -57,7 +57,7 @@ class LastEventOffset():
             if self.get_last_seen_offsets().get(feed_id, 0) < offset:
                 self.cache[feed_id] = offset
                 self._put_remote(self.cache)
-                log.info("Updated last seen offset for feed %s to %s", feed_id, offset)
+                log.info("Updated last seen offset for stream feed: %s to: %s", feed_id, offset)
 
     def _put_remote(self, value):
         '''
