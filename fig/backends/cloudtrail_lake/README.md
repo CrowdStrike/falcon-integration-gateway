@@ -17,7 +17,7 @@ backends=CLOUDTRAIL_LAKE
 #channel_arn =
 
 # Uncomment to provide the AWS region. Alternatively, use CLOUDTRAIL_LAKE_REGION env variable.
-# region =
+#region =
 ```
 
 ### Developer Guide
