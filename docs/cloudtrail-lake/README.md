@@ -33,4 +33,4 @@ strategies for the FIG, and depending on your situation, the following strategie
 ### [Deployment to EKS](./eks)
 > Deploy FIG on EKS with Helm chart or Kube spec
 ### [Manual Deployment](./manual)
-> Deploy FIG via Docker or as a Python Package
+> Deploy FIG via Docker
