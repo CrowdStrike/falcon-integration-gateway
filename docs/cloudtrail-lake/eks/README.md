@@ -120,7 +120,7 @@ file.
   `region =` should be set to your AWS region where you setup the CloudTrail Lake Channel
 
   `application_id =` should be set to something unique.
-  > Running multiple FIG instances with the same `application_id` can cause issues.
+  > :exclamation: Running multiple FIG instances with the same `application_id` can cause issues.
 
   See the below example of config changes:
   <details open>
