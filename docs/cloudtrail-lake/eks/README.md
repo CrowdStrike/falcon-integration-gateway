@@ -36,10 +36,10 @@ file.
 <details>
   <summary>Click to expand</summary>
 
-  #### Prequisite
+  #### Prerequisite
   For Dependency requirements, installation instructions, as well as the full list of available configuration options, go to
   the [Helm Chart - Falcon Integration Gateway](https://github.com/CrowdStrike/falcon-helm/tree/main/helm-charts/falcon-integration-gateway)
-  repositoy.
+  repository.
 
   ##### Export the following variables
   ```bash
