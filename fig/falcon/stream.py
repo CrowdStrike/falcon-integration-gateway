@@ -1,5 +1,6 @@
 import sys
 import datetime
+import logging
 import time
 import threading
 import requests
@@ -86,6 +87,7 @@ class StreamingThread(StoppableThread):
         self.conn = StreamingConnection(stream, queue.last_offset())
         self.queue = queue
         self.relevant_event_types = relevant_event_types
+        self.event_count = 0
 
     def run(self):
         try:
@@ -105,9 +107,19 @@ class StreamingThread(StoppableThread):
                 self.conn.close()
 
     def process_event(self, event):
+        if log.level <= logging.DEBUG:
+            self.log_event()
         event = Event(event)
+        if log.level <= logging.DEBUG:
+            self.log_event(event)
+
         if (self.relevant_event_types is None or event.event_type in self.relevant_event_types) and not event.irrelevant():
             self.queue.put(event)
+
+    def log_event(self):
+        self.event_count += 1
+        if self.event_count % 200 == 0:
+            log.debug("Received %d events from the stream", self.event_count)
 
 
 class StreamingConnection():
