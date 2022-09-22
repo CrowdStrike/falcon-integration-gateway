@@ -126,6 +126,7 @@ class StreamingConnection():
         url = self.stream.url + '&offset={}'.format(self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0)
         self.connection = requests.get(url, headers=headers, stream=True, timeout=60)
         log.info("Established Streaming Connection: %d %s", self.connection.status_code, self.connection.reason)
+        self.connection.raise_for_status()
         return self.connection
 
     def events(self):
