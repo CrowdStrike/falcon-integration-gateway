@@ -1,5 +1,6 @@
 import sys
 import datetime
+import logging
 import time
 import threading
 import requests
@@ -86,6 +87,8 @@ class StreamingThread(StoppableThread):
         self.conn = StreamingConnection(stream, queue.last_offset())
         self.queue = queue
         self.relevant_event_types = relevant_event_types
+        self.event_count = 0
+        self.event_count_types = {}
 
     def run(self):
         try:
@@ -106,8 +109,17 @@ class StreamingThread(StoppableThread):
 
     def process_event(self, event):
         event = Event(event)
+        if log.level <= logging.DEBUG:
+            self.log_event(event)
+
         if (self.relevant_event_types is None or event.event_type in self.relevant_event_types) and not event.irrelevant():
             self.queue.put(event)
+
+    def log_event(self, event):
+        self.event_count += 1
+        self.event_count_types[event.event_type] = self.event_count_types.get(event.event_type, 0) + 1
+        if self.event_count % 200 == 0:
+            log.debug("Received %d events from the stream. Type breakdown was: %s", self.event_count, self.event_count_types)
 
 
 class StreamingConnection():
@@ -125,6 +137,8 @@ class StreamingConnection():
         log.info("Opening Streaming Connection")
         url = self.stream.url + '&offset={}'.format(self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0)
         self.connection = requests.get(url, headers=headers, stream=True, timeout=60)
+        log.info("Established Streaming Connection: %d %s", self.connection.status_code, self.connection.reason)
+        self.connection.raise_for_status()
         return self.connection
 
     def events(self):
