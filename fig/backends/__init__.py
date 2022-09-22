@@ -5,6 +5,7 @@ from . import azure
 from . import gcp
 from . import workspaceone
 from ..config import config
+from ..log import log
 
 
 ALL_BACKENDS = {
@@ -24,6 +25,12 @@ class Backends():
                          if k in config.backends]
         if len(self.runtimes) == 0:
             raise Exception("No Backend enabled. Exiting.")
+
+        accepted_types = self.relevant_event_types
+        if accepted_types is None:
+            log.info("At least one of the enabled backends will receive all the events")
+        else:
+            log.info("Enabled backends will only process events with types: %s", accepted_types)
 
     def process(self, falcon_event):
         for runtime in self.runtimes:
