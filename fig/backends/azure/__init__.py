@@ -80,7 +80,7 @@ class Runtime():
         log.info("Azure Backend is enabled.")
 
     def is_relevant(self, falcon_event):
-        return falcon_event.cloud_provider == 'AZURE'
+        return True
 
     def process(self, falcon_event):
         Submitter(falcon_event).submit()
