@@ -75,8 +75,10 @@ class Stream(dict):
 
     @property
     def feed_id(self):
-        match = re.match(r'.*\/sensors\/entities\/datafeed/v1/([0-9a-zA-Z]+)\?',
-                         self['dataFeedURL'])
-        if not match or not match.group(1):
-            raise Exception('Cannot parse Feed ID from stream data: {}'.format(self))
-        return match.group(1)
+        if 'feed_id' not in self:
+            match = re.match(r'.*\/sensors\/entities\/datafeed/v1/([0-9a-zA-Z]+)\?',
+                             self['dataFeedURL'])
+            if not match or not match.group(1):
+                raise Exception('Cannot parse Feed ID from stream data: {}'.format(self))
+            self['feed_id'] = match.group(1)
+        return self['feed_id']
