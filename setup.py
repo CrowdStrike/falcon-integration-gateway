@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="falcon-integration-gateway",
-    version="3.1.1",
+    version="3.1.2",
     author="CrowdStrike",
     maintainer="Simon Lukasik",
     description="The CrowdStrike Demo Falcon Integration Gateway for GCP",
