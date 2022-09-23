@@ -5,9 +5,15 @@ from ..config import config
 
 
 class Event(dict):
-    def __init__(self, event_string):
+    def __init__(self, event_string, feed_id):
         event = json.loads(event_string.decode('utf-8'))
+        self.feed_id = feed_id
         super().__init__(event)
+
+    def __eq__(self, other):
+        if not isinstance(other, Event):
+            return False
+        return super().__eq__(self, other) and self.feed_id == other.feed_id
 
     def irrelevant(self):
         return self.severity < int(config.get('events', 'severity_threshold')) \
@@ -20,6 +26,10 @@ class Event(dict):
     @property
     def offset(self):
         return self['metadata']['offset']
+
+    @property
+    def uid(self):
+        return str(self.feed_id) + '_' + str(self.offset)
 
     @property
     def severity(self):
@@ -61,4 +71,12 @@ class Stream(dict):
                          self['refreshActiveSessionURL'])
         if not match or not match.group(1):
             raise Exception('Cannot parse stream partition from stream data: {}'.format(self))
+        return match.group(1)
+
+    @property
+    def feed_id(self):
+        match = re.match(r'.*\/sensors\/entities\/datafeed/v1/([0-9a-zA-Z]+)\?',
+                         self['dataFeedURL'])
+        if not match or not match.group(1):
+            raise Exception('Cannot parse Feed ID from stream data: {}'.format(self))
         return match.group(1)
