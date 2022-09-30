@@ -2,6 +2,7 @@ import json
 import re
 import datetime
 from ..config import config
+from ..log import log
 
 
 class Event(dict):
@@ -16,8 +17,11 @@ class Event(dict):
         return super().__eq__(self, other) and self.feed_id == other.feed_id
 
     def irrelevant(self):
-        return self.severity < int(config.get('events', 'severity_threshold')) \
+        decision = self.severity < int(config.get('events', 'severity_threshold')) \
             or self.creation_time < self.cut_off_date()
+        if decision:
+            log.debug("A detection event has been skipped based on severity_threshold of cut_off_date settings")
+        return decision
 
     @property
     def event_type(self):
