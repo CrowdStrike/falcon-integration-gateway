@@ -49,7 +49,7 @@ class FalconAPI():
                       })
 
     def device_details(self, device_id):
-        return self._resources(action='GetDeviceDetails', ids=[device_id])
+        return self._resources(action='GetDeviceDetailsV2', ids=[device_id])
 
     def init_rtr_session(self, device_id):
         return self._resources(
