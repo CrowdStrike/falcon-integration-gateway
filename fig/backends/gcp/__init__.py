@@ -104,7 +104,7 @@ class Submitter():
             external_uri=self.event.falcon_link,
             event_time=self.event.time,
             category=self.event_category,
-            severity=self.severity.upper(),
+            severity=self.severity,
             source_properties={
                 'FalconEventId': self.event.event_id,
                 'ComputerName': self.event.original_event['event']['ComputerName'],
