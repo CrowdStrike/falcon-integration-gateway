@@ -137,7 +137,8 @@ class Submitter():
 
     @property
     def severity(self):
-        return self.event.severity.upper()
+        sev = self.event.severity.upper()
+        return 'LOW' if sev == 'INFORMATIONAL' else sev
 
     def submit_finding(self, finding):
         return self.cache.submit_finding(self.finding_id, finding, self.org_id)
