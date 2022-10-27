@@ -1,5 +1,6 @@
 import os
 import configparser
+from functools import cached_property
 
 
 class FigConfig(configparser.SafeConfigParser):
@@ -99,7 +100,7 @@ class FigConfig(configparser.SafeConfigParser):
             if len(self.get('azure', 'primary_key')) == 0:
                 raise Exception('Malformed Configuration: expected azure.primary_key to be non-empty')
 
-    @property
+    @cached_property
     def backends(self):
         return set(self.get('main', 'backends').split(','))
 
