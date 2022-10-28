@@ -68,7 +68,7 @@ class Submitter():
             'DetectName': self.event.detect_name,
             'AccountId': self.event.cloud_provider_account_id,
             'InstanceId': self.event.instance_id,
-            'ResourceGroup': self.event.device_details['zone_group']
+            'ResourceGroup': self.event.device_details.get('zone_group', None)
         }]
         return dumps(json_data)
 
