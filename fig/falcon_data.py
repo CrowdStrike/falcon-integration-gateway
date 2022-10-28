@@ -99,7 +99,7 @@ class FalconEvent():
 
     @property
     def instance_id(self):
-        return self.device_details['instance_id']
+        return self.device_details.get('instance_id', None)
 
     @property
     def falcon_link(self):
