@@ -34,8 +34,15 @@ class Backends():
 
     def process(self, falcon_event):
         for runtime in self.runtimes:
-            if self.event_type_is_accepted(runtime, falcon_event) and runtime.is_relevant(falcon_event):
+            if self.event_type_is_accepted(runtime, falcon_event) and self.cloud_detection_is_relevant(falcon_event) and runtime.is_relevant(falcon_event):
                 runtime.process(falcon_event)
+
+    def cloud_detection_is_relevant(self, falcon_event):
+        if falcon_event.original_event.event_type == 'DetectionSummaryEvent':
+            if falcon_event.cloud_provider in config.detections_exclude_clouds or falcon_event.cloud_provider is None and 'unrecognized' in config.detections_exclude_clouds:
+                log.debug('A detection event is skipped based on cloud based exclusion')
+                return False
+        return True
 
     def event_type_is_accepted(self, runtime, falcon_event):
         return runtime.RELEVANT_EVENT_TYPES == "ALL" or falcon_event.original_event.event_type in runtime.RELEVANT_EVENT_TYPES

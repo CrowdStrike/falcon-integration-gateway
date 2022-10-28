@@ -6,6 +6,7 @@ from functools import cached_property
 class FigConfig(configparser.SafeConfigParser):
     ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
+    SENSOR_RECOGNIZED_CLOUDS = {'AWS', 'Azure', 'GCP', 'unrecognized'}
     ENV_DEFAULTS = [
         ['main', 'backends', 'FIG_BACKENDS'],
         ['main', 'worker_threads', 'FIG_WORKER_THREADS'],
@@ -65,6 +66,11 @@ class FigConfig(configparser.SafeConfigParser):
             )
 
     def validate_events(self):
+        if not self.detections_exclude_clouds.issubset(self.SENSOR_RECOGNIZED_CLOUDS):
+            raise Exception(
+                'Malformed configuration: expected events.detections_exclude_clouds to be subset of "{}" got "{}"'.format(
+                    self.SENSOR_RECOGNIZED_CLOUDS, self.detections_exclude_clouds))
+
         if int(self.get('events', 'severity_threshold')) not in range(0, 5):
             raise Exception('Malformed configuration: expected events.severity_threshold to be in range 0-4')
         if int(self.get('events', 'older_than_days_threshold')) not in range(0, 10000):
@@ -106,6 +112,13 @@ class FigConfig(configparser.SafeConfigParser):
     @cached_property
     def backends(self):
         return set(self.get('main', 'backends').split(','))
+
+    @cached_property
+    def detections_exclude_clouds(self):
+        value = self.get('events', 'detections_exclude_clouds')
+        if value == '':
+            return set()
+        return set(value.split(','))
 
 
 config = FigConfig()
