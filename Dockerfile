@@ -6,12 +6,13 @@ RUN : \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home --home-dir /fig figuser
-USER figuser
 WORKDIR /fig
 
 COPY requirements.txt .
 RUN pip install -r ./requirements.txt
 
 COPY . .
+
+USER figuser
 
 CMD [ "python3", "-m" , "fig"]
