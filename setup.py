@@ -3,13 +3,14 @@ from setuptools import setup
 from glob import glob
 from os.path import basename
 from os.path import splitext
+import fig
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
     name="falcon-integration-gateway",
-    version="3.1.3",
+    version=fig.__version__,
     author="CRWD Solution Architects",
     author_email="integrations@crowdstrike.com",
     description="The CrowdStrike Demo Falcon Integration Gateway for GCP",
