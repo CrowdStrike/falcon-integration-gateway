@@ -35,7 +35,7 @@ mpdev verify \
 ## Preparation
 
  - authenticate with GCP using gcloud
- - create your GKE cluster for testing, configure your kubectl command to use that cluster
+ - create your [GKE cluster](https://cloud.google.com/kubernetes-engine/docs/deploy-app-cluster#create_cluster) for testing, configure your kubectl command to use that cluster
  - install `mpdev` command locally
 
 ## Push the application image
