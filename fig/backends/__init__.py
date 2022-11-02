@@ -34,8 +34,11 @@ class Backends():
 
     def process(self, falcon_event):
         for runtime in self.runtimes:
-            if (runtime.RELEVANT_EVENT_TYPES == "ALL" or falcon_event.original_event.event_type in runtime.RELEVANT_EVENT_TYPES) and runtime.is_relevant(falcon_event):
+            if self.event_type_is_accepted(runtime, falcon_event) and runtime.is_relevant(falcon_event):
                 runtime.process(falcon_event)
+
+    def event_type_is_accepted(self, runtime, falcon_event):
+        return runtime.RELEVANT_EVENT_TYPES == "ALL" or falcon_event.original_event.event_type in runtime.RELEVANT_EVENT_TYPES
 
     @property
     def relevant_event_types(self):
