@@ -2,6 +2,7 @@ from falconpy import api_complete as FalconSDK
 from ..config import config
 from .errors import ApiError, NoStreamsError
 from .models import Stream
+from .rtr import RTRSession
 
 
 class FalconAPI():
@@ -66,6 +67,27 @@ class FalconAPI():
                 'sequence_id': sequence_id,
             }
         )
+
+    def rtr_fetch_file(self, device_id, filepath):
+        session = RTRSession(self, device_id)
+
+        z7pack = None
+        try:
+            z7pack = session.get_file(filepath)
+        finally:
+            session.close()
+
+        import io
+        import py7zr
+
+        flo = io.BytesIO(z7pack)
+        with py7zr.SevenZipFile(flo, password='infected') as zip:
+            content = zip.readall()
+            if len(content) != 1:
+                raise ApiError('Cannot extract RTR file from 7z')
+
+            for fname, bio in content.items():
+                return bio.read()
 
     def _resources(self, *args, **kwargs):
         response = self._command(*args, **kwargs)

@@ -28,7 +28,8 @@ setup(
         'google-cloud-resource-manager >= 1.0.2',
         'tls-syslog',
         'google-auth',
-        'google-api-python-client'
+        'google-api-python-client',
+        'py7zr'
     ],
     extras_require={
         'devel': [

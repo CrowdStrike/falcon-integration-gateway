@@ -6,6 +6,7 @@ from hmac import new
 from requests import post
 from ...log import log
 from ...config import config
+from ...falcon.errors import RTRConnectionError
 
 
 def build_signature(workspace_id, primary_key, date, content_length, method, content_type, resource):
@@ -49,6 +50,37 @@ class Submitter():
         self.event = event
         self.workspace_id = config.get('azure', 'workspace_id')
         self.primary_key = config.get('azure', 'primary_key')
+        self.autodiscovery()
+
+    def autodiscovery(self):
+        if self.event.cloud_provider != 'AZURE' and config.getboolean('azure', 'arc_autodiscovery'):
+            if self.event.device_details['platform_name'] != 'Linux':
+                log.debug('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
+                          self.event.device_details['platform_name'],
+                          self.event.original_event.sensor_id,
+                          self.event.original_event.computer_name
+                          )
+                return
+            if self.event.device_details['product_type_desc'] == 'Pod':
+                log.debug('Skipping Azure Arc Autodiscovery for k8s pod (aid=%s, name=%s)',
+                          self.event.original_event.sensor_id,
+                          self.event.original_event.computer_name
+                          )
+                return
+
+            try:
+                azure_config = self.event.azure_arc_config()
+            except RTRConnectionError as e:
+                log.error("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
+                          self.event.original_event.sensor_id,
+                          self.event.device_details['hostname'],
+                          self.event.device_details['last_seen'],
+                          e
+                          )
+                return
+
+            breakpoint()
+            print()
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
