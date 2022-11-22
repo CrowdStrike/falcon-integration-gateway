@@ -58,7 +58,7 @@ class Submitter():
         json_data = [{
             'ExternalUri': self.event.falcon_link,
             'FalconEventId': self.event.event_id,
-            'ComputerName': self.event.original_event['event']['ComputerName'],
+            'ComputerName': self.event.original_event.computer_name,
             'Description': self.event.detect_description,
             'Severity': self.event.severity,
             'Title': 'Falcon Alert. Instance {}'.format(self.event.instance_id),

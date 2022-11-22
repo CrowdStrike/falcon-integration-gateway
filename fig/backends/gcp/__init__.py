@@ -107,7 +107,7 @@ class Submitter():
             severity=self.severity,
             source_properties={
                 'FalconEventId': self.event.event_id,
-                'ComputerName': self.event.original_event['event']['ComputerName'],
+                'ComputerName': self.event.original_event.computer_name,
                 'Description': self.event.detect_description,
                 'Severity': self.severity,
                 'Title': 'Falcon Alert. Instance {}'.format(self.event.instance_id),

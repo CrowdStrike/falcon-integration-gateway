@@ -63,7 +63,7 @@ class Submitter():
             },
             "principal": {
                 "asset_id": "CrowdStrike.Falcon:" + event["SensorId"],
-                "hostname": event["ComputerName"],
+                "hostname": self.event.original_event.computer_name,
                 "user": {
                     "userid": event["UserName"]
                 },
