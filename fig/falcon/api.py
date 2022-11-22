@@ -86,7 +86,7 @@ class FalconAPI():
             if len(content) != 1:
                 raise ApiError('Cannot extract RTR file from 7z')
 
-            for fname, bio in content.items():
+            for _fname, bio in content.items():
                 return bio.read()
 
     def _resources(self, *args, **kwargs):

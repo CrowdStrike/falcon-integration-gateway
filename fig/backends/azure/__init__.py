@@ -46,11 +46,13 @@ def post_data(workspace_id, primary_key, body, log_type):
 
 
 class Submitter():
+    AZURE_ARC_KEYS = ['resourceName', 'resourceGroup', 'subscriptionId', 'tenantId', 'vmId']
+
     def __init__(self, event):
         self.event = event
         self.workspace_id = config.get('azure', 'workspace_id')
         self.primary_key = config.get('azure', 'primary_key')
-        self.autodiscovery()
+        self.azure_arc_config = self.autodiscovery()
 
     def autodiscovery(self):
         if self.event.cloud_provider != 'AZURE' and config.getboolean('azure', 'arc_autodiscovery'):
@@ -69,7 +71,7 @@ class Submitter():
                 return
 
             try:
-                azure_config = self.event.azure_arc_config()
+                azure_arc_config = self.event.azure_arc_config()
             except RTRConnectionError as e:
                 log.error("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
                           self.event.original_event.sensor_id,
@@ -79,8 +81,10 @@ class Submitter():
                           )
                 return
 
-            breakpoint()
-            print()
+            return {k: v
+                    for k, v in azure_arc_config.items()
+                    if k in self.AZURE_ARC_KEYS
+                    }
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
@@ -102,6 +106,10 @@ class Submitter():
             'InstanceId': self.event.instance_id,
             'ResourceGroup': self.event.device_details.get('zone_group', None)
         }]
+
+        if self.azure_arc_config is not None:
+            json_data[0]['arc'] = self.azure_arc_config
+
         return dumps(json_data)
 
 
