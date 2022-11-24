@@ -8,12 +8,20 @@ class RTRSession:
         self.session = self._connect()
 
     def close(self):
-        return self.falcon._resources(
-            action='RTR_DeleteSession',
-            parameters={
-                'session_id': self.id
-            }
+        # return self.falcon.client.command('RTR_DeleteSession', session_id=self.id)
+        # Below is a workaround for the above not working properly (/cc @jshcodes)
+
+        from falconpy import OAuth2, RealTimeResponse  # pylint: disable=C0415
+        from ..config import config  # pylint: disable=C0415
+        from ..log import log  # pylint: disable=C0415
+        falcon_auth = OAuth2(
+            client_id=config.get('falcon', 'client_id'),
+            client_secret=config.get('falcon', 'client_secret')
         )
+        falcon_rtr = RealTimeResponse(falcon_auth)
+        response = falcon_rtr.delete_session(session_id=self.id)
+        if response['status_code'] != 204:
+            log.debug('Unable to close the RTR session: reponse was: %s', response)
 
     def execute_and_wait(self, action, base_command, command_string):
         command = self._execute(action, base_command, command_string)
