@@ -104,6 +104,7 @@ class Submitter():
             'DetectName': self.event.detect_name,
             'AccountId': self.event.cloud_provider_account_id,
             'InstanceId': self.event.instance_id,
+            'CloudProvider': self.cloud,
             'ResourceGroup': self.event.device_details.get('zone_group', None)
         }]
 
@@ -111,6 +112,10 @@ class Submitter():
             json_data[0]['arc'] = self.azure_arc_config
 
         return dumps(json_data)
+
+    @property
+    def cloud(self):
+        return self.event.cloud_provider if self.event.cloud_provider is not None else 'Unrecognized'
 
 
 class Runtime():
