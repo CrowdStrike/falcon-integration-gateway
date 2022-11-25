@@ -82,6 +82,14 @@ class Submitter():
                       e
                       )
             return None
+        except Exception as e:  # pylint: disable=W0703
+            log.exception("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
+                          self.event.original_event.sensor_id,
+                          self.event.device_details['hostname'],
+                          self.event.device_details['last_seen'],
+                          e
+                          )
+            return None
 
         return {k: v
                 for k, v in azure_arc_config.items()
