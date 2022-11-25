@@ -55,36 +55,38 @@ class Submitter():
         self.azure_arc_config = self.autodiscovery()
 
     def autodiscovery(self):
-        if self.event.cloud_provider != 'AZURE' and config.getboolean('azure', 'arc_autodiscovery'):
-            if self.event.device_details['platform_name'] != 'Linux':
-                log.debug('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
-                          self.event.device_details['platform_name'],
-                          self.event.original_event.sensor_id,
-                          self.event.original_event.computer_name
-                          )
-                return
-            if self.event.device_details['product_type_desc'] == 'Pod':
-                log.debug('Skipping Azure Arc Autodiscovery for k8s pod (aid=%s, name=%s)',
-                          self.event.original_event.sensor_id,
-                          self.event.original_event.computer_name
-                          )
-                return
+        if self.event.cloud_provider == 'AZURE' or not config.getboolean('azure', 'arc_autodiscovery'):
+            return None
 
-            try:
-                azure_arc_config = self.event.azure_arc_config()
-            except RTRConnectionError as e:
-                log.error("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
-                          self.event.original_event.sensor_id,
-                          self.event.device_details['hostname'],
-                          self.event.device_details['last_seen'],
-                          e
-                          )
-                return
+        if self.event.device_details['platform_name'] != 'Linux':
+            log.debug('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
+                      self.event.device_details['platform_name'],
+                      self.event.original_event.sensor_id,
+                      self.event.original_event.computer_name
+                      )
+            return None
+        if self.event.device_details['product_type_desc'] == 'Pod':
+            log.debug('Skipping Azure Arc Autodiscovery for k8s pod (aid=%s, name=%s)',
+                      self.event.original_event.sensor_id,
+                      self.event.original_event.computer_name
+                      )
+            return None
 
-            return {k: v
-                    for k, v in azure_arc_config.items()
-                    if k in self.AZURE_ARC_KEYS
-                    }
+        try:
+            azure_arc_config = self.event.azure_arc_config()
+        except RTRConnectionError as e:
+            log.error("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
+                      self.event.original_event.sensor_id,
+                      self.event.device_details['hostname'],
+                      self.event.device_details['last_seen'],
+                      e
+                      )
+            return None
+
+        return {k: v
+                for k, v in azure_arc_config.items()
+                if k in self.AZURE_ARC_KEYS
+                }
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)

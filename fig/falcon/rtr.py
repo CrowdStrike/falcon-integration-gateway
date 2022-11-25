@@ -44,7 +44,7 @@ class RTRSession:
         return self.session['session_id']
 
     def _list_files(self):
-        return self.falcon._resources(
+        return self.falcon._resources(  # pylint: disable=W0212
             'RTR_ListFiles',
             parameters={
                 'session_id': self.id
@@ -69,7 +69,7 @@ class RTRSession:
         try:
             response = self.falcon.init_rtr_session(self.device_id)
         except ApiError as e:
-            raise RTRConnectionError(f"{e}")
+            raise RTRConnectionError(f"{e}") from e
 
         if len(response) != 1:
             raise RTRError(f'Unexpected response from RTR Init: {response}')

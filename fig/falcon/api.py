@@ -77,17 +77,18 @@ class FalconAPI():
         finally:
             session.close()
 
-        import io
-        import py7zr
+        import io  # pylint: disable=C0415
+        import py7zr  # pylint: disable=C0415
 
         flo = io.BytesIO(z7pack)
-        with py7zr.SevenZipFile(flo, password='infected') as zip:
-            content = zip.readall()
+        with py7zr.SevenZipFile(flo, password='infected') as archive:
+            content = archive.readall()
             if len(content) != 1:
                 raise ApiError('Cannot extract RTR file from 7z')
 
             for _fname, bio in content.items():
                 return bio.read()
+        raise ApiError(f'Cannot extract file {filepath} from device {device_id}')
 
     def _resources(self, *args, **kwargs):
         response = self._command(*args, **kwargs)
