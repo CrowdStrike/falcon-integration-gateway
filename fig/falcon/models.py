@@ -47,6 +47,10 @@ class Event(dict):
     def sensor_id(self):
         return self['event']['SensorId']
 
+    @property
+    def computer_name(self):
+        return self['event']['ComputerName']
+
     @classmethod
     def parse_cs_time(cls, cs_timestamp):
         return datetime.datetime.utcfromtimestamp(float(cs_timestamp) / 1000.0)

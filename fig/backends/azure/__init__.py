@@ -6,6 +6,7 @@ from hmac import new
 from requests import post
 from ...log import log
 from ...config import config
+from ...falcon.errors import RTRConnectionError
 
 
 def build_signature(workspace_id, primary_key, date, content_length, method, content_type, resource):
@@ -45,10 +46,55 @@ def post_data(workspace_id, primary_key, body, log_type):
 
 
 class Submitter():
+    AZURE_ARC_KEYS = ['resourceName', 'resourceGroup', 'subscriptionId', 'tenantId', 'vmId']
+
     def __init__(self, event):
         self.event = event
         self.workspace_id = config.get('azure', 'workspace_id')
         self.primary_key = config.get('azure', 'primary_key')
+        self.azure_arc_config = self.autodiscovery()
+
+    def autodiscovery(self):
+        if self.event.cloud_provider == 'AZURE' or not config.getboolean('azure', 'arc_autodiscovery'):
+            return None
+
+        if self.event.device_details['platform_name'] != 'Linux':
+            log.debug('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
+                      self.event.device_details['platform_name'],
+                      self.event.original_event.sensor_id,
+                      self.event.original_event.computer_name
+                      )
+            return None
+        if self.event.device_details['product_type_desc'] == 'Pod':
+            log.debug('Skipping Azure Arc Autodiscovery for k8s pod (aid=%s, name=%s)',
+                      self.event.original_event.sensor_id,
+                      self.event.original_event.computer_name
+                      )
+            return None
+
+        try:
+            azure_arc_config = self.event.azure_arc_config()
+        except RTRConnectionError as e:
+            log.error("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
+                      self.event.original_event.sensor_id,
+                      self.event.device_details['hostname'],
+                      self.event.device_details['last_seen'],
+                      e
+                      )
+            return None
+        except Exception as e:  # pylint: disable=W0703
+            log.exception("Cannot fetch Azure Arc info from host (aid=%s, hostname=%s, last_seen=%s): %s",
+                          self.event.original_event.sensor_id,
+                          self.event.device_details['hostname'],
+                          self.event.device_details['last_seen'],
+                          e
+                          )
+            return None
+
+        return {k: v
+                for k, v in azure_arc_config.items()
+                if k in self.AZURE_ARC_KEYS
+                }
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
@@ -58,7 +104,7 @@ class Submitter():
         json_data = [{
             'ExternalUri': self.event.falcon_link,
             'FalconEventId': self.event.event_id,
-            'ComputerName': self.event.original_event['event']['ComputerName'],
+            'ComputerName': self.event.original_event.computer_name,
             'Description': self.event.detect_description,
             'Severity': self.event.severity,
             'Title': 'Falcon Alert. Instance {}'.format(self.event.instance_id),
@@ -68,9 +114,18 @@ class Submitter():
             'DetectName': self.event.detect_name,
             'AccountId': self.event.cloud_provider_account_id,
             'InstanceId': self.event.instance_id,
+            'CloudProvider': self.cloud,
             'ResourceGroup': self.event.device_details.get('zone_group', None)
         }]
+
+        if self.azure_arc_config is not None:
+            json_data[0]['arc'] = self.azure_arc_config
+
         return dumps(json_data)
+
+    @property
+    def cloud(self):
+        return self.event.cloud_provider if self.event.cloud_provider is not None else 'Unrecognized'
 
 
 class Runtime():

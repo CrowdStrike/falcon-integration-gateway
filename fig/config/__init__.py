@@ -108,6 +108,8 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
             if len(self.get('azure', 'primary_key')) == 0:
                 raise Exception('Malformed Configuration: expected azure.primary_key to be non-empty')
+            if self.get('azure', 'arc_autodiscovery') not in ['false', 'true']:
+                raise Exception('Malformed Configuration: expected azure.arc_autodiscovery must be either true or false')
 
     @cached_property
     def backends(self):

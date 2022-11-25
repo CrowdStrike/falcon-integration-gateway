@@ -1,3 +1,4 @@
+import json
 from .falcon import Event
 
 
@@ -18,6 +19,7 @@ class FalconCache():
         self.falcon_api = falcon_api
         self._host_detail = {}
         self._mdm_id = {}
+        self._arc_config = {}
 
     def device_details(self, sensor_id):
         if not sensor_id:
@@ -34,6 +36,14 @@ class FalconCache():
             self._host_detail[sensor_id] = detail
 
         return self._host_detail[sensor_id]
+
+    def azure_arc_config(self, sensor_id):
+        if not sensor_id:
+            return EventDataError("Cannot fetch Azure Arc info. SensorId field is missing")
+        if sensor_id not in self._arc_config:
+            file_bytes = self.falcon_api.rtr_fetch_file(sensor_id, '/var/opt/azcmagent/agentconfig.json')
+            self._arc_config[sensor_id] = json.loads(file_bytes)
+        return self._arc_config[sensor_id]
 
     def mdm_identifier(self, sensor_id, event_platform):
         if not sensor_id:
@@ -88,6 +98,9 @@ class FalconEvent():
     def mdm_identifier(self):
         device_details = self.cache.device_details(self.original_event.sensor_id)
         return self.cache.mdm_identifier(self.original_event.sensor_id, device_details['platform_name'])
+
+    def azure_arc_config(self):
+        return self.cache.azure_arc_config(self.original_event.sensor_id)
 
     @property
     def cloud_provider(self):

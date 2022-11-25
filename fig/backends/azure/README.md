@@ -17,7 +17,21 @@ backends=AZURE
 #workspace_id =
 # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
 #primary_key =
+
+# Uncoment to enable RTR based auto discovery of Azure Arc Systems
+# arc_autodiscovery = true
 ```
+
+### Azure Arc Autodiscovery
+
+Azure Arc is service within Microsoft Azure that allows users to connect and manage systems outside Azure using single pane of glass (Azure user interface).
+
+Falcon Integration Gateway is able to identify Azure Arc system properties (resourceName, resourceGroup, subscriptionId, tenantId, and vmId) using RTR and send these details over to Azure Log Analytics.
+
+To enable this feature:
+ - set `azure_autodiscovery=true` in config.ini
+ - grant extra Falcon permission to API keys in CrowdStrike Falcon
+    - Real Time Response: [Read, Write]
 
 ### Developer Guide
 

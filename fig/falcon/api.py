@@ -1,18 +1,9 @@
 from falconpy import api_complete as FalconSDK
 from ..config import config
+from .errors import ApiError, NoStreamsError
 from .models import Stream
-
-
-class ApiError(Exception):
-    pass
-
-
-class NoStreamsError(ApiError):
-    def __init__(self, app_id):
-        super().__init__(
-            'Falcon Streaming API not discovered. This may be caused by second instance of this application '
-            'already running in your environment with the same application_id={}, or by missing streaming API '
-            'capability.'.format(app_id))
+from .rtr import RTRSession
+from .. import __version__
 
 
 class FalconAPI():
@@ -27,6 +18,7 @@ class FalconAPI():
         self.client = FalconSDK.APIHarness(creds={
             'client_id': config.get('falcon', 'client_id'),
             'client_secret': config.get('falcon', 'client_secret')},
+            user_agent=f"falcon-integration-gateway/{__version__}",
             base_url=self.__class__.base_url())
 
     @classmethod
@@ -77,6 +69,28 @@ class FalconAPI():
                 'sequence_id': sequence_id,
             }
         )
+
+    def rtr_fetch_file(self, device_id, filepath):
+        session = RTRSession(self, device_id)
+
+        z7pack = None
+        try:
+            z7pack = session.get_file(filepath)
+        finally:
+            session.close()
+
+        import io  # pylint: disable=C0415
+        import py7zr  # pylint: disable=C0415
+
+        flo = io.BytesIO(z7pack)
+        with py7zr.SevenZipFile(flo, password=config.get('falcon', 'rtr_quarantine_keyword')) as archive:
+            content = archive.readall()
+            if len(content) != 1:
+                raise ApiError('Cannot extract RTR file from 7z')
+
+            for _fname, bio in content.items():
+                return bio.read()
+        raise ApiError(f'Cannot extract file {filepath} from device {device_id}')
 
     def _resources(self, *args, **kwargs):
         response = self._command(*args, **kwargs)
