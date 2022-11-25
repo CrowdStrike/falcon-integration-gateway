@@ -83,7 +83,7 @@ class FalconAPI():
         import py7zr  # pylint: disable=C0415
 
         flo = io.BytesIO(z7pack)
-        with py7zr.SevenZipFile(flo, password='infected') as archive:
+        with py7zr.SevenZipFile(flo, password=config.get('falcon', 'rtr_quarantine_keyword')) as archive:
             content = archive.readall()
             if len(content) != 1:
                 raise ApiError('Cannot extract RTR file from 7z')
