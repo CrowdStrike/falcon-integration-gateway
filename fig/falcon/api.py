@@ -3,6 +3,7 @@ from ..config import config
 from .errors import ApiError, NoStreamsError
 from .models import Stream
 from .rtr import RTRSession
+from .. import __version__
 
 
 class FalconAPI():
@@ -17,6 +18,7 @@ class FalconAPI():
         self.client = FalconSDK.APIHarness(creds={
             'client_id': config.get('falcon', 'client_id'),
             'client_secret': config.get('falcon', 'client_secret')},
+            user_agent=f"falcon-integration-gateway/{__version__}",
             base_url=self.__class__.base_url())
 
     @classmethod
