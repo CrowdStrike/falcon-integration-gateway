@@ -29,7 +29,7 @@ Azure Arc is service within Microsoft Azure that allows users to connect and man
 Falcon Integration Gateway is able to identify Azure Arc system properties (resourceName, resourceGroup, subscriptionId, tenantId, and vmId) using RTR and send these details over to Azure Log Analytics.
 
 To enable this feature:
- - set `azure_autodiscovery=true` in config.ini
+ - set `arc_autodiscovery=true` inside `[azure]` section in your config.ini
  - grant extra Falcon permission to API keys in CrowdStrike Falcon
     - Real Time Response: [Read, Write]
 
