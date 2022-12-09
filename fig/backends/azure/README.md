@@ -18,7 +18,7 @@ backends=AZURE
 # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
 #primary_key =
 
-# Uncoment to enable RTR based auto discovery of Azure Arc Systems
+# Uncomment to enable RTR based auto discovery of Azure Arc Systems
 # arc_autodiscovery = true
 ```
 
