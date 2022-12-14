@@ -1,5 +1,6 @@
 import json
 from .falcon import Event
+from .log import log
 
 
 class TranslatorError(Exception):
@@ -42,6 +43,7 @@ class FalconCache():
             return EventDataError("Cannot fetch Azure Arc info. SensorId field is missing")
         if sensor_id not in self._arc_config:
             file_bytes = self.falcon_api.rtr_fetch_file(sensor_id, '/var/opt/azcmagent/agentconfig.json')
+            log.debug('Fetched Azure Arc Config from the system: %s', str(file_bytes))
             self._arc_config[sensor_id] = json.loads(file_bytes)
         return self._arc_config[sensor_id]
 
