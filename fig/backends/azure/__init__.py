@@ -58,7 +58,7 @@ class Submitter():
         if self.event.cloud_provider == 'AZURE' or not config.getboolean('azure', 'arc_autodiscovery'):
             return None
 
-        if self.event.device_details['platform_name'] != 'Linux':
+        if self.event.device_details['platform_name'] not in ['Linux', 'Windows']:
             log.debug('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
                       self.event.device_details['platform_name'],
                       self.event.original_event.sensor_id,

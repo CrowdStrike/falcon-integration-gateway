@@ -42,7 +42,10 @@ class FalconCache():
         if not sensor_id:
             return EventDataError("Cannot fetch Azure Arc info. SensorId field is missing")
         if sensor_id not in self._arc_config:
-            file_bytes = self.falcon_api.rtr_fetch_file(sensor_id, '/var/opt/azcmagent/agentconfig.json')
+            is_linux = self.device_details(sensor_id)['platform_name'] == 'Linux'
+            path = '/var/opt/azcmagent/agentconfig.json' if is_linux else 'C:\\ProgramData\\AzureConnectedMachineAgent\\Config\\agentconfig.json'
+            log.debug('Fetching Azure Arc Config %s from the system %s', path, sensor_id)
+            file_bytes = self.falcon_api.rtr_fetch_file(sensor_id, path)
             log.debug('Fetched Azure Arc Config from the system: %s', str(file_bytes))
             self._arc_config[sensor_id] = json.loads(file_bytes)
         return self._arc_config[sensor_id]
