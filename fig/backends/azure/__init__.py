@@ -59,17 +59,17 @@ class Submitter():
             return None
 
         if self.event.device_details['platform_name'] not in ['Linux', 'Windows']:
-            log.debug('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
-                      self.event.device_details['platform_name'],
-                      self.event.original_event.sensor_id,
-                      self.event.original_event.computer_name
-                      )
+            log.info('Skipping Azure Arc Autodiscovery for %s (aid=%s, name=%s)',
+                     self.event.device_details['platform_name'],
+                     self.event.original_event.sensor_id,
+                     self.event.original_event.computer_name
+                     )
             return None
         if self.event.device_details['product_type_desc'] == 'Pod':
-            log.debug('Skipping Azure Arc Autodiscovery for k8s pod (aid=%s, name=%s)',
-                      self.event.original_event.sensor_id,
-                      self.event.original_event.computer_name
-                      )
+            log.info('Skipping Azure Arc Autodiscovery for k8s pod (aid=%s, name=%s)',
+                     self.event.original_event.sensor_id,
+                     self.event.original_event.computer_name
+                     )
             return None
 
         try:
