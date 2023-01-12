@@ -23,7 +23,7 @@ spec:
     kind: Secret
   descriptor:
     type: falcon-integration-gateway
-    version: '3.1.6'
+    version: '3.1.7'
     description: |-
       Falcon Integration Gateway (FIG) forwards threat detection findings from CrowdStrike Falcon
       platform to the backend of your choice. This instance forwards detection findings to Chronicle.
@@ -47,9 +47,9 @@ spec:
       Sample detections can be created to verify the deployment. To generate a sample detection,
       run the following command inside a Linux virtual machine or container that is protected by
       CrowdStrike Falcon.
-      
+
           chgrp 0 /etc/ld.so.preload
-          
+
       The above command will attempt to change the file permissions on the Linux dynamic linker/loader.
       The CrowdStrike Falcon sensor will detect this attempt and generate an event.
 
