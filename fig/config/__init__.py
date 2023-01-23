@@ -4,7 +4,7 @@ from functools import cached_property
 
 
 class FigConfig(configparser.SafeConfigParser):
-    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE'}
+    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL_LAKE'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     SENSOR_RECOGNIZED_CLOUDS = {'AWS', 'Azure', 'GCP', 'unrecognized'}
     ENV_DEFAULTS = [
@@ -28,7 +28,9 @@ class FigConfig(configparser.SafeConfigParser):
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
         ['chronicle', 'service_account', 'GOOGLE_SERVICE_ACCOUNT_FILE'],
         ['chronicle', 'customer_id', 'GOOGLE_CUSTOMER_ID'],
-        ['chronicle', 'region', 'CHRONICLE_REGION']
+        ['chronicle', 'region', 'CHRONICLE_REGION'],
+        ['cloudtrail_lake', 'channel_arn', 'CLOUDTRAIL_LAKE_CHANNEL_ARN'],
+        ['cloudtrail_lake', 'region', 'CLOUDTRAIL_LAKE_REGION'],
     ]
 
     def __init__(self):
@@ -103,6 +105,11 @@ class FigConfig(configparser.SafeConfigParser):
                 raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
             if len(self.get('chronicle', 'customer_id')) == 0:
                 raise Exception('Malformed Configuration: expected chronicle.customer_id to be non-empty')
+        if 'CLOUDTRAIL_LAKE' in self.backends:
+            if len(self.get('cloudtrail_lake', 'channel_arn')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.channel_arn to be non-empty')
+            if len(self.get('cloudtrail_lake', 'region')) == 0:
+                raise Exception('Malformed Configuration: expected cloudtrail_lake.region to be non-empty')
         if 'AZURE' in self.backends:
             if len(self.get('azure', 'workspace_id')) == 0:
                 raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
