@@ -51,6 +51,7 @@ mpdev verify \
    docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_helm/onbuild
    ```
  - build the image
+    > Navigate to the `docs/listings/gke/deployer` directory before running the following commands
    ```
    IMAGE=gcr.io/crowdstrike-public/falcon-integration-gateway/deployer
    docker build --tag "$IMAGE:latest" .
