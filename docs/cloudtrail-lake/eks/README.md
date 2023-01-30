@@ -4,12 +4,11 @@ can choose to either deploy the FIG container with a Helm chart, or as a standar
 file.
 
 ## Table of Contents
-* [Prerequisites](#prerequisites)
-  * [Create the IAM Role for the Service Account](#create-the-iam-role-for-the-service-account)
-* [Choose Your Method](#choose-your-method)
-  * [Deployment to EKS using Helm Chart](#deployment-to-eks-using-helm-chart)
-  * [Deployment to EKS with Pod Spec](#deployment-to-eks-with-pod-spec)
-* [Verify Deployment](#verify-deployment)
+- [Prerequisites](#prerequisites)
+- [Choose Your Method](#choose-your-method)
+  - [Deployment to EKS using Helm Chart](#deployment-to-eks-using-helm-chart)
+  - [Deployment to EKS with Pod Spec](#deployment-to-eks-with-pod-spec)
+- [Verify Deployment](#verify-deployment)
 
 ## Prerequisites
 - Falcon API Credentials
@@ -28,7 +27,7 @@ file.
 
 ![cloudformation-stack](./assets/eks-role-stack-create.png)
 
-2. Once the CloudFormation stack is completed, in the `Outputs` tab, make note of the `FalconFigAccessRoleArn` value.
+2. Once the CloudFormation stack is completed, in the *Outputs* tab, make note of the `FalconFigAccessRoleArn` value.
     > This value will be used as an input when deploying the FIG application on EKS.
 
 ## Choose Your Method
@@ -182,7 +181,7 @@ file.
   deployment.apps/falcon-integration-gateway created
   ```
 
-  ### Uninstall
+  #### Uninstall
   To uninstall, run the following command:
   ```bash
   kubectl delete -f falcon-integration-gateway.yaml
