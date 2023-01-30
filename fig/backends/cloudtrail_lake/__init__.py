@@ -7,12 +7,12 @@ from .cloudtrail_offset import LastEventOffset
 
 
 class Submitter():
-    def __init__(self, event, account_id, last_event_offset):
+    def __init__(self, event, channel_arn, region, account_id, last_event_offset):
         self.event = event
-        self.last_event_offset = last_event_offset
+        self.channel_arn = channel_arn
+        self.region = region
         self.account_id = account_id
-        self.channel_arn = config.get('cloudtrail_lake', 'channel_arn')
-        self.region = config.get('cloudtrail_lake', 'region')
+        self.last_event_offset = last_event_offset
 
     def cloudtrail_lake_audit_event(self):
         '''
@@ -101,11 +101,15 @@ class Runtime():
 
     def __init__(self):
         log.info("AWS CloudTrail Lake Backend is enabled.")
-        # Get AWS Account ID:
+        # Initialize Config Variables
+        self.channel_arn = config.get('cloudtrail_lake', 'channel_arn')
+        self.region = config.get('cloudtrail_lake', 'region')
+        self.account_id = None
         try:
-            self.account_id = boto3.client('sts').get_caller_identity().get('Account')
-        except ClientError as err:
-            raise err
+            self.account_id = self.channel_arn.split(':')[4]
+        except IndexError:
+            log.error("Could not get account ID from Channel ARN: %s", self.channel_arn)
+            raise
         # Instantiate the last seen offset object
         self.last_event_offset = LastEventOffset()
         # Get the last seen offset for each feed
@@ -122,7 +126,7 @@ class Runtime():
         return False
 
     def process(self, falcon_event):
-        Submitter(falcon_event, self.account_id, self.last_event_offset).submit()
+        Submitter(falcon_event, self.channel_arn, self.region, self.account_id, self.last_event_offset).submit()
 
 
 __all__ = ['Runtime']
