@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates the IAM role for EKS FIG service account'
+Parameters:
+  OIDCIssuerURLWithoutProtocol:
+    Type: String
+    Description: OIDC Issuer URL without protocol
+    AllowedPattern: '^oidc\.eks\.\S+\.amazonaws\.com\/id\/\S+$'
+    ConstraintDescription: >-
+      Malformed input-Parameter. Must be a valid OIDC Issuer URL WITHOUT protocol
+      like: oidc.eks.region-code.amazonaws.com/id/EXAMPLED539D4633E53DE1B716D3041E
+  FIGPolicyArn:
+    Type: String
+    Description: ARN of the FIG Managed Policy
+
+Resources:
+  FalconFigIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: !Sub |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/${OIDCIssuerURLWithoutProtocol}"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "${OIDCIssuerURLWithoutProtocol}:sub": "system:serviceaccount:falcon-integration-gateway:falcon-integration-gateway"
+                }
+              }
+            }
+          ]
+        }
+      ManagedPolicyArns:
+        - !Ref FIGPolicyArn
+
+Outputs:
+  FalconFigAccessRoleArn:
+    Value: !GetAtt FalconFigIAMRole.Arn
+

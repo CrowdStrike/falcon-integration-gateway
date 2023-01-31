@@ -4,6 +4,7 @@ from . import aws_sqs
 from . import azure
 from . import gcp
 from . import workspaceone
+from . import cloudtrail_lake
 from ..config import config
 from ..log import log
 
@@ -14,7 +15,8 @@ ALL_BACKENDS = {
     'AZURE': azure,
     'GCP': gcp,
     'WORKSPACEONE': workspaceone,
-    'CHRONICLE': chronicle
+    'CHRONICLE': chronicle,
+    'CLOUDTRAIL_LAKE': cloudtrail_lake
 }
 
 

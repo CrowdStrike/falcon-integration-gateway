@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates IAM Role/Instance Profile for EC2 instances to run FIG'
+Parameters:
+  FIGPolicyArn:
+    Type: String
+    Description: ARN of the FIG Managed Policy
+
+Resources:
+  CSIntegrationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-cs-integration-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - !Ref FIGPolicyArn
+
+  CSIntegrationRoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${AWS::StackName}-cs-integration-role-instance-profile
+      Path: "/"
+      Roles:
+        - !Ref CSIntegrationRole
+
+Outputs:
+  RoleName:
+    Description: The name of the role created by this template
+    Value: !Ref CSIntegrationRole
+  RoleArn:
+    Description: The ARN of the role created by this template
+    Value: !GetAtt CSIntegrationRole.Arn
+  InstanceProfileName:
+    Description: The name of the instance profile created by this template
+    Value: !Ref CSIntegrationRoleInstanceProfile
+  InstanceProfileArn:
+    Description: The ARN of the instance profile created by this template
+    Value: !GetAtt CSIntegrationRoleInstanceProfile.Arn

@@ -1,0 +1,112 @@
+# Kubernetes pod spec for falcon-integration-gateway
+#
+# Deployment
+#    kubectl apply -f ./falcon-integration-gateway.yaml
+# Tear Down
+#    kubectl delete -f ./falcon-integration-gateway.yaml
+#
+# This example shows how to bind CrowdStrike OAuth Credentials and configuration file to the application.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: falcon-integration-gateway
+  labels:
+    name: falcon-integration-gateway
+---
+apiVersion: v1
+data:
+  FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+kind: Secret
+type: Opaque
+metadata:
+  name: falcon-integration-gateway-creds
+  namespace: falcon-integration-gateway
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falcon-integration-gateway-config
+  namespace: falcon-integration-gateway
+data:
+  config.ini: |
+    # Falcon Integration Gateway
+
+    [main]
+    # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
+    backends=CLOUDTRAIL_LAKE
+
+    # Uncomment to configure number of threads that process Falcon Events
+    #worker_threads = 4
+
+    [events]
+    # Uncomment to filter out events based on number of days past the event (default 21)
+    #older_than_days_threshold = 14
+
+    [logging]
+    # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
+    #level = DEBUG
+
+    [falcon]
+    # Uncomment to provide Falcon Cloud. Alternatively, use FALCON_CLOUD_REGION env variable. (default us-1)
+    #cloud_region = us-1
+
+    # Uncomment to provide application id. Needs to be different per each fig instance.
+    # Alternatively, use FALCON_APPLICATION_ID env variable.
+    #application_id = changeme
+
+    [cloudtrail_lake]
+    # AWS CloudTrail Lake section is applicable only when CLOUDTRAIL_LAKE backend is enabled in the [main] section.
+
+    # Uncomment to provide the Channel ARN. Alternatively, use CLOUDTRAIL_LAKE_CHANNEL_ARN env variable.
+    #channel_arn =
+
+    # Uncomment to provide the AWS region to authenticate. Alternatively, use CLOUDTRAIL_LAKE_REGION env variable.
+    #region =
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: falcon-integration-gateway
+  namespace: falcon-integration-gateway
+  annotations:
+    eks.amazonaws.com/role-arn: <IAM_ROLE_ARN>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: falcon-integration-gateway
+  namespace: falcon-integration-gateway
+spec:
+  selector:
+   matchLabels:
+      run: falcon-integration-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: falcon-integration-gateway
+    spec:
+      serviceAccountName: falcon-integration-gateway
+      containers:
+        - name: falcon-integration-gateway
+          image: quay.io/crowdstrike/falcon-integration-gateway:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: config-volume
+              mountPath: /fig/config/config.ini
+              subPath: config.ini
+          envFrom:
+          - secretRef:
+              name: falcon-integration-gateway-creds
+          resources:
+            {}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: falcon-integration-gateway-config
+            items:
+            - key: config.ini
+              path: config.ini

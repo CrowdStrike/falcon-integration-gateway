@@ -16,6 +16,7 @@ This project facilitates the export of the individual detections and audit event
 | AWS_SQS | Pushes events to AWS SQS | *Coming Soon* | [AWS SQS backend](fig/backends/aws_sqs) |
 | Azure | Pushes events to Azure Log Analytics | <ul><li>[Deployment to AKS](docs/aks)</li></ul> | [Azure backend](fig/backends/azure) |
 | Chronicle | Pushes events to Google Chronicle | <ul><li>[Deployment to GKE](docs/listings/gke-chronicle/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-chronicle))</li><li>[Deployment to GKE](docs/chronicle) (manual)</li></ul> | [Chronicle backend](fig/backends/chronicle) |
+| CloudTrail Lake | Pushes events to AWS CloudTrail Lake | <ul><li>[Deployment to EKS](docs/cloudtrail-lake/eks)</li><li>[Manual Deployment](docs/cloudtrail-lake/manual)</li></ul> | [CloudTrail Lake backend](fig/backends/cloudtrail_lake) |
 | GCP | Pushes events to GCP Security Command Center | <ul><li>[Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))</li><li>[Deployment to GKE](docs/gke) (manual)</li></ul> | [GCP backend](fig/backends/gcp) |
 | Workspace ONE | Pushes events to VMware Workspace ONE Intelligence | *Coming Soon* | [Workspace ONE backend](fig/backends/workspaceone) |
 
@@ -62,4 +63,4 @@ To install as a container:
 ## [Developers Guide](./docs/developer_guide.md)
 
 ## Statement of Support
-Falcon Integration Gateway (FIG) is an open source project, not CrowdStrike product. As such it carries no formal support, expressed or implied.
+Falcon Integration Gateway (FIG) is an open source project, not a CrowdStrike product. As such it carries no formal support, expressed or implied.
