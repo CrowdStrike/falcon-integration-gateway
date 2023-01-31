@@ -89,7 +89,7 @@ file.
   <summary>Click to expand</summary>
 
   #### Step 1: Edit Kubernetes Pod Spec
-  Download/Edit the pod specification file available [here](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/docs/cloudtrail-lake/eks/falcon-integration-gateway.yaml).
+  Download/Edit the pod specification file available [here](./falcon-integration-gateway.yaml).
   ```bash
   wget https://raw.githubusercontent.com/crowdstrike/falcon-integration-gateway/main/docs/cloudtrail-lake/eks/falcon-integration-gateway.yaml
   ```
