@@ -102,9 +102,10 @@ class FalconAPI():
     def _command(self, *args, **kwargs):
         response = self.client.command(*args, **kwargs)
         body = response['body']
+        trace_id = body.get('meta', {}).get('trace_id', '')
         if 'errors' in body and body['errors'] is not None:
             if len(body['errors']) > 0:
-                raise ApiError('Error received from CrowdStrike Falcon platform: {}'.format(body['errors']))
+                raise ApiError('Error received from CrowdStrike Falcon platform: {} (trace_id: {})'.format(body['errors'], trace_id))
         if 'status_code' not in response or (response['status_code'] != 200 and response['status_code'] != 201):
-            raise ApiError('Unexpected response code from Falcon API. Response was: {}'.format(response))
+            raise ApiError('Unexpected response code from Falcon API. Response was: {} (trace_id: {})'.format(response, trace_id))
         return response
