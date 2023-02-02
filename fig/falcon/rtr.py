@@ -1,4 +1,5 @@
 from .errors import ApiError, RTRError, RTRConnectionError
+from ..log import log
 
 
 class RTRSession:
@@ -13,7 +14,6 @@ class RTRSession:
 
         from falconpy import OAuth2, RealTimeResponse  # pylint: disable=C0415
         from ..config import config  # pylint: disable=C0415
-        from ..log import log  # pylint: disable=C0415
         falcon_auth = OAuth2(
             client_id=config.get('falcon', 'client_id'),
             client_secret=config.get('falcon', 'client_secret')
@@ -28,16 +28,18 @@ class RTRSession:
         response = self._rtr_wait(command[0])
 
         if response['stderr']:
-            raise RTRError(f'RTR Execute device: {self.device_id}, stderr: {response["stderr"]}')
+            raise RTRError(f'RTR Execute device: {self.device_id}, stderr: {response["stderr"]}, (session_id: {response["session_id"]}, task_id: {response["task_id"]})')
         return response
 
     def get_file(self, filepath):
         command = self.execute_and_wait('RTR_ExecuteActiveResponderCommand', 'get', 'get ' + filepath)
-        for f in self._list_files():
+        files = self._list_files()
+        for f in files:
             if f['cloud_request_id'] == command['task_id']:
                 return self._fetch_file(f['sha256'], filepath)
 
-        raise RTRError(f'RTR File Not Found: device: {self.device_id}, file {filepath}')
+        log.error('RTR File Not Found. Searching for cloud_request_id=%s, but found only %s', command["task_id"], files)
+        raise RTRError(f'RTR File Not Found: device: {self.device_id}, file: {filepath} (session_id: {command["session_id"]}, task_id: {command["session_id"]})')
 
     @property
     def id(self):
