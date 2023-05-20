@@ -85,7 +85,7 @@ class StreamingThread(StoppableThread):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
         self.stream = stream
-        self.conn = StreamingConnection(self.stream, queue.last_offset(self.stream.feed_id))
+        self.conn = StreamingConnection(self.stream, queue.last_offset(self.stream.feed_id), relevant_event_types)
         self.queue = queue
         self.relevant_event_types = relevant_event_types
         self.event_count = 0
@@ -124,10 +124,11 @@ class StreamingThread(StoppableThread):
 
 
 class StreamingConnection():
-    def __init__(self, stream: Stream, last_seen_offset=0):
+    def __init__(self, stream: Stream, last_seen_offset=0, relevant_event_types=None):
         self.stream = stream
         self.connection = None
         self.last_seen_offset = last_seen_offset
+        self.relevant_event_types = relevant_event_types
 
     def open(self):
         headers = {
@@ -136,7 +137,9 @@ class StreamingConnection():
             'Connection': 'Keep-Alive'
         }
         log.info("Opening Streaming Connection")
-        url = self.stream.url + '&offset={}'.format(self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0)
+        eventTypeFilter = '' if self.relevant_event_types is None else '&eventType=' + ','.join(self.relevant_event_types)
+        url = self.stream.url + '&offset={}'.format(self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0) + eventTypeFilter
+        log.debug("Streaming URL: %s", url)
         self.connection = requests.get(url, headers=headers, stream=True, timeout=60)
         log.info("Established Streaming Connection: %d %s", self.connection.status_code, self.connection.reason)
         self.connection.raise_for_status()
