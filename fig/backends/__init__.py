@@ -51,6 +51,6 @@ class Backends():
 
     @property
     def relevant_event_types(self):
-        if any(r.RELEVANT_EVENT_TYPES == "ALL" for r in self.runtimes):
+        if any("ALL" in r.RELEVANT_EVENT_TYPES for r in self.runtimes):
             return None
         return set(typ for r in self.runtimes for typ in r.RELEVANT_EVENT_TYPES)
