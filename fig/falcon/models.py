@@ -20,7 +20,7 @@ class Event(dict):
         decision = self.severity < int(config.get('events', 'severity_threshold')) \
             or self.creation_time < self.cut_off_date()
         if decision:
-            log.debug("A detection event has been skipped based on severity_threshold of cut_off_date settings")
+            log.debug("A detection event has been skipped based on severity_threshold or cut_off_date settings")
         return decision
 
     @property
