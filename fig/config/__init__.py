@@ -20,6 +20,7 @@ class FigConfig(configparser.SafeConfigParser):
         ['falcon', 'application_id', 'FALCON_APPLICATION_ID'],
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
+        ['azure', 'arc_autodiscovery', 'ARC_AUTODISCOVERY'],
         ['aws', 'region', 'AWS_REGION'],
         ['aws_sqs', 'region', 'AWS_REGION'],
         ['aws_sqs', 'sqs_queue_name', 'AWS_SQS'],
