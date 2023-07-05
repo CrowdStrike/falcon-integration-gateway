@@ -5,7 +5,8 @@ Integration with Microsoft Azure Log Analytics.
 ### Example Configuration file
 
 [config/config.ini](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/config/config.ini) configures Falcon Integration Gateway. Below is a minimal configuration example for Azure:
-```
+
+```terminal
 [main]
 # Cloud backends that are enabled. The gateway will push events to the cloud providers specified below
 backends=AZURE
@@ -20,8 +21,16 @@ backends=AZURE
 
 # Uncomment to enable RTR based auto discovery of Azure Arc Systems. Alternatively,
 # use ARC_AUTODISCOVERY env variable.
-# arc_autodiscovery = true
+#arc_autodiscovery = true
 ```
+
+### API Scopes
+
+Configure the following additional API scopes in your CrowdStrike Falcon console:
+
+- **Hosts**: [Read]
+- **Real Time Response**: [Read, Write]
+  > *Required if using Azure Arc Autodiscovery feature.*
 
 ### Azure Arc Autodiscovery
 
@@ -30,18 +39,20 @@ Azure Arc is service within Microsoft Azure that allows users to connect and man
 Falcon Integration Gateway is able to identify Azure Arc system properties (resourceName, resourceGroup, subscriptionId, tenantId, and vmId) using RTR and send these details over to Azure Log Analytics.
 
 To enable this feature:
- - set `arc_autodiscovery=true` inside `[azure]` section in your config.ini
- - grant extra Falcon permission to API keys in CrowdStrike Falcon
-    - Real Time Response: [Read, Write]
+
+- set `arc_autodiscovery=true` inside `[azure]` section in your config.ini
 
 ### Developer Guide
 
- - Build the image
-   ```
+- Build the image
+
+   ```bash
    docker build . -t falcon-integration-gateway
    ```
- - Run the application
-   ```
+
+- Run the application
+
+   ```bash
    docker run -it --rm \
        -e FALCON_CLIENT_ID="$FALCON_CLIENT_ID" \
        -e FALCON_CLIENT_SECRET="$FALCON_CLIENT_SECRET" \
@@ -52,4 +63,5 @@ To enable this feature:
    ```
 
 ### Developer Resources
- - [Log Analytics Tutorial](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-tutorial)
+
+- [Log Analytics Tutorial](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-tutorial)

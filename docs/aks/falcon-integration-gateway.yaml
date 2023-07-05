@@ -42,6 +42,8 @@ data:
     # Uncomment to filter out events based on number of days past the event (default 21)
     #older_than_days_threshold = 14
 
+    # detections_exclude_clouds =
+
     [logging]
     # Uncomment to request logging level (ERROR, WARN, INFO, DEBUG)
     #level = DEBUG
@@ -61,11 +63,15 @@ data:
 
     [azure]
     # Azure section is applicable only when AZURE backend is enabled in the [main] section.
-    
+
     # Uncomment to provide Azure Workspace ID. Alternatively, use WORKSPACE_ID env variable.
     #workspace_id =
     # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
     #primary_key =
+
+    # Uncomment to enable RTR based auto discovery of Azure Arc Systems. Alternatively,
+    # use ARC_AUTODISCOVERY env variable.
+    #arc_autodiscovery = true
 
 
 ---
