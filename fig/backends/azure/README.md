@@ -28,7 +28,6 @@ backends=AZURE
 
 Configure the following additional API scopes in your CrowdStrike Falcon console:
 
-- **Hosts**: [Read]
 - **Real Time Response**: [Read, Write]
   > *Required if using Azure Arc Autodiscovery feature.*
 

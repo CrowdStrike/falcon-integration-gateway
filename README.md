@@ -12,9 +12,10 @@ This project facilitates the export of the individual detections and audit event
 
 API clients are granted one or more API scopes. Scopes allow access to specific CrowdStrike APIs and describe the actions that an API client can perform.
 
-FIG requires the following API scope at a minimum:
+FIG requires the following API scopes at a minimum:
 
 - **Event streams**: [Read]
+- **Hosts**: [Read]
 
 > Consult the backend guides for additional API scopes that may be required.
 
