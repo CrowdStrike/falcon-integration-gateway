@@ -42,6 +42,7 @@ data:
     # Uncomment to filter out events based on number of days past the event (default 21)
     #older_than_days_threshold = 14
 
+    # Exclude events originating from certain cloud environments (AWS, Azure, GCP, or unrecognized)
     # detections_exclude_clouds =
 
     [logging]
