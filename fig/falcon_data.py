@@ -1,4 +1,5 @@
 import json
+from threading import Lock
 from .falcon import Event
 from .log import log
 
@@ -21,6 +22,7 @@ class FalconCache():
         self._host_detail = {}
         self._mdm_id = {}
         self._arc_config = {}
+        self._arc_config_lock = {}
 
     def device_details(self, sensor_id):
         if not sensor_id:
@@ -41,14 +43,21 @@ class FalconCache():
     def azure_arc_config(self, sensor_id):
         if not sensor_id:
             return EventDataError("Cannot fetch Azure Arc info. SensorId field is missing")
-        if sensor_id not in self._arc_config:
-            is_linux = self.device_details(sensor_id)['platform_name'] == 'Linux'
-            path = '/var/opt/azcmagent/agentconfig.json' if is_linux else 'C:\\ProgramData\\AzureConnectedMachineAgent\\Config\\agentconfig.json'
-            log.info('Fetching Azure Arc Config %s from the system %s', path, sensor_id)
-            file_bytes = self.falcon_api.rtr_fetch_file(sensor_id, path)
-            log.info('Fetched Azure Arc Config from the system: %s', str(file_bytes))
-            self._arc_config[sensor_id] = json.loads(file_bytes)
-        return self._arc_config[sensor_id]
+
+        with self._get_lock(sensor_id):
+            if sensor_id not in self._arc_config:
+                is_linux = self.device_details(sensor_id)['platform_name'] == 'Linux'
+                path = '/var/opt/azcmagent/agentconfig.json' if is_linux else 'C:\\ProgramData\\AzureConnectedMachineAgent\\Config\\agentconfig.json'
+                log.info('Fetching Azure Arc Config %s from the system %s', path, sensor_id)
+                file_bytes = self.falcon_api.rtr_fetch_file(sensor_id, path)
+                log.info('Fetched Azure Arc Config from the system: %s', str(file_bytes))
+                self._arc_config[sensor_id] = json.loads(file_bytes)
+            return self._arc_config[sensor_id]
+
+    def _get_lock(self, sensor_id):
+        if sensor_id not in self._arc_config_lock:
+            self._arc_config_lock[sensor_id] = Lock()
+        return self._arc_config_lock[sensor_id]
 
     def mdm_identifier(self, sensor_id, event_platform):
         if not sensor_id:
