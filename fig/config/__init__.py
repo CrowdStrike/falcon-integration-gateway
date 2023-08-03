@@ -4,7 +4,7 @@ from functools import cached_property
 
 
 class FigConfig(configparser.SafeConfigParser):
-    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL_LAKE'}
+    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL_LAKE', 'GENERIC'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     SENSOR_RECOGNIZED_CLOUDS = {'AWS', 'Azure', 'GCP', 'unrecognized'}
     ENV_DEFAULTS = [

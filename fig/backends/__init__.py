@@ -5,6 +5,7 @@ from . import azure
 from . import gcp
 from . import workspaceone
 from . import cloudtrail_lake
+from . import generic
 from ..config import config
 from ..log import log
 
@@ -16,7 +17,8 @@ ALL_BACKENDS = {
     'GCP': gcp,
     'WORKSPACEONE': workspaceone,
     'CHRONICLE': chronicle,
-    'CLOUDTRAIL_LAKE': cloudtrail_lake
+    'CLOUDTRAIL_LAKE': cloudtrail_lake,
+    'GENERIC': generic
 }
 
 
