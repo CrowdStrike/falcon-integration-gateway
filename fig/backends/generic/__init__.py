@@ -1,5 +1,6 @@
 from ...log import log
 
+
 class Runtime():
     RELEVANT_EVENT_TYPES = "ALL"
 
