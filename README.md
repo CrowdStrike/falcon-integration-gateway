@@ -78,7 +78,24 @@ To install as a container:
     git clone https://github.com/CrowdStrike/falcon-integration-gateway.git
     ```
 
+1. Install the python dependencies. 
+
+    You can either use the `requirements.txt` file:
+
+    ```shell
+    pip install -r requirements.txt
+    ```
+
+    or install the individual python packages associated with your backend:
+
+    > Example: AWS backend
+
+    ```shell
+    pip install crowdstrike-falconpy boto3
+    ```
+
 1. Modify the `./config/config.ini` file with your backend options
+
 1. Run the application
 
     ```bash
