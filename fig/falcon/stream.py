@@ -84,8 +84,19 @@ class StreamingThread(StoppableThread):
     def __init__(self, stream: Stream, queue, relevant_event_types, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
+
+        # Obtain offset values from config and queue
+        config_offset = int(config.get('events', 'offset'))
+        queue_offset = queue.last_offset(stream.feed_id)
+
+        # Logic to determine what value to use for self.offset
+        if config_offset == 0 and queue_offset == 0:
+            self.offset = 0
+        else:
+            self.offset = max(config_offset, queue_offset)
+
         self.stream = stream
-        self.conn = StreamingConnection(self.stream, queue.last_offset(self.stream.feed_id), relevant_event_types)
+        self.conn = StreamingConnection(self.stream, self.offset, relevant_event_types)
         self.queue = queue
         self.relevant_event_types = relevant_event_types
         self.event_count = 0
@@ -124,7 +135,7 @@ class StreamingThread(StoppableThread):
 
 
 class StreamingConnection():
-    def __init__(self, stream: Stream, last_seen_offset=0, relevant_event_types=None):
+    def __init__(self, stream: Stream, last_seen_offset, relevant_event_types=None):
         self.stream = stream
         self.connection = None
         self.last_seen_offset = last_seen_offset
