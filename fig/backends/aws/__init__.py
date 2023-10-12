@@ -9,12 +9,13 @@ from ...log import log
 class Submitter():
     def __init__(self, event):
         self.event = event
+        self.region = config.get('aws', 'region')
 
     def find_instance(self, instance_id, mac_address):
         # Instance IDs are unique to the region, not the account, so we have to check them all
-        report_region = config.get('aws', 'region')
+        report_region = self.region
         ec2instance = None
-        ec2_client = boto3.client("ec2")
+        ec2_client = boto3.client("ec2", region_name=report_region)
         regions = [region["RegionName"] for region in ec2_client.describe_regions()["Regions"]]
         for region in regions:
             ec2 = boto3.resource("ec2", region_name=region)
@@ -39,8 +40,8 @@ class Submitter():
         return report_region, ec2instance
 
     @staticmethod
-    def send_to_securityhub(manifest):
-        client = boto3.client('securityhub', region_name=config.get('aws', 'region'))
+    def send_to_securityhub(manifest, region):
+        client = boto3.client('securityhub', region_name=region)
         check_response = {}
         found = False
         try:
@@ -62,7 +63,7 @@ class Submitter():
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
-        det_region = config.get('aws', 'region')
+        det_region = self.region
         send = False
         try:
             if self.event.instance_id:
@@ -87,7 +88,7 @@ class Submitter():
 
         if send:
             sh_payload = self.create_payload(det_region)
-            response = self.send_to_securityhub(sh_payload)
+            response = self.send_to_securityhub(sh_payload, det_region)
             if not response:
                 log.info("Detection already submitted to Security Hub. Alert not processed.")
             else:
@@ -96,7 +97,7 @@ class Submitter():
                     log.info(submit_msg)
 
     def create_payload(self, instance_region):
-        region = config.get('aws', 'region')
+        region = self.region
         try:
             account_id = boto3.client("sts").get_caller_identity().get('Account')
         except KeyError:
