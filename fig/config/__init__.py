@@ -13,6 +13,7 @@ class FigConfig(configparser.SafeConfigParser):
         ['logging', 'level', 'LOG_LEVEL'],
         ['events', 'severity_threshold', 'EVENTS_SEVERITY_THRESHOLD'],
         ['events', 'older_than_days_threshold', 'EVENTS_OLDER_THAN_DAYS_THRESHOLD'],
+        ['events', 'offset', 'EVENTS_OFFSET'],
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
         ['falcon', 'client_id', 'FALCON_CLIENT_ID'],
         ['falcon', 'client_secret', 'FALCON_CLIENT_SECRET'],
