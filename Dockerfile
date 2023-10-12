@@ -1,9 +1,9 @@
-FROM docker.io/python:3-slim-bullseye
+FROM registry.access.redhat.com/ubi9/python-311
 
+USER root
 RUN : \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get upgrade --no-install-recommends --assume-yes \
-    && rm -rf /var/lib/apt/lists/*
+    && yum update -y \
+    && yum -y clean all --enablerepo='*'
 
 RUN useradd --create-home --home-dir /fig figuser
 WORKDIR /fig
