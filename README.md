@@ -78,7 +78,14 @@ To install as a container:
     git clone https://github.com/CrowdStrike/falcon-integration-gateway.git
     ```
 
+1. Install the python dependencies.
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
 1. Modify the `./config/config.ini` file with your backend options
+
 1. Run the application
 
     ```bash
