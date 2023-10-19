@@ -23,7 +23,7 @@ FIG requires the following API scopes at a minimum:
 
 | Backend | Description | Deployment Guide(s) | General Guide(s) |
 |:--------|:------------|:--------------------|:-------------------|
-| AWS | Pushes events to AWS Security Hub | *Coming Soon* | [AWS backend](fig/backends/aws) |
+| AWS | Pushes events to AWS Security Hub | <ul><li>[Manual Deployment](docs/aws/manual/README.md)</li></ul> | [AWS backend](fig/backends/aws) |
 | AWS_SQS | Pushes events to AWS SQS | *Coming Soon* | [AWS SQS backend](fig/backends/aws_sqs) |
 | Azure | Pushes events to Azure Log Analytics | <ul><li>[Deployment to AKS](docs/aks)</li></ul> | [Azure backend](fig/backends/azure) |
 | Chronicle | Pushes events to Google Chronicle | <ul><li>[Deployment to GKE](docs/listings/gke-chronicle/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-chronicle))</li><li>[Deployment to GKE](docs/chronicle) (manual)</li></ul> | [Chronicle backend](fig/backends/chronicle) |
