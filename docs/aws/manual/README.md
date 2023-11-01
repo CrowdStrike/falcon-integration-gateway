@@ -149,10 +149,14 @@ You can either use the `config/config.ini` file or you can use environment varia
     [main]
     backends = AWS
 
+    [events]
+    severity_threshold = 3
+
     [falcon]
     cloud_region = <Falcon Cloud Region>
     client_id = <Falcon Client ID>
     client_secret = <Falcon Client Secret>
+    application_id = <EXAMPLE-SECHUB-APPID>
 
     [aws]
     region = <AWS Region>
@@ -164,9 +168,11 @@ You can either use the `config/config.ini` file or you can use environment varia
 
     ```bash
     export FIG_BACKENDS=AWS
+    export EVENTS_SEVERITY_THRESHOLD=3
     export FALCON_CLOUD_REGION=<Falcon Cloud Region>
     export FALCON_CLIENT_ID=<Falcon Client ID>
     export FALCON_CLIENT_SECRET=<Falcon Client Secret>
+    export FALCON_APPLICATION_ID=<EXAMPLE-SECHUB-APPID>
     export AWS_REGION=<AWS Region>
     ```
 
@@ -197,3 +203,22 @@ As events are processed by the FIG, they will be sent to Security Hub. You can v
 1. Navigate to the [Security Hub](https://console.aws.amazon.com/securityhub/home) page
 1. Click the **Findings** tab
 1. Add a filter for **Product name** and enter **CrowdStrike Falcon**
+
+---
+
+## Troubleshooting
+
+To get additional logging verbosity, you can set the logging level to `DEBUG` by modifying either the `config.ini` or setting an environment variable.
+
+**Modify the `config.ini`:**
+
+```ini
+[logging]
+level = DEBUG
+```
+
+**Alternatively, set the environment variable:**
+
+```bash
+export LOG_LEVEL=DEBUG
+```
