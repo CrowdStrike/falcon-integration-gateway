@@ -193,7 +193,7 @@ You can either use the `config/config.ini` file or you can use environment varia
 1. Verify output
 
     ```bash
-    2023-10-18 16:45:43 fig MainThread INFO     Starting Falcon Integration Gateway 3.1.10
+    2023-10-18 16:45:43 fig MainThread INFO     Starting Falcon Integration Gateway 3.1.11
     2023-10-18 16:45:43 fig MainThread INFO     AWS Backend is enabled.
     2023-10-18 16:45:43 fig MainThread INFO     Enabled backends will only process events with types: {'DetectionSummaryEvent'}
     2023-10-18 16:45:44 fig cs_stream  INFO     Opening Streaming Connection
