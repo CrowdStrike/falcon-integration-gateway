@@ -10,6 +10,7 @@ class Submitter():
     def __init__(self, event):
         self.event = event
         self.region = config.get('aws', 'region')
+        self.confirm_instance = config.getboolean('aws', 'confirm_instance')
 
     def find_instance(self, instance_id, mac_address):
         # Instance IDs are unique to the region, not the account, so we have to check them all
@@ -65,26 +66,30 @@ class Submitter():
         log.info("Processing detection: %s", self.event.detect_description)
         det_region = self.region
         send = False
-        try:
-            if self.event.instance_id:
-                det_region, instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
-                if instance is None:
-                    log.warning("Instance %s with MAC address %s not found in regions searched. Alert not processed.",
-                                self.event.instance_id, self.event.device_details["mac_address"])
-                    return
-                try:
-                    for _ in instance.network_interfaces:
-                        # Only send alerts for instances we can find
-                        send = True
+        if self.confirm_instance:
+            try:
+                if self.event.instance_id:
+                    det_region, instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
+                    if instance is None:
+                        log.warning("Instance %s with MAC address %s not found in regions searched. Alert not processed.",
+                                    self.event.instance_id, self.event.device_details["mac_address"])
+                        return
+                    try:
+                        for _ in instance.network_interfaces:
+                            # Only send alerts for instances we can find
+                            send = True
 
-                except ClientError:
-                    # Not our instance
-                    i_id = self.event.instance_id
-                    mac = self.event.device_details["mac_address"]
-                    log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed.", i_id, mac)
-        except AttributeError:
-            # Instance ID was not provided by the detection
-            log.info("Instance ID not provided by detection. Alert not processed.")
+                    except ClientError:
+                        # Not our instance
+                        i_id = self.event.instance_id
+                        mac = self.event.device_details["mac_address"]
+                        log.info("Instance %s with MAC address %s not found in regions searched. Alert not processed.", i_id, mac)
+            except AttributeError:
+                # Instance ID was not provided by the detection
+                log.info("Instance ID not provided by detection. Alert not processed.")
+        else:
+            # If we're not confirming the instance, we can just send the alert
+            send = True
 
         if send:
             sh_payload = self.create_payload(det_region)

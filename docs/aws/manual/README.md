@@ -143,6 +143,12 @@ You can either use the `config/config.ini` file or you can use environment varia
 
 ##### 3.2.1 Configure the FIG using the `config/config.ini` file
 
+> [!NOTE]
+> Instance existence confirmation can be disabled using the `confirm_instance` config.ini in
+> the `[aws]` section or by setting the `AWS_CONFIRM_INSTANCE` environment variable. This option is
+> available for scenarios where the account that is running the service application does not have
+> access to the AWS account where the instance with the detection resides.
+
 1. Modify the `config/config.ini` file and set the following minimum values:
 
     ```ini
