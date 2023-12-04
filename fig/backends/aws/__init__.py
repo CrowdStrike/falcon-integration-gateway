@@ -104,10 +104,10 @@ class Submitter():
     def create_payload(self, instance_region):
         region = self.region
         try:
-            account_id = boto3.client("sts").get_caller_identity().get('Account')
+            account_id = boto3.client("sts", region_name=region).get_caller_identity().get('Account')
         except KeyError:
             # Failed to get endpoint_resolver the first time, try it again
-            account_id = boto3.client("sts").get_caller_identity().get('Account')
+            account_id = boto3.client("sts", region_name=region).get_caller_identity().get('Account')
         severity_product = self.event.severity_value
         severity_normalized = severity_product * 20
         if "gov" in region:
