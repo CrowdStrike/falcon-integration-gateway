@@ -110,9 +110,13 @@ class Submitter():
             account_id = boto3.client("sts").get_caller_identity().get('Account')
         severity_product = self.event.severity_value
         severity_normalized = severity_product * 20
+        if "gov" in region:
+            ARN = "arn:aws-us-gov:securityhub:{}:358431324613:product/crowdstrike/crowdstrike-falcon".format(region)
+        else:
+            ARN = "arn:aws:securityhub:{}:517716713836:product/crowdstrike/crowdstrike-falcon".format(region)
         payload = {
             "SchemaVersion": "2018-10-08",
-            "ProductArn": "arn:aws:securityhub:{}:517716713836:product/crowdstrike/crowdstrike-falcon".format(region),
+            "ProductArn": f"{ARN}",
             "AwsAccountId": account_id,
             "SourceUrl": self.event.falcon_link,
             "GeneratorId": "Falcon Host",
