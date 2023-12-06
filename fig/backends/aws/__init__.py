@@ -108,8 +108,8 @@ class Submitter():
         except KeyError:
             # Failed to get endpoint_resolver the first time, try it again
             account_id = boto3.client("sts", region_name=region).get_caller_identity().get('Account')
-        severity_product = self.event.severity_value
-        severity_normalized = severity_product * 20
+        severity_original = self.event.severity
+        severity_label = severity_original.upper()
         if "gov" in region:
             ARN = "arn:aws-us-gov:securityhub:{}:358431324613:product/crowdstrike/crowdstrike-falcon".format(region)
         else:
@@ -123,7 +123,7 @@ class Submitter():
             "CreatedAt": datetime.utcfromtimestamp(float(self.event.event_create_time) / 1000.).isoformat() + 'Z',
             "UpdatedAt": ((datetime.utcfromtimestamp(datetime.timestamp(datetime.now()))).isoformat() + 'Z'),
             "RecordState": "ACTIVE",
-            "Severity": {"Product": severity_product, "Normalized": severity_normalized}
+            "Severity": {"Label": severity_label, "Original": severity_original}
         }
 
         # Instance ID based detail
