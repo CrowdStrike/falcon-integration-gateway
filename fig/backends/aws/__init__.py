@@ -188,7 +188,8 @@ class Runtime():
         log.info("AWS Backend is enabled.")
 
     def is_relevant(self, falcon_event):
-        return falcon_event.cloud_provider[:3].upper() == 'AWS'
+        if falcon_event.cloud_provider is not None:
+            return falcon_event.cloud_provider[:3].upper() == 'AWS'
 
     def process(self, falcon_event):
         Submitter(falcon_event).submit()
