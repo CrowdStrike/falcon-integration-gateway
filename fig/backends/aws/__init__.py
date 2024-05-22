@@ -190,6 +190,7 @@ class Runtime():
     def is_relevant(self, falcon_event):
         if falcon_event.cloud_provider is not None:
             return falcon_event.cloud_provider[:3].upper() == 'AWS'
+        return False
 
     def process(self, falcon_event):
         Submitter(falcon_event).submit()
