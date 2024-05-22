@@ -57,23 +57,8 @@ This will be used to grant the EC2 instance access to the Security Hub and EC2 A
 
 1. Navigate to the [IAM Roles](https://console.aws.amazon.com/iam/home#/roles) page
 1. Click the **Create role** button
-1. Select **Custom trust policy** and paste the following policy into the editor:
-
-    ```json
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "Service": "ec2.amazonaws.com"
-                },
-                "Action": "sts:AssumeRole"
-            }
-        ]
-    }
-    ```
-
+1. Select **AWS service** as the trusted entity
+1. Select **EC2** as the service/use-case that will use this role
 1. Click the **Next** button
 1. Search for the policy you created in the previous step (e.g. `FIG-SecurityHub-Access-Policy`) and select it
 1. Click the **Next** button
