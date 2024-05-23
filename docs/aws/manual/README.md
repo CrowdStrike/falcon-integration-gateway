@@ -93,7 +93,7 @@ Connect to your EC2 instance via SSH and follow the steps below to install the F
 - git
 
 ```bash
-sudo dnf install python3 python3-pip git
+sudo dnf install python3 python3-pip python3-devel git
 ```
 
 > Use the package manager for your distro to ensure these packages are installed.
