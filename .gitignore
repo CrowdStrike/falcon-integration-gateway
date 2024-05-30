@@ -5,3 +5,4 @@
 *.egg-info
 /config/devel.ini
 /runtest.sh
+*.DS_Store
