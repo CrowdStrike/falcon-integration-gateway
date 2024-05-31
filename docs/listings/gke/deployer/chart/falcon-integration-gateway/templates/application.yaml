@@ -23,7 +23,7 @@ spec:
     kind: Secret
   descriptor:
     type: falcon-integration-gateway
-    version: '3.1.12'
+    version: '3.1.13'
     description: |-
       Falcon Integration Gateway (FIG) forwards threat detection findings from CrowdStrike Falcon
       platform to the backend of your choice. This instance forwards detection findings to GCP
