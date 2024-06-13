@@ -130,7 +130,7 @@ class Submitter():
         try:
             payload["Id"] = f"{self.event.instance_id}{self.event.event_id}"
             payload["Title"] = "Falcon Alert. Instance: %s" % self.event.instance_id
-            payload["Resources"] = [{"Type": "AwsEc2Instnace", "Id": self.event.instance_id, "Region": instance_region}]
+            payload["Resources"] = [{"Type": "AwsEc2Instance", "Id": self.event.instance_id, "Region": instance_region}]
         except AttributeError:
             payload["Id"] = f"UnknownInstanceID:{self.event.event_id}"
             payload["Title"] = "Falcon Alert"
