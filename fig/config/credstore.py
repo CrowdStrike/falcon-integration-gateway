@@ -22,18 +22,16 @@ class CredStore:
             response = client.get_secret_value(SecretId=secret_name)
             if 'SecretString' in response:
                 return json.loads(response['SecretString'])
-            else:
-                raise Exception(f"SecretString not found in the response for secret ({secret_name})")
+            raise Exception(f"SecretString not found in the response for secret ({secret_name})")
         except ClientError as e:
             error_code = e.response['Error']['Code']
             if error_code == 'ResourceNotFoundException':
                 raise Exception(f"The requested secret ({secret_name}) was not found") from e
-            elif error_code == 'InvalidRequestException':
+            if error_code == 'InvalidRequestException':
                 raise Exception(f"The request was invalid due to: {e}") from e
-            elif error_code == 'InvalidParameterException':
+            if error_code == 'InvalidParameterException':
                 raise Exception(f"The request had invalid params: {e}") from e
-            else:
-                raise Exception(f"Error retrieving Secrets Manager secret ({secret_name}): {e}") from e
+            raise Exception(f"Error retrieving Secrets Manager secret ({secret_name}): {e}") from e
 
     def validate_secret_keys(self, secret, client_id_key, client_secret_key):
         """Validate the presence of required keys in the secret."""
