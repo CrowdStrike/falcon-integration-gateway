@@ -21,11 +21,11 @@ class FigConfig(configparser.ConfigParser):
         ['falcon', 'reconnect_retry_count', 'FALCON_RECONNECT_RETRY_COUNT'],
         ['falcon', 'application_id', 'FALCON_APPLICATION_ID'],
         ['credentials_store', 'store', 'CREDENTIALS_STORE'],
-        ['credentials_store', 'ssm_client_id', 'SSM_CLIENT_ID'],
-        ['credentials_store', 'ssm_client_secret', 'SSM_CLIENT_SECRET'],
-        ['credentials_store', 'secrets_manager_secret_name', 'SECRETS_MANAGER_SECRET_NAME'],
-        ['credentials_store', 'secrets_manager_client_id_key', 'SECRETS_MANAGER_CLIENT_ID_KEY'],
-        ['credentials_store', 'secrets_manager_client_secret_key', 'SECRETS_MANAGER_CLIENT_SECRET_KEY'],
+        ['ssm', 'ssm_client_id', 'SSM_CLIENT_ID'],
+        ['ssm', 'ssm_client_secret', 'SSM_CLIENT_SECRET'],
+        ['secrets_manager', 'secrets_manager_secret_name', 'SECRETS_MANAGER_SECRET_NAME'],
+        ['secrets_manager', 'secrets_manager_client_id_key', 'SECRETS_MANAGER_CLIENT_ID_KEY'],
+        ['secrets_manager', 'secrets_manager_client_secret_key', 'SECRETS_MANAGER_CLIENT_SECRET_KEY'],
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['azure', 'arc_autodiscovery', 'ARC_AUTODISCOVERY'],
@@ -59,9 +59,7 @@ class FigConfig(configparser.ConfigParser):
         credentials_store = self.get('credentials_store', 'store')
         if credentials_store:
             self._validate_credentials_store()
-            region = self._get_region()
-            if not region:
-                raise Exception("No region was found for the credential store")
+            region = self._get_region(credentials_store)
             credstore = CredStore(self, region)
             try:
                 client_id, client_secret = credstore.load_credentials(credentials_store)
@@ -75,23 +73,18 @@ class FigConfig(configparser.ConfigParser):
         if self.get('credentials_store', 'store') not in ['ssm', 'secrets_manager']:
             raise Exception('Malformed Configuration: expected credentials_store.store to be either ssm or secrets_manager')
         if self.get('credentials_store', 'store') == 'ssm':
-            if not self.get('credentials_store', 'ssm_client_id') or not self.get('credentials_store', 'ssm_client_secret'):
+            if not self.get('ssm', 'ssm_client_id') or not self.get('ssm', 'ssm_client_secret'):
                 raise Exception('Malformed Configuration: expected ssm_client_id and ssm_client_secret to be provided')
         if self.get('credentials_store', 'store') == 'secrets_manager':
-            if not self.get('credentials_store', 'secrets_manager_secret_name') or not self.get('credentials_store', 'secrets_manager_client_id_key') or not self.get('credentials_store', 'secrets_manager_client_secret_key'):
+            if not self.get('secrets_manager', 'secrets_manager_secret_name') or not self.get('secrets_manager', 'secrets_manager_client_id_key') or not self.get('secrets_manager', 'secrets_manager_client_secret_key'):
                 raise Exception('Malformed Configuration: expected secrets_manager_secret_name, secrets_manager_client_id_key and secrets_manager_client_secret_key to be provided')
 
-    def _get_region(self):
+    def _get_region(self, credentials_store):
         """Get the region to use for credential stores."""
-        region = None
-        if 'AWS' in self.backends:
-            region = self.get('aws', 'region')
-        elif 'AWS_SQS' in self.backends:
-            region = self.get('aws_sqs', 'region')
-        elif 'CLOUDTRAIL_LAKE' in self.backends:
-            region = self.get('cloudtrail_lake', 'region')
-        elif 'CHRONICLE' in self.backends:
-            region = self.get('chronicle', 'region')
+        try:
+            region = self.get(credentials_store, 'region')
+        except configparser.NoOptionError as e:
+            raise Exception("No region was found for the credential store: {}".format(e)) from e
         return region
 
     def validate(self):

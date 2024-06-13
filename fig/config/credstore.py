@@ -20,9 +20,32 @@ class CredStore:
         """Retrieve a secret from AWS Secrets Manager."""
         try:
             response = client.get_secret_value(SecretId=secret_name)
-            return json.loads(response['SecretString'])
+            if 'SecretString' in response:
+                return json.loads(response['SecretString'])
+            else:
+                raise Exception(f"SecretString not found in the response for secret ({secret_name})")
         except ClientError as e:
-            raise Exception(f"Error retrieving Secrets Manager secret ({secret_name}): {e}") from e
+            error_code = e.response['Error']['Code']
+            if error_code == 'ResourceNotFoundException':
+                raise Exception(f"The requested secret ({secret_name}) was not found") from e
+            elif error_code == 'InvalidRequestException':
+                raise Exception(f"The request was invalid due to: {e}") from e
+            elif error_code == 'InvalidParameterException':
+                raise Exception(f"The request had invalid params: {e}") from e
+            else:
+                raise Exception(f"Error retrieving Secrets Manager secret ({secret_name}): {e}") from e
+
+    def validate_secret_keys(self, secret, client_id_key, client_secret_key):
+        """Validate the presence of required keys in the secret."""
+        falcon_client_id = secret.get(client_id_key)
+        falcon_client_secret = secret.get(client_secret_key)
+
+        if falcon_client_id is None:
+            raise Exception(f"The client ID key ({client_id_key}) does not exist or is None in the retrieved secret.")
+        if falcon_client_secret is None:
+            raise Exception(f"The client secret key ({client_secret_key}) does not exist or is None in the retrieved secret.")
+
+        return falcon_client_id, falcon_client_secret
 
     def load_credentials(self, store):
         """Load credentials based on the specified store."""
@@ -30,23 +53,22 @@ class CredStore:
             ssm_client = boto3.client('ssm', region_name=self.region)
             falcon_client_id = self.get_ssm_parameter(
                 ssm_client,
-                self.config.get('credentials_store', 'ssm_client_id')
+                self.config.get('ssm', 'ssm_client_id')
             )
             falcon_client_secret = self.get_ssm_parameter(
                 ssm_client,
-                self.config.get('credentials_store', 'ssm_client_secret')
+                self.config.get('ssm', 'ssm_client_secret')
             )
         elif store == 'secrets_manager':
             secrets_client = boto3.client('secretsmanager', region_name=self.region)
             secret = self.get_secret(
                 secrets_client,
-                self.config.get('credentials_store', 'secrets_manager_secret_name')
+                self.config.get('secrets_manager', 'secrets_manager_secret_name')
             )
-            falcon_client_id = secret.get(
-                self.config.get('credentials_store', 'secrets_manager_client_id_key')
-            )
-            falcon_client_secret = secret.get(
-                self.config.get('credentials_store', 'secrets_manager_client_secret_key')
+            falcon_client_id, falcon_client_secret = self.validate_secret_keys(
+                secret,
+                self.config.get('secrets_manager', 'secrets_manager_client_id_key'),
+                self.config.get('secrets_manager', 'secrets_manager_client_secret_key')
             )
         else:
             raise ValueError("Invalid credentials store specified.")
