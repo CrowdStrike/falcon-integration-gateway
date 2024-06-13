@@ -12,12 +12,67 @@ This project facilitates the export of the individual detections and audit event
 
 API clients are granted one or more API scopes. Scopes allow access to specific CrowdStrike APIs and describe the actions that an API client can perform.
 
+> [!NOTE]
+> For more information on how to generate an API client, refer to the [CrowdStrike API documentation](https://falcon.crowdstrike.com/login/?unilogin=true&next=/documentation/page/a2a7fc0e/crowdstrike-oauth2-based-apis#mf8226da).
+
 FIG requires the following API scopes at a minimum:
 
 - **Event streams**: [Read]
 - **Hosts**: [Read]
 
 > Consult the backend guides for additional API scopes that may be required.
+
+## Authentication
+
+FIG requires an API client ID and client secret to authenticate with the CrowdStrike API. There are three ways to provide these credentials:
+
+### Direct Configuration
+
+> [!IMPORTANT]
+> This method is not recommended for production deployments.
+
+You can use the `config.ini` file to store your API client ID and client secret. The `config.ini` file should be located in the `config` directory. To configure authentication, add the following to the `config.ini` file:
+
+```ini
+[falcon]
+client_id = YOUR_CLIENT_ID
+client_secret = YOUR_CLIENT_SECRET
+```
+
+### Environment Variables
+
+You can also provide your API client ID and client secret as environment variables. To do so, set the following environment variables:
+
+```bash
+export FALCON_CLIENT_ID=YOUR_CLIENT_ID
+export FALCON_CLIENT_SECRET=YOUR_CLIENT_SECRET
+```
+
+### Credential Store
+
+You can use a credential store to securely store your API client ID and client secret. FIG supports the following credential stores:
+
+- AWS Secrets Manager ('`secrets_manager`')
+- AWS SSM Parameter Store ('`ssm`')
+
+To configure FIG to use a credential store, add the following to the `config.ini` file:
+
+```ini
+[credentials_store]
+#store = ssm|secrets_manager
+```
+
+After selecting a credential store, you must provide the necessary configuration for the store. For example, to use AWS Secrets Manager, add the following to the `config.ini` file:
+
+```ini
+[secrets_manager]
+region = YOUR_AWS_REGION
+secrets_manager_secret_name = your/secret/name
+secrets_manager_client_id_key = client_id_key_name
+secrets_manager_client_secret_key = client_secret_key_name
+```
+
+Please refer to the [configuration options](./config/config.ini) for more details on the available options.
 
 ## Backends w/ Available Deployment Guide(s)
 
@@ -84,7 +139,7 @@ To install as a container:
     pip install -r requirements.txt
     ```
 
-1. Modify the `./config/config.ini` file with your backend options
+1. Modify the `./config/config.ini` file with your backend options or set the associated environment variables.
 
 1. Run the application
 
