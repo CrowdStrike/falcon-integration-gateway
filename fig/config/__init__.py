@@ -1,6 +1,7 @@
 import os
 import configparser
 from functools import cached_property
+from .credstore import CredStore
 
 
 class FigConfig(configparser.ConfigParser):
@@ -19,6 +20,14 @@ class FigConfig(configparser.ConfigParser):
         ['falcon', 'client_secret', 'FALCON_CLIENT_SECRET'],
         ['falcon', 'reconnect_retry_count', 'FALCON_RECONNECT_RETRY_COUNT'],
         ['falcon', 'application_id', 'FALCON_APPLICATION_ID'],
+        ['credentials_store', 'store', 'CREDENTIALS_STORE'],
+        ['ssm', 'region', 'SSM_REGION'],
+        ['ssm', 'ssm_client_id', 'SSM_CLIENT_ID'],
+        ['ssm', 'ssm_client_secret', 'SSM_CLIENT_SECRET'],
+        ['secrets_manager', 'region', 'SECRETS_MANAGER_REGION'],
+        ['secrets_manager', 'secrets_manager_secret_name', 'SECRETS_MANAGER_SECRET_NAME'],
+        ['secrets_manager', 'secrets_manager_client_id_key', 'SECRETS_MANAGER_CLIENT_ID_KEY'],
+        ['secrets_manager', 'secrets_manager_client_secret_key', 'SECRETS_MANAGER_CLIENT_SECRET_KEY'],
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['azure', 'arc_autodiscovery', 'ARC_AUTODISCOVERY'],
@@ -40,12 +49,45 @@ class FigConfig(configparser.ConfigParser):
         super().__init__()
         self.read(['config/defaults.ini', 'config/config.ini', 'config/devel.ini'])
         self._override_from_env()
+        self._override_from_credentials_store()
 
     def _override_from_env(self):
         for section, var, envvar in self.__class__.ENV_DEFAULTS:
             value = os.getenv(envvar)
             if value:
                 self.set(section, var, value)
+
+    def _override_from_credentials_store(self):
+        credentials_store = self.get('credentials_store', 'store')
+        if credentials_store:
+            self._validate_credentials_store()
+            region = self._get_region(credentials_store)
+            credstore = CredStore(self, region)
+            try:
+                client_id, client_secret = credstore.load_credentials(credentials_store)
+            except ValueError as e:
+                raise Exception("Error loading credentials from store: {}:{}".format(credentials_store, e)) from e
+
+            self.set('falcon', 'client_id', client_id)
+            self.set('falcon', 'client_secret', client_secret)
+
+    def _validate_credentials_store(self):
+        if self.get('credentials_store', 'store') not in ['ssm', 'secrets_manager']:
+            raise Exception('Malformed Configuration: expected credentials_store.store to be either ssm or secrets_manager')
+        if self.get('credentials_store', 'store') == 'ssm':
+            if not self.get('ssm', 'ssm_client_id') or not self.get('ssm', 'ssm_client_secret'):
+                raise Exception('Malformed Configuration: expected ssm_client_id and ssm_client_secret to be provided')
+        if self.get('credentials_store', 'store') == 'secrets_manager':
+            if not self.get('secrets_manager', 'secrets_manager_secret_name') or not self.get('secrets_manager', 'secrets_manager_client_id_key') or not self.get('secrets_manager', 'secrets_manager_client_secret_key'):
+                raise Exception('Malformed Configuration: expected secrets_manager_secret_name, secrets_manager_client_id_key and secrets_manager_client_secret_key to be provided')
+
+    def _get_region(self, credentials_store):
+        """Get the region to use for credential stores."""
+        try:
+            region = self.get(credentials_store, 'region')
+        except configparser.NoOptionError as e:
+            raise Exception("No region was found for the credential store: {}".format(e)) from e
+        return region
 
     def validate(self):
         for section, var, envvar in self.__class__.ENV_DEFAULTS:
