@@ -177,7 +177,6 @@ If you have made any changes to the `config.ini` file, you can update the FIG by
 1. Clone and navigate to the repository again.
 1. Install/update the python dependencies.
 1. Update the `config/config.ini` file with your configuration settings.
-    > [!NOTE]
     > Because the `config.ini` file may have new changes (ie, new sections or options), it is recommended to reapply your configuration settings from the backup to the new `config.ini` file.
 1. Run the application.
 
