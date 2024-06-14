@@ -110,9 +110,7 @@ Please refer to the [config.ini](./config/config.ini) file for more details on t
 
 Please refer to the [FIG helm chart documentation](https://github.com/CrowdStrike/falcon-helm/tree/main/helm-charts/falcon-integration-gateway) for detailed instructions on deploying the FIG via helm chart for your respective backend(s).
 
-### Manual Installation and Removal
-
-#### With Docker/Podman
+### With Docker/Podman
 
 To install as a container:
 
@@ -140,18 +138,22 @@ To install as a container:
     docker logs <container>
     ```
 
-#### From Git Repository
+### From Git Repository
 
-1. Clone the repository
+> [!NOTE]
+> This method requires Python 3.7 or higher and a python package manager such as `pip` to be installed on your system.
+
+1. Clone and navigate to the repository
 
     ```bash
     git clone https://github.com/CrowdStrike/falcon-integration-gateway.git
+    cd falcon-integration-gateway
     ```
 
 1. Install the python dependencies.
 
     ```bash
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
     ```
 
 1. Modify the `./config/config.ini` file with your configuration options or set the associated environment variables.
@@ -161,6 +163,53 @@ To install as a container:
     ```bash
     python3 -m fig
     ```
+
+### Updating the FIG from the Git Repository
+
+Depending on which configuration method you are using, follow the steps below to update the FIG from the Git repository.
+
+#### config.ini
+
+If you have made any changes to the `config.ini` file, you can update the FIG by following these steps:
+
+1. Make a backup of the `config/config.ini` file.
+1. Remove the `falcon-integration-gateway` directory.
+1. Clone and navigate to the repository again.
+1. Install/update the python dependencies.
+1. Update the `config/config.ini` file with your configuration settings.
+    > [!NOTE]
+    > Because the `config.ini` file may have new changes (ie, new sections or options), it is recommended to reapply your configuration settings from the backup to the new `config.ini` file.
+1. Run the application.
+
+An example of the process:
+
+```bash
+cp config/config.ini /tmp/config.ini
+cd .. && rm -rf falcon-integration-gateway
+git clone https://github.com/CrowdStrike/falcon-integration-gateway.git
+cd falcon-integration-gateway
+pip3 install --upgrade -r requirements.txt
+# Review the new config.ini file and reapply your settings from the backup
+python3 -m fig
+```
+
+This method ensures that your configuration settings are preserved while updating the FIG to the latest version.
+
+#### Environment Variables (only)
+
+If you are only using environment variables to configure the FIG, you can update the FIG by following these steps:
+
+1. Pull the latest changes from the repository.
+1. Install/update the python dependencies.
+1. Run the application.
+
+An example of the process:
+
+```bash
+git pull
+pip3 install --upgrade -r requirements.txt
+python3 -m fig
+```
 
 ## [Developers Guide](./docs/developer_guide.md)
 
