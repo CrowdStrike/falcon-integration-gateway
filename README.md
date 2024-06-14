@@ -24,17 +24,23 @@ FIG requires the following API scopes at a minimum:
 
 ## Authentication
 
-FIG requires an API client ID and client secret to authenticate with the CrowdStrike API. There are three ways to provide these credentials:
+FIG requires the authentication of an API client ID and client secret, along with its associated cloud region, to establish a connection with the CrowdStrike API.
+
+FIG supports auto-discovery of the Falcon cloud region. If you do not specify a cloud region, FIG will attempt to auto-discover the cloud region based on the API client ID and client secret provided.
+
+> [!IMPORTANT]
+> Auto-discovery is only available for [us-1, us-2, eu-1] regions.
 
 ### Direct Configuration
 
-> [!IMPORTANT]
+> [!NOTE]
 > This method is not recommended for production deployments.
 
 You can use the `config.ini` file to store your API client ID and client secret. The `config.ini` file should be located in the `config` directory. To configure authentication, add the following to the `config.ini` file:
 
 ```ini
 [falcon]
+cloud_region = us-1
 client_id = YOUR_CLIENT_ID
 client_secret = YOUR_CLIENT_SECRET
 ```
@@ -44,6 +50,7 @@ client_secret = YOUR_CLIENT_SECRET
 You can also provide your API client ID and client secret as environment variables. To do so, set the following environment variables:
 
 ```bash
+export FALCON_CLOUD_REGION=us-1
 export FALCON_CLIENT_ID=YOUR_CLIENT_ID
 export FALCON_CLIENT_SECRET=YOUR_CLIENT_SECRET
 ```
@@ -52,12 +59,18 @@ export FALCON_CLIENT_SECRET=YOUR_CLIENT_SECRET
 
 You can use a credential store to securely store your API client ID and client secret. FIG supports the following credential stores:
 
-- AWS Secrets Manager ('`secrets_manager`')
-- AWS SSM Parameter Store ('`ssm`')
+- AWS Secrets Manager (`secrets_manager`)
+- AWS SSM Parameter Store (`ssm`)
+
+> [!NOTE]
+> You can use either direct configuration or environment variables to specify the credential store and its associated configurations.
 
 To configure FIG to use a credential store, add the following to the `config.ini` file:
 
 ```ini
+[falcon]
+cloud_region = us-1
+
 [credentials_store]
 #store = ssm|secrets_manager
 ```
@@ -72,7 +85,9 @@ secrets_manager_client_id_key = client_id_key_name
 secrets_manager_client_secret_key = client_secret_key_name
 ```
 
-Please refer to the [configuration options](./config/config.ini) for more details on the available options.
+## Configuration
+
+Please refer to the [config.ini](./config/config.ini) file for more details on the available options along with their respective environment variables.
 
 ## Backends w/ Available Deployment Guide(s)
 
@@ -139,7 +154,7 @@ To install as a container:
     pip install -r requirements.txt
     ```
 
-1. Modify the `./config/config.ini` file with your backend options or set the associated environment variables.
+1. Modify the `./config/config.ini` file with your configuration options or set the associated environment variables.
 
 1. Run the application
 
