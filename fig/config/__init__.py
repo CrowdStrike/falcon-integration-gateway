@@ -5,7 +5,7 @@ from .credstore import CredStore
 
 
 class FigConfig(configparser.ConfigParser):
-    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CHRONICLE', 'CLOUDTRAIL_LAKE', 'GENERIC'}
+    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CLOUDTRAIL_LAKE', 'GENERIC'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     SENSOR_RECOGNIZED_CLOUDS = {'AWS', 'Azure', 'GCP', 'unrecognized'}
     ENV_DEFAULTS = [
@@ -38,9 +38,6 @@ class FigConfig(configparser.ConfigParser):
         ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
         ['workspaceone', 'syslog_host', 'SYSLOG_HOST'],
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
-        ['chronicle', 'service_account', 'GOOGLE_SERVICE_ACCOUNT_FILE'],
-        ['chronicle', 'customer_id', 'GOOGLE_CUSTOMER_ID'],
-        ['chronicle', 'region', 'CHRONICLE_REGION'],
         ['cloudtrail_lake', 'channel_arn', 'CLOUDTRAIL_LAKE_CHANNEL_ARN'],
         ['cloudtrail_lake', 'region', 'CLOUDTRAIL_LAKE_REGION'],
     ]
@@ -145,13 +142,6 @@ class FigConfig(configparser.ConfigParser):
                 raise Exception('Malformed Configuration: expected workspaceone.syslog_host to be non-empty')
             if int(self.get('workspaceone', 'syslog_port')) not in range(1, 65535):
                 raise Exception('Malformed configuration: expected workspaceone.syslog_port to be in range 1-65335')
-        if 'CHRONICLE' in self.backends:
-            if len(self.get('chronicle', 'service_account')) == 0:
-                raise Exception('Malformed Configuration: expected chronicle.service_account_file to be non-empty')
-            if len(self.get('chronicle', 'region')) == 0:
-                raise Exception('Malformed Configuration: expected chronicle.region to be non-empty')
-            if len(self.get('chronicle', 'customer_id')) == 0:
-                raise Exception('Malformed Configuration: expected chronicle.customer_id to be non-empty')
         if 'CLOUDTRAIL_LAKE' in self.backends:
             if len(self.get('cloudtrail_lake', 'channel_arn')) == 0:
                 raise Exception('Malformed Configuration: expected cloudtrail_lake.channel_arn to be non-empty')

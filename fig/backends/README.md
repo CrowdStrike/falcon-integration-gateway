@@ -4,7 +4,7 @@ Falcon Integration Gateway may push information to various backends. Backends ne
 
 ```
 [main]
-backends=AWS,AZURE,GCP,WORKSPACEONE,CHRONICLE
+backends=AWS,AZURE,GCP,WORKSPACEONE
 ```
 
 ## Currently Available Backends
@@ -13,4 +13,3 @@ backends=AWS,AZURE,GCP,WORKSPACEONE,CHRONICLE
  * [Azure(Log Analytics)](azure)
  * [GCP(Security Command Center)](gcp)
  * [WorkspaceOne](workspaceone)
- * [Chronicle](chronicle)
