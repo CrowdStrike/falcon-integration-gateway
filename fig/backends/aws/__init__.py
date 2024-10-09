@@ -24,11 +24,12 @@ class Submitter():
                 ec2instance = ec2.Instance(instance_id)
                 found = False
                 # Confirm the mac address matches
-                for iface in ec2instance.network_interfaces:
-                    det_mac = mac_address.lower().replace(":", "").replace("-", "")
-                    ins_mac = iface.mac_address.lower().replace(":", "").replace("-", "")
-                    if det_mac == ins_mac:
-                        found = True
+                if ec2instance.network_interfaces:
+                    for iface in ec2instance.network_interfaces:
+                        det_mac = mac_address.lower().replace(":", "").replace("-", "")
+                        ins_mac = iface.mac_address.lower().replace(":", "").replace("-", "")
+                        if det_mac == ins_mac:
+                            found = True
                 if found:  # pylint: disable=R1723
                     return region, ec2instance
             except ClientError:
@@ -75,9 +76,10 @@ class Submitter():
                                     self.event.instance_id, self.event.device_details["mac_address"])
                         return
                     try:
-                        for _ in instance.network_interfaces:
-                            # Only send alerts for instances we can find
-                            send = True
+                        if instance.network_interfaces:
+                            for _ in instance.network_interfaces:
+                                # Only send alerts for instances we can find
+                                send = True
 
                     except ClientError:
                         # Not our instance
