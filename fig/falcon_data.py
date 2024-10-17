@@ -130,11 +130,15 @@ class FalconEvent():
 
     @property
     def falcon_link(self):
-        return self.original_event['event']['FalconHostLink']
+        return self.original_event["event"]["FalconHostLink"]
+
+    @property
+    def cid(self):
+        return self.original_event["metadata"]["customerIDString"]
 
     @property
     def event_id(self):
-        return self.original_event['event']['DetectId']
+        return self.original_event["event"].get("DetectId") or self.original_event["event"].get("CompositeId")
 
     @property
     def time(self):
@@ -154,11 +158,11 @@ class FalconEvent():
 
     @property
     def detect_description(self):
-        return self.original_event['event']['DetectDescription']
+        return self.original_event["event"].get("DetectDescription") or self.original_event["event"].get("Description")
 
     @property
     def detect_name(self):
-        return self.original_event['event']['DetectName']
+        return self.original_event["event"].get("DetectName") or self.original_event["event"].get("Name")
 
     @property
     def service_name(self):
