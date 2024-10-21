@@ -126,7 +126,7 @@ class Submitter():
             "UpdatedAt": ((datetime.utcfromtimestamp(datetime.timestamp(datetime.now()))).isoformat() + 'Z'),
             "RecordState": "ACTIVE",
             "Severity": {"Label": severity_label, "Original": severity_original},
-            "ProductFields": {"crowdstrike/crowdstrike-falcon/cid":self.event.cid},
+            "ProductFields": {"crowdstrike/crowdstrike-falcon/cid": self.event.cid},
         }
 
         # Instance ID based detail
