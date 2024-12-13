@@ -45,11 +45,12 @@ class Event(dict):
 
     @property
     def sensor_id(self):
-        return self['event']['SensorId']
+        # return self['event']['SensorId']
+        return self['event'].get('SensorId') or self['event'].get('AgentId')
 
     @property
     def computer_name(self):
-        return self['event']['ComputerName']
+        return self['event'].get('ComputerName') or self['event'].get('Hostname')
 
     @classmethod
     def parse_cs_time(cls, cs_timestamp):

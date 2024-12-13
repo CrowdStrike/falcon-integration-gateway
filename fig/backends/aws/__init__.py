@@ -125,7 +125,8 @@ class Submitter():
             "CreatedAt": datetime.utcfromtimestamp(float(self.event.event_create_time) / 1000.).isoformat() + 'Z',
             "UpdatedAt": ((datetime.utcfromtimestamp(datetime.timestamp(datetime.now()))).isoformat() + 'Z'),
             "RecordState": "ACTIVE",
-            "Severity": {"Label": severity_label, "Original": severity_original}
+            "Severity": {"Label": severity_label, "Original": severity_original},
+            "ProductFields": {"crowdstrike/crowdstrike-falcon/cid": self.event.cid},
         }
 
         # Instance ID based detail
@@ -184,7 +185,7 @@ class Submitter():
 
 
 class Runtime():
-    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+    RELEVANT_EVENT_TYPES = ['EppDetectionSummaryEvent']
 
     def __init__(self):
         log.info("AWS Backend is enabled.")
