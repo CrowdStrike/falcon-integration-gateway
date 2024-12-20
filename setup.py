@@ -1,8 +1,5 @@
 from setuptools import find_packages
 from setuptools import setup
-from glob import glob
-from os.path import basename
-from os.path import splitext
 import fig
 
 with open("README.md", "r") as fh:
@@ -17,9 +14,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/crowdstrike/falcon-integration-gateway",
-    packages=find_packages("fig"),
-    package_dir={"": "fig"},
-    py_modules=[splitext(basename(path))[0] for path in glob("fig/*.py")],
+    packages=find_packages(),
     include_package_data=True,
     install_requires=[
         'boto3',
@@ -49,5 +44,5 @@ setup(
         "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.6, <3.12'
 )

@@ -6,3 +6,5 @@
 /config/devel.ini
 /runtest.sh
 *.DS_Store
+/build
+/dist

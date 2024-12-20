@@ -1,6 +1,7 @@
 import os
 import configparser
 from functools import cached_property
+from importlib.resources import files
 from .credstore import CredStore
 
 
@@ -44,9 +45,22 @@ class FigConfig(configparser.ConfigParser):
 
     def __init__(self):
         super().__init__()
-        self.read(['config/defaults.ini', 'config/config.ini', 'config/devel.ini'])
+        self._read_config_files()
         self._override_from_env()
         self._override_from_credentials_store()
+
+    def _read_config_files(self):
+        # If installed via python package, look for defaults.ini in package directory
+        default_config = files('config').joinpath('defaults.ini')
+        self.read(default_config)
+        # Allow overrides from local directory and config directory
+        config_files = ['defaults.ini', 'config.ini', 'devel.ini']
+        for file in config_files:
+            # Try reading from local directory first, then from config directory
+            if os.path.exists(file):
+                self.read(file)
+            elif os.path.exists(os.path.join('config', file)):
+                self.read(os.path.join('config', file))
 
     def _override_from_env(self):
         for section, var, envvar in self.__class__.ENV_DEFAULTS:
