@@ -3,7 +3,7 @@ x-google-marketplace:
 
   applicationApiVersion: v1beta1
 
-  publishedVersion: "3.2.2"
+  publishedVersion: "3.2.3"
   publishedVersionMetadata:
     releaseNote: >-
       3.1
