@@ -15,6 +15,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/crowdstrike/falcon-integration-gateway",
     packages=find_packages(),
+    package_data={'': ['config/*.ini']},
     include_package_data=True,
     install_requires=[
         'boto3',
