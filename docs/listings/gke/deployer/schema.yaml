@@ -3,7 +3,7 @@ x-google-marketplace:
 
   applicationApiVersion: v1beta1
 
-  publishedVersion: "3.2.1"
+  publishedVersion: "3.2.2"
   publishedVersionMetadata:
     releaseNote: >-
       3.1
@@ -14,13 +14,13 @@ x-google-marketplace:
 
   clusterConstraints:
     resources:
-    - replicas: 1
-      requests:
-        cpu: 100m
-        memory: 300Mi
+      - replicas: 1
+        requests:
+          cpu: 100m
+          memory: 300Mi
 
   images:
-    '':  # Primary image has no name.
+    "": # Primary image has no name.
       properties:
         imageRepo:
           type: REPO_WITH_REGISTRY
@@ -45,10 +45,10 @@ properties:
       type: STRING
     default: us-1
     enum:
-    - 'us-1'
-    - 'us-2'
-    - 'eu-1'
-    - 'us-gov-1'
+      - "us-1"
+      - "us-2"
+      - "eu-1"
+      - "us-gov-1"
   falcon.client_id:
     title: "Falcon API OAuth2 Credentials: Client ID"
     description: "API keypair used to authenticate with Falcon Platform and to initiate streaming session. Only the following permissions are required: READ 'Event streams' and READ 'Hosts'"
@@ -69,14 +69,14 @@ properties:
       type: MASKED_FIELD
 
 required:
-- name
-- namespace
-- falcon.client_id
-- falcon.client_secret
-- falcon.cloud_region
-- cloud.google.application_credentials
+  - name
+  - namespace
+  - falcon.client_id
+  - falcon.client_secret
+  - falcon.cloud_region
+  - cloud.google.application_credentials
 
 form:
-- widget: help
-  description: |-
-    <a href="https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/docs/listings/gke/UserGuide.md">Deployment Guide</a>
+  - widget: help
+    description: |-
+      <a href="https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/docs/listings/gke/UserGuide.md">Deployment Guide</a>
