@@ -169,7 +169,7 @@ To install as a container:
 Falcon Integration Gateway (FIG) is available on the [Python Package Index](https://pypi.org/project/falcon-integration-gateway/).
 
 > [!WARNING]
-> Falcon Integration Gateway (FIG) versions below 3.2.2 on PyPI are broken and will not install correctly. Please ensure you install version 3.2.2 or higher from PyPI.
+> Falcon Integration Gateway (FIG) versions below 3.2.3 on PyPI are broken and will not install correctly. Please ensure you install version 3.2.3 or higher from PyPI.
 
 1. Install the package:
 
