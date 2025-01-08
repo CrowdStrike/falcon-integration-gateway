@@ -1,28 +1,137 @@
-name: Publish Python Package
+name: Release
 
 on:
   release:
     types: [created]
 
-jobs:
-  deploy:
+env:
+  IMAGE_REGISTRY: gcr.io
+  IMAGE_NAME: gcr.io/crowdstrike-public/falcon-integration-gateway
+  DEPLOYER: gcr.io/crowdstrike-public/falcon-integration-gateway/deployer
 
+jobs:
+  python-package:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PACKAGE_API_ID }}
-        TWINE_PASSWORD: ${{ secrets.PACKAGE_API_SECRET }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PACKAGE_API_ID }}
+          TWINE_PASSWORD: ${{ secrets.PACKAGE_API_SECRET }}
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
+
+  container:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2.1.7
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 600s
+
+      - name: Login to gcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=match,pattern=\d.\d
+            type=match,pattern=\d.\d.\d
+          annotations: ${{ secrets.SERVICE_ANNOTATION }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          tags: ${{ steps.meta.outputs.tags }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          provenance: false
+          sbom: false
+          push: true
+
+  deployer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2.1.7
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          access_token_lifetime: 600s
+
+      - name: Login to gcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ secrets.REGISTRY_LOGIN }}
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Pull latest onbuild image
+        run: |
+          docker pull gcr.io/cloud-marketplace-tools/k8s/deployer_helm/onbuild
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DEPLOYER }}
+          tags: |
+            # set latest tag for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=match,pattern=\d.\d
+            type=match,pattern=\d.\d.\d
+          annotations: ${{ secrets.SERVICE_ANNOTATION }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: docs/listings/gke/deployer
+          tags: ${{ steps.meta.outputs.tags }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          provenance: false
+          sbom: false
+          push: true
