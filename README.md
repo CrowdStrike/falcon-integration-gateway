@@ -174,7 +174,7 @@ Falcon Integration Gateway (FIG) is available on the [Python Package Index](http
 1. Install the package:
 
     ```bash
-    python3 -m pip install falcon-integration-gateway
+    python3 -m pip install 'falcon-integration-gateway>3.2.3'
     ```
 
 1. Once installed, create a configuration file or set your environment variables according to the [CONFIG](./config/config.ini) options before running the application. Example `config.ini` for the GENERIC backend:
