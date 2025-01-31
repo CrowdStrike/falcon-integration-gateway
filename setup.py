@@ -16,7 +16,7 @@ setup(
     url="https://github.com/crowdstrike/falcon-integration-gateway",
     packages=find_packages(),
     package_data={
-        '': ['config/*.ini'],
+        'fig': ['../config/*.ini'],
     },
     include_package_data=True,
     install_requires=[

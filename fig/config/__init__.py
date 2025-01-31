@@ -50,54 +50,47 @@ class FigConfig(configparser.ConfigParser):
         self._override_from_credentials_store()
 
     def _read_config_files(self):
-        # Define possible locations for config files
-        base_paths = [
-            os.path.dirname(
-                os.path.dirname(os.path.dirname(__file__))
-            ),  # Root project directory
-            os.getcwd(),  # Current working directory
-        ]
-
-        # Try to find and read defaults.ini first
-        defaults_found = False
-        for base_path in base_paths:
-            possible_paths = [
-                os.path.join(base_path, "config", "defaults.ini"),
-                os.path.join(base_path, "defaults.ini"),
+        # Try reading from package first (when installed via pip)
+        try:
+            default_config = files("fig").joinpath("../config/defaults.ini")
+            self.read(default_config)
+        except (TypeError, ModuleNotFoundError, ValueError) as e:
+            # If package reading fails, try reading from local paths
+            base_paths = [
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),  # Project root
+                os.getcwd(),  # Current working directory
             ]
 
-            for path in possible_paths:
-                if os.path.exists(path):
-                    self.read(path)
-                    defaults_found = True
-                    break
-
-            if defaults_found:
-                break
-
-        if not defaults_found:
-            try:
-                # Try reading from installed package
-                default_config = files("config").joinpath("defaults.ini")
-                self.read(default_config)
-            except (TypeError, ModuleNotFoundError, ValueError) as exc:
-                raise FileNotFoundError(
-                    "Could not find defaults.ini in any expected location. "
-                    "Make sure defaults.ini exists in the config directory."
-                ) from exc
-
-        # Allow overrides from config.ini and devel.ini
-        override_files = ["config.ini", "devel.ini"]
-        for file in override_files:
+            config_found = False
             for base_path in base_paths:
                 possible_paths = [
-                    os.path.join(base_path, "config", file),
-                    os.path.join(base_path, file),
+                    os.path.join(base_path, 'config', 'defaults.ini'),
+                    os.path.join(base_path, 'defaults.ini'),
                 ]
 
                 for path in possible_paths:
                     if os.path.exists(path):
                         self.read(path)
+                        config_found = True
+                        break
+
+                if config_found:
+                    break
+
+            if not config_found:
+                raise FileNotFoundError(
+                    "Could not find defaults.ini in any expected location. "
+                    "Make sure defaults.ini exists in the config directory."
+                ) from e
+
+        # Allow overrides from config.ini and devel.ini
+        override_files = ['config.ini', 'devel.ini']
+        for file in override_files:
+            # Try current directory first
+            if os.path.exists(file):
+                self.read(file)
+            elif os.path.exists(os.path.join('config', file)):
+                self.read(os.path.join('config', file))
 
     def _override_from_env(self):
         for section, var, envvar in self.__class__.ENV_DEFAULTS:
