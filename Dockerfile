@@ -12,6 +12,7 @@ COPY requirements.txt .
 RUN pip install -r ./requirements.txt
 
 COPY . .
+RUN chown -R figuser:figuser /fig
 
 USER figuser
 
