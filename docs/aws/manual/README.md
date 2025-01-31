@@ -134,7 +134,7 @@ sudo dnf install python3 python3-pip python3-devel
 Install the package:
 
 ```bash
-python3 -m pip install 'falcon-integration-gateway>3.2.3'
+python3 -m pip install 'falcon-integration-gateway>3.2.5'
 ```
 
 #### 3.3 Configure the FIG
