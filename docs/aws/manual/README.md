@@ -3,6 +3,18 @@
 This guide will walk you through the steps to manually deploy the Falcon Integration Gateway on
 an AWS EC2 instance as a Python application.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Architecture Overview](#architecture-overview)
+- [Deployment Steps](#deployment-steps)
+  - [1. Create an Instance Profile](#1-create-an-instance-profile)
+  - [2. Create an EC2 Instance (Linux)](#2-create-an-ec2-instance-linux)
+  - [3. Deploy the FIG](#3-deploy-the-fig)
+  - [4. Run the FIG](#4-run-the-fig)
+  - [5. Verify in Security Hub](#5-verify-in-security-hub)
+- [Troubleshooting](#troubleshooting)
+
 ## Prerequisites
 
 - Falcon API Credentials with the following API scopes:
@@ -12,6 +24,15 @@ an AWS EC2 instance as a Python application.
   - Create EC2 instances
   - Create IAM roles/policies
   - Access Security Hub
+
+## Architecture Overview
+
+```mermaid
+graph LR
+    A[CrowdStrike Cloud] -->|Events| B[FIG]
+    B -->|Findings| C[AWS Security Hub]
+    D[EC2 Instances] -->|Metadata| B
+```
 
 ## Deployment Steps
 
@@ -82,9 +103,92 @@ For the purposes of this guide, we will be using the latest Amazon Linux 2023 AM
       1. Select the instance profile you created in the previous step
 1. Click the **Launch instance** button
 
-### 3. Install the FIG
+### 3. Deploy the FIG
 
 Connect to your EC2 instance via SSH and follow the steps below to install the FIG.
+
+#### Installation Methods
+
+| Method | Pros | Cons | Best For |
+|--------|------|------|----------|
+| Python Package | • Simple installation<br>• Automatic updates<br>• Dependency management | • Less customization | Most users |
+| Git Repository | • Full source access<br>• Maximum customization<br>• Development features | • Manual updates<br>• Manual dependency management | Developers |
+
+#### Choose Your Installation Method:
+
+<details><summary>Python Package (<strong>Recommended</strong>)</summary>
+
+#### 3.1 Ensure the following packages are installed
+
+- Python 3.6 <= 3.11
+- pip
+
+```bash
+sudo dnf install python3 python3-pip python3-devel
+```
+
+> Use the package manager for your distro to ensure these packages are installed.
+
+#### 3.2 Install the FIG
+
+Install the package:
+
+```bash
+python3 -m pip install 'falcon-integration-gateway>3.2.3'
+```
+
+#### 3.3 Configure the FIG
+
+There are two different ways that you can configure the FIG to use the AWS backend.
+You can either use the `config.ini` file or you can use environment variables.
+
+> Refer to the [configuration options](../../../config/config.ini) available to the application
+> and backend.
+
+##### 3.3.1 Configure the FIG using the `config.ini` file
+
+> [!NOTE]
+> Instance existence confirmation can be disabled using the `confirm_instance` config.ini in
+> the `[aws]` section or by setting the `AWS_CONFIRM_INSTANCE` environment variable. This option is
+> available for scenarios where the account that is running the service application does not have
+> access to the AWS account where the instance with the detection resides.
+
+Create the `config.ini` file and set the following minimum values:
+
+```ini
+[main]
+backends = AWS
+
+[events]
+severity_threshold = 3
+
+[falcon]
+cloud_region = <Falcon Cloud Region>
+client_id = <Falcon Client ID>
+client_secret = <Falcon Client Secret>
+application_id = <EXAMPLE-SECHUB-APPID>
+
+[aws]
+region = <AWS Region>
+```
+
+##### 3.2.2 Configure the FIG using environment variables
+
+Alternatively, if you would like to use environment variables, set the following minimum environment variables:
+
+```bash
+export FIG_BACKENDS=AWS
+export EVENTS_SEVERITY_THRESHOLD=3
+export FALCON_CLOUD_REGION=<Falcon Cloud Region>
+export FALCON_CLIENT_ID=<Falcon Client ID>
+export FALCON_CLIENT_SECRET=<Falcon Client Secret>
+export FALCON_APPLICATION_ID=<EXAMPLE-SECHUB-APPID>
+export AWS_REGION=<AWS Region>
+```
+
+</details>
+
+<details><summary>Git Repository</summary>
 
 #### 3.1 Ensure the following packages are installed
 
@@ -98,7 +202,7 @@ sudo dnf install python3 python3-pip python3-devel git
 
 > Use the package manager for your distro to ensure these packages are installed.
 
-#### 3.1 Install the FIG
+#### 3.2 Install the FIG
 
 1. Clone the repository
 
@@ -118,7 +222,7 @@ sudo dnf install python3 python3-pip python3-devel git
     pip install -r requirements.txt
     ```
 
-#### 3.2 Configure the FIG
+#### 3.3 Configure the FIG
 
 There are two different ways that you can configure the FIG to use the AWS backend.
 You can either use the `config/config.ini` file or you can use environment variables.
@@ -126,7 +230,7 @@ You can either use the `config/config.ini` file or you can use environment varia
 > Refer to the [configuration options](../../../config/config.ini) available to the application
 > and backend.
 
-##### 3.2.1 Configure the FIG using the `config/config.ini` file
+##### 3.3.1 Configure the FIG using the `config/config.ini` file
 
 > [!NOTE]
 > Instance existence confirmation can be disabled using the `confirm_instance` config.ini in
@@ -153,7 +257,7 @@ You can either use the `config/config.ini` file or you can use environment varia
     region = <AWS Region>
     ```
 
-##### 3.2.2 Configure the FIG using environment variables
+##### 3.3.2 Configure the FIG using environment variables
 
 1. Set the following minimum environment variables:
 
@@ -167,27 +271,29 @@ You can either use the `config/config.ini` file or you can use environment varia
     export AWS_REGION=<AWS Region>
     ```
 
-#### 3.3 Run the FIG
+</details>
 
-1. Run the application
+### 4. Run the FIG
 
-    ```bash
-    python3 -m fig
-    ```
+Run the following to start the FIG:
 
-1. Verify output
+```bash
+python3 -m fig
+```
 
-    ```bash
-    2023-10-18 16:45:43 fig MainThread INFO     Starting Falcon Integration Gateway 3.2.1
-    2023-10-18 16:45:43 fig MainThread INFO     AWS Backend is enabled.
-    2023-10-18 16:45:43 fig MainThread INFO     Enabled backends will only process events with types: {'DetectionSummaryEvent'}
-    2023-10-18 16:45:44 fig cs_stream  INFO     Opening Streaming Connection
-    2023-10-18 16:45:44 fig cs_stream  INFO     Established Streaming Connection: 200 OK
-    ...
-    ...
-    ```
+Verify output
 
-### 4. Verify in Security Hub
+```bash
+2023-10-18 16:45:43 fig MainThread INFO     Starting Falcon Integration Gateway 3.2.1
+2023-10-18 16:45:43 fig MainThread INFO     AWS Backend is enabled.
+2023-10-18 16:45:43 fig MainThread INFO     Enabled backends will only process events with types: {'DetectionSummaryEvent'}
+2023-10-18 16:45:44 fig cs_stream  INFO     Opening Streaming Connection
+2023-10-18 16:45:44 fig cs_stream  INFO     Established Streaming Connection: 200 OK
+...
+...
+```
+
+### 5. Verify in Security Hub
 
 As events are processed by the FIG, they will be sent to Security Hub. You can verify this by following the steps below.
 
