@@ -159,8 +159,8 @@ class FigConfig(configparser.ConfigParser):
                 'Malformed configuration: expected events.detections_exclude_clouds to be subset of "{}" got "{}"'.format(
                     self.SENSOR_RECOGNIZED_CLOUDS, self.detections_exclude_clouds))
 
-        if int(self.get('events', 'severity_threshold')) not in range(0, 5):
-            raise Exception('Malformed configuration: expected events.severity_threshold to be in range 0-4')
+        if int(self.get('events', 'severity_threshold')) not in range(1, 6):
+            raise Exception('Malformed configuration: expected events.severity_threshold to be in range 1-5')
         if int(self.get('events', 'older_than_days_threshold')) not in range(0, 10000):
             raise Exception('Malformed configuration: expected events.older_than_days_threshold to be in range 0-10000')
 
