@@ -17,11 +17,39 @@ class Event(dict):
         return super().__eq__(self, other) and self.feed_id == other.feed_id
 
     def irrelevant(self):
-        decision = self.severity < int(config.get('events', 'severity_threshold')) \
-            or self.creation_time < self.cut_off_date()
-        if decision:
-            log.debug("A detection event has been skipped based on severity_threshold or cut_off_date settings")
-        return decision
+        severity = self.mapped_severity()
+        threshold = int(config.get('events', 'severity_threshold'))
+        cutoff = self.cut_off_date()
+
+        # Check severity threshold
+        if severity < threshold:
+            log.debug("Event skipped: severity %d below threshold %d (offset: %s)",
+                      severity, threshold, self.offset)
+            return True
+
+        # Check cut-off date
+        if self.creation_time < cutoff:
+            # Format datetime objects directly
+            event_date = self.creation_time.strftime('%Y-%m-%d %H:%M:%S')
+            cutoff_date = cutoff.strftime('%Y-%m-%d %H:%M:%S')
+
+            log.debug("Event skipped: creation time %s before cut-off date %s (offset: %s)",
+                      event_date, cutoff_date, self.offset)
+            return True
+
+        return False
+
+    def mapped_severity(self):
+        """Map CrowdStrike severity to internal 1-5 scale"""
+        severity_name = self['event'].get('SeverityName', 'Critical')
+        name_to_value = {
+            "Informational": 1,
+            "Low": 2,
+            "Medium": 3,
+            "High": 4,
+            "Critical": 5
+        }
+        return name_to_value.get(severity_name, 5)  # Default to 5 (highest) if unknown
 
     @property
     def event_type(self):
