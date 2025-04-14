@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import traceback
 import boto3
 from botocore.exceptions import ClientError
@@ -97,11 +98,18 @@ class Submitter():
             sh_payload = self.create_payload(det_region)
             response = self.send_to_securityhub(sh_payload, det_region)
             if not response:
-                log.info("Detection already submitted to Security Hub. Alert not processed.")
+                if log.level <= logging.DEBUG:
+                    log.debug("Detection already submitted to Security Hub. Alert not processed. Payload info: %s", sh_payload)
+                else:
+                    log.info("Detection already submitted to Security Hub. Alert not processed.")
             else:
                 if response["SuccessCount"] > 0:
-                    submit_msg = f"Detection submitted to Security Hub. (Request ID: {response['ResponseMetadata']['RequestId']})"
-                    log.info(submit_msg)
+                    if log.level <= logging.DEBUG:
+                        log.debug("Detection submitted to Security Hub. (Request ID: %s). Payload info: %s",
+                                  response['ResponseMetadata']['RequestId'], sh_payload)
+                    else:
+                        submit_msg = f"Detection submitted to Security Hub. (Request ID: {response['ResponseMetadata']['RequestId']})"
+                        log.info(submit_msg)
 
     def create_payload(self, instance_region):
         region = self.region
