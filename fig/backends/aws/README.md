@@ -4,6 +4,9 @@ Integration with AWS Security Hub.
 
 Single Falcon Integration Gateway can be used to send reports from all AWS regions to single AWS Security Hub region.
 
+> [!NOTE]
+> Currently, this backend only supports sending detection events that originate from AWS to Security Hub.
+
 ### Example Configuration file
 
 [config/config.ini](https://github.com/CrowdStrike/falcon-integration-gateway/blob/main/config/config.ini)  configures Falcon Integration Gateway. Below is a minimal configuration example for AWS:
