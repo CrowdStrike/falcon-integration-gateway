@@ -34,6 +34,9 @@ graph LR
     D[EC2 Instances] -->|Metadata| B
 ```
 
+> [!NOTE]
+> Currently, this backend only supports sending detection events that originate from AWS to Security Hub.
+
 ## Deployment Steps
 
 ### 1. Create an Instance Profile
