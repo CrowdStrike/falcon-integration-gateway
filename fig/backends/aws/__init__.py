@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 import traceback
 import boto3
@@ -147,8 +147,8 @@ class Submitter():
             "AwsAccountId": account_id,
             "SourceUrl": self.event.falcon_link,
             "GeneratorId": "Falcon Host",
-            "CreatedAt": datetime.utcfromtimestamp(float(self.event.event_create_time) / 1000.).isoformat() + 'Z',
-            "UpdatedAt": ((datetime.utcfromtimestamp(datetime.timestamp(datetime.now()))).isoformat() + 'Z'),
+            "CreatedAt": datetime.fromtimestamp(float(self.event.event_create_time) / 1000., tz=timezone.utc).isoformat().replace('+00:00', 'Z'),
+            "UpdatedAt": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
             "RecordState": "ACTIVE",
             "Severity": {"Label": severity_label, "Original": severity_original},
             "ProductFields": self.build_product_fields(),
@@ -207,7 +207,6 @@ class Submitter():
         Returns:
             dict: ProductFields dictionary with crowdstrike/crowdstrike-falcon/ prefixed keys
         """
-        log.debug("Starting ProductFields generation")
 
         # Initialize ProductFields with core information
         product_fields = {
@@ -218,7 +217,6 @@ class Submitter():
         # Get event data safely
         try:
             event_data = self.event.original_event.get('event', {})
-            log.debug("Retrieved event data: %s keys found", len(event_data) if event_data else 0)
         except (AttributeError, TypeError) as e:
             log.warning("Failed to get event data: %s", str(e))
             return product_fields
@@ -244,9 +242,6 @@ class Submitter():
             if field_name in event_data:
                 try:
                     value = str(event_data[field_name])
-                    # Truncate if too long to stay within AWS limits
-                    # if len(value) > 1024:
-                    #     value = value[:1021] + "..."
                     product_fields[f"crowdstrike/crowdstrike-falcon/{field_name}"] = value
                 except Exception as e:
                     log.warning("Error processing field %s: %s", field_name, str(e))
@@ -265,8 +260,6 @@ class Submitter():
                                 if key in entry:
                                     try:
                                         value = str(entry[key])
-                                        # if len(value) > 1024:
-                                        #     value = value[:1021] + "..."
                                         product_fields[f"{entry_prefix}/{key}"] = value
                                     except Exception as e:
                                         log.warning("Error processing MITRE field %s: %s", key, str(e))
