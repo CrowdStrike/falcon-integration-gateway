@@ -172,14 +172,27 @@ class Submitter():
             aws_id = f"| AWS Account for alerting instance: {self.event.cloud_provider_account_id}"
         payload["Description"] = f"{self.event.detect_description} {aws_id}"
 
-        # TTPs
+        # TTPs with simple fallback to MitreAttack
         try:
-            payload["Types"] = ["Namespace: TTPs",
-                                "Category: %s" % self.event.original_event["event"]["Tactic"],
-                                "Classifier: %s" % self.event.original_event["event"]["Technique"]
-                                ]
+            tactic = self.event.original_event["event"]["Tactic"]
+            technique = self.event.original_event["event"]["Technique"]
         except KeyError:
-            payload.pop("Types", None)
+            # Fallback to first MitreAttack entry
+            try:
+                mitre_data = self.event.original_event["event"]["MitreAttack"]
+                if mitre_data and len(mitre_data) > 0:
+                    tactic = mitre_data[0].get("Tactic")
+                    technique = mitre_data[0].get("Technique")
+                else:
+                    tactic = technique = None
+            except (KeyError, IndexError, TypeError):
+                tactic = technique = None
+
+        if tactic and technique:
+            payload["Types"] = ["Namespace: TTPs",
+                                "Category: %s" % tactic,
+                                "Classifier: %s" % technique
+                                ]
 
         # Running process detail
         try:
