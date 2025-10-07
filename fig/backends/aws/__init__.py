@@ -5,6 +5,7 @@ import boto3
 from botocore.exceptions import ClientError
 from ...config import config
 from ...log import log
+from ... import __version__
 
 
 class Submitter():
@@ -103,13 +104,29 @@ class Submitter():
                 else:
                     log.info("Detection already submitted to Security Hub. Alert not processed.")
             else:
-                if response["SuccessCount"] > 0:
-                    if log.level <= logging.DEBUG:
-                        log.debug("Detection submitted to Security Hub. (Request ID: %s). Payload info: %s",
-                                  response['ResponseMetadata']['RequestId'], sh_payload)
+                try:
+                    success_count = response.get("SuccessCount", 0)
+                    log.debug("SuccessCount: %d", success_count)
+
+                    if success_count > 0:
+                        try:
+                            request_id = response.get('ResponseMetadata', {}).get('RequestId', 'UNKNOWN')
+                            if log.level <= logging.DEBUG:
+                                log.debug("Detection submitted to Security Hub. (Request ID: %s). Payload info: %s",
+                                          request_id, sh_payload)
+                            else:
+                                submit_msg = f"Detection submitted to Security Hub. (Request ID: {request_id})"
+                                log.info(submit_msg)
+                        except Exception as e:
+                            log.error("Error accessing response metadata: %s", str(e))
+                            log.info("Detection submitted to Security Hub (Request ID unavailable due to error)")
                     else:
-                        submit_msg = f"Detection submitted to Security Hub. (Request ID: {response['ResponseMetadata']['RequestId']})"
-                        log.info(submit_msg)
+                        log.warning("SuccessCount is 0 or missing - submission may have failed")
+                        log.debug("Full response for debugging: %s", response)
+                except Exception as e:
+                    log.error("Error processing Security Hub response: %s", str(e))
+                    log.exception("Response processing exception details:")
+                    log.debug("Raw response that caused error: %s", response)
 
     def create_payload(self, instance_region):
         region = self.region
@@ -134,7 +151,7 @@ class Submitter():
             "UpdatedAt": ((datetime.utcfromtimestamp(datetime.timestamp(datetime.now()))).isoformat() + 'Z'),
             "RecordState": "ACTIVE",
             "Severity": {"Label": severity_label, "Original": severity_original},
-            "ProductFields": {"crowdstrike/crowdstrike-falcon/cid": self.event.cid},
+            "ProductFields": self.build_product_fields(),
         }
 
         # Instance ID based detail
@@ -179,6 +196,84 @@ class Submitter():
             pass
 
         return payload
+
+    def build_product_fields(self):
+        """
+        Build ProductFields with core fields for AWS Security Hub.
+
+        Extracts important fields to add context to the detection. Please NOTE that there
+        is a max limit of 50 properties per the ProductFields object.
+
+        Returns:
+            dict: ProductFields dictionary with crowdstrike/crowdstrike-falcon/ prefixed keys
+        """
+        log.debug("Starting ProductFields generation")
+
+        # Initialize ProductFields with core information
+        product_fields = {
+            "crowdstrike/crowdstrike-falcon/cid": self.event.cid,
+            "crowdstrike/crowdstrike-falcon/FigVersion": __version__
+        }
+
+        # Get event data safely
+        try:
+            event_data = self.event.original_event.get('event', {})
+            log.debug("Retrieved event data: %s keys found", len(event_data) if event_data else 0)
+        except (AttributeError, TypeError) as e:
+            log.warning("Failed to get event data: %s", str(e))
+            return product_fields
+
+        if not event_data:
+            log.debug("No event data found, returning core ProductFields")
+            return product_fields
+
+        # Core fields for analysis.
+        target_fields = [
+            # File and Hash Information
+            'FileName', 'FilePath', 'SHA256String', 'SHA1String', 'MD5String',
+            # Process Context
+            'CommandLine', 'ParentImageFileName', 'ParentCommandLine', 'GrandParentImageFileName', 'GrandParentCommandLine',
+            # Indicator Context
+            'IOCType', 'IOCValue', 'AssociatedFile', 'PatternDispositionDescription',
+            # Behavioral Classification
+            'Tactic', 'Technique', 'Objective'
+        ]
+
+        # Extract fields
+        for field_name in target_fields:
+            if field_name in event_data:
+                try:
+                    value = str(event_data[field_name])
+                    # Truncate if too long to stay within AWS limits
+                    # if len(value) > 1024:
+                    #     value = value[:1021] + "..."
+                    product_fields[f"crowdstrike/crowdstrike-falcon/{field_name}"] = value
+                except Exception as e:
+                    log.warning("Error processing field %s: %s", field_name, str(e))
+
+        # Handle MitreAttack array separately due to nested structure
+        try:
+            if 'MitreAttack' in event_data:
+                mitre_data = event_data['MitreAttack']
+                if isinstance(mitre_data, list) and mitre_data:
+                    # Process up to 5 MITRE entries to stay within limits
+                    for i, entry in enumerate(mitre_data[:5]):
+                        if isinstance(entry, dict):
+                            entry_prefix = f"crowdstrike/crowdstrike-falcon/MitreAttack/{i}"
+                            # Add key MITRE fields
+                            for key in ['Tactic', 'TacticID', 'Technique', 'TechniqueID', 'PatternID']:
+                                if key in entry:
+                                    try:
+                                        value = str(entry[key])
+                                        # if len(value) > 1024:
+                                        #     value = value[:1021] + "..."
+                                        product_fields[f"{entry_prefix}/{key}"] = value
+                                    except Exception as e:
+                                        log.warning("Error processing MITRE field %s: %s", key, str(e))
+        except Exception as e:
+            log.warning("Error adding MitreAttack fields: %s", str(e))
+
+        return product_fields
 
     def network_payload(self):
         net = {}
