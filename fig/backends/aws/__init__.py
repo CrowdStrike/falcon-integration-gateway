@@ -1,3 +1,4 @@
+# pylint: disable=broad-except
 from datetime import datetime, timezone
 import logging
 import traceback
