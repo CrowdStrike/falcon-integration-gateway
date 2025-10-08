@@ -107,7 +107,6 @@ class Submitter():
             else:
                 try:
                     success_count = response.get("SuccessCount", 0)
-                    log.debug("SuccessCount: %d", success_count)
 
                     if success_count > 0:
                         try:
