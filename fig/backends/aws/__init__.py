@@ -81,9 +81,9 @@ class Submitter():
             title_suffix = f"Instance: {resource_id}"
             resource_details = None  # AWS events use existing logic
         else:
-            # Non-AWS events use Other type with event_id as resource_id
+            # Non-AWS events use Other type with sensor_id as resource_id
             resource_type = "Other"
-            resource_id = self.event.event_id
+            resource_id = self.event.original_event.sensor_id
             title_suffix = self._build_title_suffix(resource_id)
             resource_details = self._build_enhanced_resource_details()
 
@@ -148,7 +148,7 @@ class Submitter():
         return import_response
 
     def submit(self):
-        log.info("Processing detection: %s", self.event.detect_description)
+        log.info("Processing detection: %s (Offset: %s)", self.event.detect_description, self.event.original_event.offset)
         det_region = self.region
         send = False
 
@@ -187,9 +187,9 @@ class Submitter():
             response = self.send_to_securityhub(sh_payload, det_region)
             if not response:
                 if log.level <= logging.DEBUG:
-                    log.debug("Detection already submitted to Security Hub. Alert not processed. Payload info: %s", sh_payload)
+                    log.debug("Detection already submitted to Security Hub. Alert not processed. (Offset: %s). Payload info: %s", self.event.original_event.offset, sh_payload)
                 else:
-                    log.info("Detection already submitted to Security Hub. Alert not processed.")
+                    log.info("Detection already submitted to Security Hub. Alert not processed. (Offset: %s)", self.event.original_event.offset)
             else:
                 try:
                     success_count = response.get("SuccessCount", 0)
@@ -198,21 +198,20 @@ class Submitter():
                         try:
                             request_id = response.get('ResponseMetadata', {}).get('RequestId', 'UNKNOWN')
                             if log.level <= logging.DEBUG:
-                                log.debug("Detection submitted to Security Hub. (Request ID: %s). Payload info: %s",
-                                          request_id, sh_payload)
+                                log.debug("Detection submitted to Security Hub. (Request ID: %s, Offset: %s). Payload info: %s",
+                                          request_id, self.event.original_event.offset, sh_payload)
                             else:
-                                submit_msg = f"Detection submitted to Security Hub. (Request ID: {request_id})"
-                                log.info(submit_msg)
+                                log.info("Detection submitted to Security Hub. (Request ID: %s, Offset: %s)", request_id, self.event.original_event.offset)
                         except Exception as e:
                             log.error("Error accessing response metadata: %s", str(e))
-                            log.info("Detection submitted to Security Hub (Request ID unavailable due to error)")
+                            log.info("Detection submitted to Security Hub (Request ID unavailable due to error, Offset: %s)", self.event.original_event.offset)
                     else:
-                        log.warning("SuccessCount is 0 or missing - submission may have failed")
-                        log.debug("Full response for debugging: %s", response)
+                        log.warning("SuccessCount is 0 or missing - submission may have failed (Offset: %s)", self.event.original_event.offset)
+                        log.debug("Full response for debugging (Offset: %s): %s", self.event.original_event.offset, response)
                 except Exception as e:
-                    log.error("Error processing Security Hub response: %s", str(e))
+                    log.error("Error processing Security Hub response: %s (Offset: %s)", str(e), self.event.original_event.offset)
                     log.exception("Response processing exception details:")
-                    log.debug("Raw response that caused error: %s", response)
+                    log.debug("Raw response that caused error (Offset: %s): %s", self.event.original_event.offset, response)
 
     def create_payload(self, instance_region):
         region = self.region
