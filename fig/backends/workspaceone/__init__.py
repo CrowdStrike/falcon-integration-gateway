@@ -15,7 +15,7 @@ class Submitter():
     def log(self):
         event = self.event.original_event['event']
         meta = self.event.original_event['metadata']
-        msg = 'CEF:0|CrowdStrike|FalconHost|1.0|DetectionSummaryEvent|Detection Summary Event|2|'
+        msg = 'CEF:0|CrowdStrike|FalconHost|1.0|EppDetectionSummaryEvent|EPP Detection Summary Event|2|'
         msg += 'Token=' + self.workspaceone_token
         msg += ' UDID=' + self.event.mdm_identifier
         if 'SensorId' in event:
@@ -67,7 +67,7 @@ class Submitter():
 
 
 class Runtime():
-    RELEVANT_EVENT_TYPES = ['DetectionSummaryEvent']
+    RELEVANT_EVENT_TYPES = ['EppDetectionSummaryEvent']
 
     def __init__(self):
         log.info("Workspace One backend is enabled.")
