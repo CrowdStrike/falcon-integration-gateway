@@ -15,10 +15,14 @@ class FalconAPI():
     }
 
     def __init__(self):
+        backends = config.get('main', 'backends')
+        # Convert comma-separated backends to space-separated products (RFC 7231 compliant)
+        backend_products = ' '.join(f"{backend.strip()}-Backend" for backend in backends.split(',') if backend.strip())
+
         self.client = FalconSDK.APIHarness(creds={
             'client_id': config.get('falcon', 'client_id'),
             'client_secret': config.get('falcon', 'client_secret')},
-            user_agent=f"falcon-integration-gateway/{__version__}",
+            user_agent=f"falcon-integration-gateway/{__version__} {backend_products}".strip(),
             base_url=self.__class__.base_url())
 
     @classmethod
