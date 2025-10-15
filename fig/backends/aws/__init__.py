@@ -213,7 +213,7 @@ class Submitter():
                     log.exception("Response processing exception details:")
                     log.debug("Raw response that caused error (Offset: %s): %s", self.event.original_event.offset, response)
 
-    def create_payload(self, instance_region):
+    def create_payload(self, instance_region):  # pylint: disable=too-many-locals
         region = self.region
         try:
             account_id = boto3.client("sts", region_name=region).get_caller_identity().get('Account')
