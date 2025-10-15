@@ -14,6 +14,87 @@ class Submitter():
         self.event = event
         self.region = config.get('aws', 'region')
         self.confirm_instance = config.getboolean('aws', 'confirm_instance')
+        self.accept_all_events = config.getboolean('aws', 'accept_all_events')
+
+    def _is_aws_event(self):
+        """Check if the event originates from AWS cloud provider."""
+        return (self.event.cloud_provider is not None and
+                self.event.cloud_provider[:3].upper() == 'AWS')
+
+    def _should_skip_instance_confirmation(self):
+        """Determine if AWS instance confirmation should be bypassed for non-AWS events."""
+        return self.accept_all_events and not self._is_aws_event()
+
+    def _build_enhanced_resource_details(self):
+        """Build enhanced resource details using CrowdStrike device data."""
+        details = {}
+
+        # Device details field mapping
+        device_field_mapping = {
+            'hostname': 'Hostname',
+            'device_id': 'AID',
+            'platform_name': 'Platform',
+            'external_ip': 'ExternalIP',
+            'local_ip': 'LocalIP',
+            'mac_address': 'MACAddress',
+            'domain': 'Domain',
+            'agent_version': 'AgentVersion',
+            'last_seen_timestamp': 'LastSeenTimestamp',
+            'os_version': 'OSVersion',
+            'device_tags': 'DeviceTags',
+            'site_name': 'SiteName',
+            'organizational_unit': 'OrganizationalUnit'
+        }
+
+        # Extract device details using comprehension
+        device_details = getattr(self.event, 'device_details', {}) or {}
+        details.update({
+            output_key: device_details[input_key]
+            for input_key, output_key in device_field_mapping.items()
+            if device_details.get(input_key)
+        })
+
+        # Cloud context field mapping
+        cloud_field_mapping = {
+            'cloud_provider': 'CloudProvider',
+            'cloud_provider_account_id': 'CloudAccountId',
+            'instance_id': 'InstanceId'
+        }
+
+        # Extract cloud context using comprehension
+        details.update({
+            output_key: getattr(self.event, input_key)
+            for input_key, output_key in cloud_field_mapping.items()
+            if getattr(self.event, input_key, None)
+        })
+
+        return details
+
+    def _determine_resource_info(self):
+        """Determine appropriate resource type and ID."""
+        is_aws = self._is_aws_event()
+
+        if is_aws:
+            # AWS events use existing AwsEc2Instance type
+            resource_type = "AwsEc2Instance"
+            resource_id = self.event.instance_id or f"UnknownInstanceId:{self.event.event_id}"
+            title_suffix = f"Instance: {resource_id}"
+            resource_details = None  # AWS events use existing logic
+        else:
+            # Non-AWS events use Other type with sensor_id as resource_id
+            resource_type = "Other"
+            resource_id = self.event.original_event.sensor_id
+            title_suffix = self._build_title_suffix(resource_id)
+            resource_details = self._build_enhanced_resource_details()
+
+        return resource_type, resource_id, title_suffix, resource_details
+
+    def _build_title_suffix(self, resource_id):
+        """Build descriptive title suffix for non-AWS events."""
+        cloud_provider = getattr(self.event, 'cloud_provider', None)
+        if cloud_provider:
+            return f"{cloud_provider} Host: {resource_id}"
+        return f"Host: {resource_id}"
 
     def find_instance(self, instance_id, mac_address):
         # Instance IDs are unique to the region, not the account, so we have to check them all
@@ -67,10 +148,15 @@ class Submitter():
         return import_response
 
     def submit(self):
-        log.info("Processing detection: %s", self.event.detect_description)
+        log.info("Processing detection: %s (Offset: %s)", self.event.detect_description, self.event.original_event.offset)
         det_region = self.region
         send = False
-        if self.confirm_instance:
+
+        if self._should_skip_instance_confirmation():
+            # For non-AWS events when accept_all_events is True, skip AWS instance confirmation
+            send = True
+            log.debug("Skipping AWS instance confirmation for non-AWS event (accept_all_events=True)")
+        elif self.confirm_instance:
             try:
                 if self.event.instance_id:
                     det_region, instance = self.find_instance(self.event.instance_id, self.event.device_details["mac_address"])
@@ -101,9 +187,9 @@ class Submitter():
             response = self.send_to_securityhub(sh_payload, det_region)
             if not response:
                 if log.level <= logging.DEBUG:
-                    log.debug("Detection already submitted to Security Hub. Alert not processed. Payload info: %s", sh_payload)
+                    log.debug("Detection already submitted to Security Hub. Alert not processed. (Offset: %s). Payload info: %s", self.event.original_event.offset, sh_payload)
                 else:
-                    log.info("Detection already submitted to Security Hub. Alert not processed.")
+                    log.info("Detection already submitted to Security Hub. Alert not processed. (Offset: %s)", self.event.original_event.offset)
             else:
                 try:
                     success_count = response.get("SuccessCount", 0)
@@ -112,21 +198,20 @@ class Submitter():
                         try:
                             request_id = response.get('ResponseMetadata', {}).get('RequestId', 'UNKNOWN')
                             if log.level <= logging.DEBUG:
-                                log.debug("Detection submitted to Security Hub. (Request ID: %s). Payload info: %s",
-                                          request_id, sh_payload)
+                                log.debug("Detection submitted to Security Hub. (Request ID: %s, Offset: %s). Payload info: %s",
+                                          request_id, self.event.original_event.offset, sh_payload)
                             else:
-                                submit_msg = f"Detection submitted to Security Hub. (Request ID: {request_id})"
-                                log.info(submit_msg)
+                                log.info("Detection submitted to Security Hub. (Request ID: %s, Offset: %s)", request_id, self.event.original_event.offset)
                         except Exception as e:
                             log.error("Error accessing response metadata: %s", str(e))
-                            log.info("Detection submitted to Security Hub (Request ID unavailable due to error)")
+                            log.info("Detection submitted to Security Hub (Request ID unavailable due to error, Offset: %s)", self.event.original_event.offset)
                     else:
-                        log.warning("SuccessCount is 0 or missing - submission may have failed")
-                        log.debug("Full response for debugging: %s", response)
+                        log.warning("SuccessCount is 0 or missing - submission may have failed (Offset: %s)", self.event.original_event.offset)
+                        log.debug("Full response for debugging (Offset: %s): %s", self.event.original_event.offset, response)
                 except Exception as e:
-                    log.error("Error processing Security Hub response: %s", str(e))
+                    log.error("Error processing Security Hub response: %s (Offset: %s)", str(e), self.event.original_event.offset)
                     log.exception("Response processing exception details:")
-                    log.debug("Raw response that caused error: %s", response)
+                    log.debug("Raw response that caused error (Offset: %s): %s", self.event.original_event.offset, response)
 
     def create_payload(self, instance_region):
         region = self.region
@@ -154,23 +239,24 @@ class Submitter():
             "ProductFields": self.build_product_fields(),
         }
 
-        # Instance ID based detail
-        try:
-            payload["Id"] = f"{self.event.instance_id}{self.event.event_id}"
-            payload["Title"] = "Falcon Alert. Instance: %s" % self.event.instance_id
-            payload["Resources"] = [{"Type": "AwsEc2Instance", "Id": self.event.instance_id, "Region": instance_region}]
-        except AttributeError:
-            payload["Id"] = f"UnknownInstanceID:{self.event.event_id}"
-            payload["Title"] = "Falcon Alert"
-            payload["Resources"] = [{"Type": "Other",
-                                     "Id": f"UnknownInstanceId:{self.event.event_id}",
-                                     "Region": region
-                                     }]
+        # Instance ID based detail - use helper method for proper resource classification
+        resource_type, resource_id, title_suffix, resource_details = self._determine_resource_info()
+        payload["Id"] = f"crowdstrike:crowdstrike-falcon:{self.event.event_id}"
+        payload["Title"] = f"Falcon Alert. {title_suffix}"
+
+        # Build Resources section with enhanced details for non-AWS events
+        resource_entry = {"Type": resource_type, "Id": resource_id, "Region": instance_region}
+        if resource_details:
+            # Add ResourceDetails using ASFF "Other" object for enhanced context
+            resource_entry["Details"] = {"Other": resource_details}
+
+        payload["Resources"] = [resource_entry]
         # Description
-        aws_id = ""
+        cloud_account_info = ""
         if self.event.cloud_provider_account_id:
-            aws_id = f"| AWS Account for alerting instance: {self.event.cloud_provider_account_id}"
-        payload["Description"] = f"{self.event.detect_description} {aws_id}"
+            cloud_provider = getattr(self.event, 'cloud_provider', 'Cloud')
+            cloud_account_info = f"| {cloud_provider} Account: {self.event.cloud_provider_account_id}"
+        payload["Description"] = f"{self.event.detect_description} {cloud_account_info}"
 
         # TTPs with simple fallback to MitreAttack
         try:
@@ -190,8 +276,8 @@ class Submitter():
 
         if tactic and technique:
             payload["Types"] = ["Namespace: TTPs",
-                                "Category: %s" % tactic,
-                                "Classifier: %s" % technique
+                                f"Category: {tactic}",
+                                f"Classifier: {technique}"
                                 ]
 
         # Running process detail
@@ -298,11 +384,10 @@ class Runtime():
 
     def __init__(self):
         log.info("AWS Backend is enabled.")
+        self.accept_all_events = config.getboolean('aws', 'accept_all_events')
 
     def is_relevant(self, falcon_event):
-        if falcon_event.cloud_provider is not None:
-            return falcon_event.cloud_provider[:3].upper() == 'AWS'
-        return False
+        return self.accept_all_events or (falcon_event.cloud_provider is not None and falcon_event.cloud_provider[:3].upper() == 'AWS')
 
     def process(self, falcon_event):
         Submitter(falcon_event).submit()

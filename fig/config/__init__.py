@@ -34,6 +34,7 @@ class FigConfig(configparser.ConfigParser):
         ['azure', 'arc_autodiscovery', 'ARC_AUTODISCOVERY'],
         ['aws', 'region', 'AWS_REGION'],
         ['aws', 'confirm_instance', 'AWS_CONFIRM_INSTANCE'],
+        ['aws', 'accept_all_events', 'AWS_ACCEPT_ALL_EVENTS'],
         ['aws_sqs', 'region', 'AWS_REGION'],
         ['aws_sqs', 'sqs_queue_name', 'AWS_SQS'],
         ['workspaceone', 'token', 'WORKSPACEONE_TOKEN'],
@@ -174,6 +175,8 @@ class FigConfig(configparser.ConfigParser):
                 raise Exception('Malformed Configuration: expected aws.region to be non-empty')
             if self.get('aws', 'confirm_instance') not in ['false', 'true']:
                 raise Exception('Malformed Configuration: expected aws.confirm_instance must be either true or false')
+            if self.get('aws', 'accept_all_events') not in ['false', 'true']:
+                raise Exception('Malformed Configuration: expected aws.accept_all_events must be either true or false')
         if 'AWS_SQS' in self.backends:
             if len(self.get('aws_sqs', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected aws_sqs.region to be non-empty')
