@@ -40,7 +40,7 @@ class Backends():
                 runtime.process(falcon_event)
 
     def cloud_detection_is_relevant(self, falcon_event):
-        if falcon_event.original_event.event_type == 'DetectionSummaryEvent':
+        if falcon_event.original_event.event_type == 'EppDetectionSummaryEvent':
             if falcon_event.cloud_provider in config.detections_exclude_clouds or falcon_event.cloud_provider is None and 'unrecognized' in config.detections_exclude_clouds:
                 log.debug('A detection event is skipped based on cloud based exclusion')
                 return False
