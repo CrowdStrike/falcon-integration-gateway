@@ -16,6 +16,7 @@ class FigConfig(configparser.ConfigParser):
         ['events', 'severity_threshold', 'EVENTS_SEVERITY_THRESHOLD'],
         ['events', 'older_than_days_threshold', 'EVENTS_OLDER_THAN_DAYS_THRESHOLD'],
         ['events', 'offset', 'EVENTS_OFFSET'],
+        ['events', 'start_from_newest', 'EVENTS_START_FROM_NEWEST'],
         ['falcon', 'cloud_region', 'FALCON_CLOUD_REGION'],
         ['falcon', 'client_id', 'FALCON_CLIENT_ID'],
         ['falcon', 'client_secret', 'FALCON_CLIENT_SECRET'],
@@ -164,6 +165,15 @@ class FigConfig(configparser.ConfigParser):
             raise Exception('Malformed configuration: expected events.severity_threshold to be in range 1-5')
         if int(self.get('events', 'older_than_days_threshold')) not in range(0, 10000):
             raise Exception('Malformed configuration: expected events.older_than_days_threshold to be in range 0-10000')
+
+        # Validate start_from_newest configuration
+        if self.get('events', 'start_from_newest') not in ['false', 'true']:
+            raise Exception('Malformed Configuration: expected events.start_from_newest must be either true or false')
+
+        # Validate mutual exclusivity between start_from_newest and offset
+        if self.getboolean('events', 'start_from_newest') and int(self.get('events', 'offset')) != 0:
+            raise Exception('Malformed Configuration: events.start_from_newest and events.offset are mutually exclusive. '
+                            'When start_from_newest is true, offset must be 0 (default).')
 
     def validate_backends(self):
         if not self.backends.issubset(self.ALL_BACKENDS) or len(self.backends) < 1:
