@@ -88,15 +88,28 @@ class StreamingThread(StoppableThread):
         # Obtain offset values from config and queue
         config_offset = int(config.get('events', 'offset'))
         queue_offset = queue.last_offset(stream.feed_id)
+        start_from_newest = config.getboolean('events', 'start_from_newest')
 
-        # Logic to determine what value to use for self.offset
-        if config_offset == 0 and queue_offset == 0:
+        # Logic to determine what value to use for self.offset and self.use_whence
+        if start_from_newest:
+            # When start_from_newest is enabled, ignore offsets on initial connection
+            # but respect queue offset on reconnections
+            if queue_offset == 0:
+                self.offset = None  # Signal to use whence=2
+                self.use_whence = True
+            else:
+                # Reconnection: use the queue offset from previous session
+                self.offset = queue_offset
+                self.use_whence = False
+        elif config_offset == 0 and queue_offset == 0:
             self.offset = 0
+            self.use_whence = False
         else:
             self.offset = max(config_offset, queue_offset)
+            self.use_whence = False
 
         self.stream = stream
-        self.conn = StreamingConnection(self.stream, self.offset, relevant_event_types)
+        self.conn = StreamingConnection(self.stream, self.offset, relevant_event_types, self.use_whence)
         self.queue = queue
         self.relevant_event_types = relevant_event_types
         self.event_count = 0
@@ -135,11 +148,12 @@ class StreamingThread(StoppableThread):
 
 
 class StreamingConnection():
-    def __init__(self, stream: Stream, last_seen_offset, relevant_event_types=None):
+    def __init__(self, stream: Stream, last_seen_offset, relevant_event_types=None, use_whence=False):
         self.stream = stream
         self.connection = None
         self.last_seen_offset = last_seen_offset
         self.relevant_event_types = relevant_event_types
+        self.use_whence = use_whence
 
     def open(self):
         headers = {
@@ -149,7 +163,17 @@ class StreamingConnection():
         }
         log.info("Opening Streaming Connection")
         eventTypeFilter = '' if self.relevant_event_types is None else '&eventType=' + ','.join(self.relevant_event_types)
-        url = self.stream.url + '&offset={}'.format(self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0) + eventTypeFilter
+
+        # Construct URL based on whence or offset
+        if self.use_whence:
+            # Use whence=2 to start from newest event
+            url = self.stream.url + '&whence=2' + eventTypeFilter
+            log.info("Starting stream from newest event (whence=2)")
+        else:
+            # Use offset-based approach (existing behavior)
+            offset_value = self.last_seen_offset + 1 if self.last_seen_offset != 0 else 0
+            url = self.stream.url + '&offset={}'.format(offset_value) + eventTypeFilter
+
         log.debug("Streaming URL: %s", url)
         self.connection = requests.get(url, headers=headers, stream=True, timeout=60)
         log.info("Established Streaming Connection: %d %s", self.connection.status_code, self.connection.reason)
