@@ -43,6 +43,7 @@ class FigConfig(configparser.ConfigParser):
         ['workspaceone', 'syslog_port', 'SYSLOG_PORT'],
         ['cloudtrail_lake', 'channel_arn', 'CLOUDTRAIL_LAKE_CHANNEL_ARN'],
         ['cloudtrail_lake', 'region', 'CLOUDTRAIL_LAKE_REGION'],
+        ['generic', 'event_types', 'GENERIC_EVENT_TYPES'],
     ]
 
     def __init__(self):
