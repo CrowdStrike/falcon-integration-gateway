@@ -126,7 +126,7 @@ Please refer to the [config.ini](./config/config.ini) file for more details on t
 | CloudTrail Lake | Pushes events to AWS CloudTrail Lake | <ul><li>[Deployment to EKS](docs/cloudtrail-lake/eks)</li><li>[Manual Deployment](docs/cloudtrail-lake/manual)</li></ul> | [CloudTrail Lake backend](fig/backends/cloudtrail_lake) |
 | GCP | Pushes events to GCP Security Command Center | <ul><li>[Deployment to GKE](docs/listings/gke/UserGuide.md) (using [marketplace](https://console.cloud.google.com/marketplace/product/crowdstrike-saas/falcon-integration-gateway-scc))</li><li>[Deployment to GKE](docs/gke) (manual)</li></ul> | [GCP backend](fig/backends/gcp) |
 | Workspace ONE | Pushes events to VMware Workspace ONE Intelligence | *Coming Soon* | [Workspace ONE backend](fig/backends/workspaceone) |
-| Generic | Displays events to STDOUT (useful for dev/debugging) | N/A | [Generic Backend](fig/backends/generic) |
+| Generic | Displays events to STDOUT (ideal for testing, debugging, and development) | N/A | [Generic Backend](fig/backends/generic) |
 
 ### Alternative Deployment Options
 
