@@ -121,6 +121,7 @@ Please refer to the [config.ini](./config/config.ini) file for more details on t
 | Backend | Description | Deployment Guide(s) | General Guide(s) |
 |:--------|:------------|:--------------------|:-------------------|
 | AWS | Pushes events to AWS Security Hub.</br>_*Currently, this backend only supports sending detection events that originate from AWS to Security Hub_ | <ul><li>[Manual Deployment](docs/aws/manual/README.md)</li></ul> | [AWS backend](fig/backends/aws) |
+| AWS_SECURITY_HUB | Pushes events to AWS Security Hub+ using OCSF 1.6 schema | *Coming Soon* | [AWS Security Hub+ backend](fig/backends/aws_security_hub) |
 | AWS_SQS | Pushes events to AWS SQS | *Coming Soon* | [AWS SQS backend](fig/backends/aws_sqs) |
 | Azure | Pushes events to Azure Log Analytics | <ul><li>[Deployment to AKS](docs/aks)</li></ul> | [Azure backend](fig/backends/azure) |
 | CloudTrail Lake | Pushes events to AWS CloudTrail Lake | <ul><li>[Deployment to EKS](docs/cloudtrail-lake/eks)</li><li>[Manual Deployment](docs/cloudtrail-lake/manual)</li></ul> | [CloudTrail Lake backend](fig/backends/cloudtrail_lake) |

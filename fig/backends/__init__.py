@@ -5,6 +5,7 @@ from . import gcp
 from . import workspaceone
 from . import cloudtrail_lake
 from . import generic
+from . import aws_security_hub
 from ..config import config
 from ..log import log
 
@@ -16,7 +17,8 @@ ALL_BACKENDS = {
     'GCP': gcp,
     'WORKSPACEONE': workspaceone,
     'CLOUDTRAIL_LAKE': cloudtrail_lake,
-    'GENERIC': generic
+    'GENERIC': generic,
+    'AWS_SECURITY_HUB': aws_security_hub,
 }
 
 
