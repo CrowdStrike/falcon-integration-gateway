@@ -6,7 +6,7 @@ from .credstore import CredStore
 
 
 class FigConfig(configparser.ConfigParser):
-    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CLOUDTRAIL_LAKE', 'GENERIC'}
+    ALL_BACKENDS = {'AWS', 'AWS_SQS', 'AZURE', 'GCP', 'WORKSPACEONE', 'CLOUDTRAIL_LAKE', 'GENERIC', 'AWS_SECURITY_HUB'}
     FALCON_CLOUD_REGIONS = {'us-1', 'us-2', 'eu-1', 'us-gov-1'}
     SENSOR_RECOGNIZED_CLOUDS = {'AWS', 'Azure', 'GCP', 'unrecognized'}
     ENV_DEFAULTS = [
@@ -44,6 +44,9 @@ class FigConfig(configparser.ConfigParser):
         ['cloudtrail_lake', 'channel_arn', 'CLOUDTRAIL_LAKE_CHANNEL_ARN'],
         ['cloudtrail_lake', 'region', 'CLOUDTRAIL_LAKE_REGION'],
         ['generic', 'event_types', 'GENERIC_EVENT_TYPES'],
+        ['aws_security_hub', 'region', 'AWS_SECURITY_HUB_REGION'],
+        ['aws_security_hub', 'endpoint_url', 'AWS_SECURITY_HUB_ENDPOINT_URL'],
+        ['aws_security_hub', 'accept_all_events', 'AWS_SECURITY_HUB_ACCEPT_ALL_EVENTS'],
     ]
 
     def __init__(self):
@@ -212,6 +215,11 @@ class FigConfig(configparser.ConfigParser):
                 raise Exception('Malformed Configuration: expected azure.primary_key to be non-empty')
             if self.get('azure', 'arc_autodiscovery') not in ['false', 'true']:
                 raise Exception('Malformed Configuration: expected azure.arc_autodiscovery must be either true or false')
+        if 'AWS_SECURITY_HUB' in self.backends:
+            if len(self.get('aws_security_hub', 'region')) == 0:
+                raise Exception('Malformed Configuration: expected aws_security_hub.region to be non-empty')
+            if self.get('aws_security_hub', 'accept_all_events') not in ['false', 'true']:
+                raise Exception('Malformed Configuration: expected aws_security_hub.accept_all_events must be either true or false')
 
     @cached_property
     def backends(self):
