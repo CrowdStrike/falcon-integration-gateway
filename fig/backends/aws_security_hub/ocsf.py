@@ -2,8 +2,8 @@
 
 from datetime import datetime, timezone
 
-# AWS-assigned product UID for CrowdStrike Falcon OCSF integration
-PRODUCT_UID = "9ad39a27-ac7b-4087-aa0a-551cbec8d9c5"
+# AWS-assigned integration ID for CrowdStrike Falcon OCSF integration
+INTEGRATION_ID = "9ad39a27-ac7b-4087-aa0a-551cbec8d9c5"
 
 # Severity mapping using SeverityName (string) not Severity (numeric)
 SEVERITY_MAP = {
@@ -31,15 +31,21 @@ def map_severity(severity_name):
 class OCSFDetectionFinding:
     """Builds OCSF 1.6 Detection Finding from CrowdStrike Falcon event."""
 
-    def __init__(self, falcon_event):
+    def __init__(self, falcon_event, account_id, region, submission_region):
         """Initialize with a FalconEvent instance.
 
         Args:
             falcon_event: FalconEvent instance from fig.falcon_data
+            account_id: AWS account ID for the cloud object
+            region: AWS region for the cloud object (resource's actual region)
+            submission_region: Configured AWS region for product ARN
         """
         self.falcon_event = falcon_event
         self.event = falcon_event.original_event.get('event', {})
         self.event_metadata = falcon_event.original_event.get('metadata', {})
+        self.account_id = account_id
+        self.region = region
+        self.submission_region = submission_region
 
     def build(self):
         """Build complete OCSF 1.6 Detection Finding payload.
@@ -87,6 +93,9 @@ class OCSFDetectionFinding:
             # Resources (process)
             "resources": [self._build_process_resource()],
 
+            # Cloud context
+            "cloud": self._build_cloud(),
+
             # CrowdStrike extensions
             "unmapped": self._build_unmapped(),
         }
@@ -97,6 +106,15 @@ class OCSFDetectionFinding:
             return int(epoch_seconds) * 1000
         return int(datetime.now(timezone.utc).timestamp() * 1000)
 
+    def _build_product_uid(self):
+        """Build region-specific product ARN for Security Hub."""
+        region = self.submission_region
+        partition = "aws-us-gov" if "gov" in region else "aws"
+        return (
+            "arn:{}:securityhub:{}::productv2/{}"
+            .format(partition, region, INTEGRATION_ID)
+        )
+
     def _build_metadata(self):
         """Build OCSF metadata section."""
         return {
@@ -104,12 +122,22 @@ class OCSFDetectionFinding:
             "logged_time": self.event_metadata.get('eventCreationTime'),
             "product": {
                 "name": self.event.get(
-                    'SourceProducts', 'Falcon Insight'
+                    'SourceProducts', 'CrowdStrike Falcon Platform for Endpoint and Cloud Protection'
                 ),
                 "vendor_name": self.event.get(
                     'SourceVendors', 'CrowdStrike'
                 ),
-                "uid": PRODUCT_UID,
+                "uid": self._build_product_uid(),
+            }
+        }
+
+    def _build_cloud(self):
+        """Build OCSF cloud context with account UID."""
+        return {
+            "provider": "AWS",
+            "region": self.region,
+            "account": {
+                "uid": self.account_id
             }
         }
 

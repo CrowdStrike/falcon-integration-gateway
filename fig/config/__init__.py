@@ -152,6 +152,18 @@ class FigConfig(configparser.ConfigParser):
         self.validate_backends()
 
     def validate_falcon(self):
+        if not self.get('falcon', 'client_id'):
+            raise Exception(
+                'Missing CrowdStrike API credentials: falcon.client_id is not set. '
+                'Provide via FALCON_CLIENT_ID environment variable, config/config.ini, '
+                'or configure a credentials_store (ssm or secrets_manager).'
+            )
+        if not self.get('falcon', 'client_secret'):
+            raise Exception(
+                'Missing CrowdStrike API credentials: falcon.client_secret is not set. '
+                'Provide via FALCON_CLIENT_SECRET environment variable, config/config.ini, '
+                'or configure a credentials_store (ssm or secrets_manager).'
+            )
         if int(self.get('falcon', 'reconnect_retry_count')) not in range(1, 10000):
             raise Exception('Malformed configuration: expected falcon.reconnect_retry_count to be in range 0-10000')
         if self.get('falcon', 'cloud_region') not in self.FALCON_CLOUD_REGIONS:
