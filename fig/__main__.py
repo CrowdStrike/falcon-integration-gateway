@@ -16,7 +16,18 @@ if __name__ == "__main__":
 
     config.validate()
 
-    falcon_cache = FalconCache(FalconAPI())
+    falcon_api = FalconAPI()
+    if not falcon_api.client.authenticate():
+        raise SystemExit(
+            'Failed to authenticate with CrowdStrike Falcon ({}). '
+            'Verify your FALCON_CLIENT_ID, FALCON_CLIENT_SECRET, and FALCON_CLOUD_REGION. '
+            'Reason: {}'.format(
+                FalconAPI.base_url(),
+                falcon_api.client.token_fail_reason
+            )
+        )
+
+    falcon_cache = FalconCache(falcon_api)
     backends = Backends()
 
     StreamManagementThread(output_queue=falcon_events, relevant_event_types=backends.relevant_event_types).start()
