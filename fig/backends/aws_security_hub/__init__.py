@@ -42,23 +42,21 @@ class Submitter:
     def _resolve_account_id(self):
         """Resolve AWS account ID for the finding's cloud object.
 
-        Always uses STS caller identity, matching the legacy AWS backend behavior.
-        The finding is submitted to the caller's Security Hub+ instance.
+        Always uses STS caller identity — the cloud object must reflect
+        the destination Security Hub instance, not the source environment.
+
+        TODO: Make dynamic after testing/launch
         """
         return self._get_sts_account_id()
 
     def _resolve_region(self):
         """Resolve AWS region for the finding's cloud object.
 
-        For AWS-originated events, extracts region from device zone_group
-        (availability zone like us-east-1a -> us-east-1).
-        For non-AWS events or when unavailable, falls back to configured region.
+        Always uses the configured region — the cloud object must reflect
+        the destination Security Hub instance, not the source environment.
+
+        TODO: Make dynamic after testing/launch
         """
-        cloud_provider = self.event.cloud_provider
-        if cloud_provider is not None and cloud_provider[:3].upper() == "AWS":
-            zone_group = self.event.device_details.get("zone_group")
-            if zone_group and len(zone_group) > 1:
-                return zone_group[:-1]
         return self.region
 
     def _finding_exists(self, client, finding_uid):
