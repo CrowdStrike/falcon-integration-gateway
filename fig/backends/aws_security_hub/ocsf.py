@@ -205,9 +205,37 @@ class OCSFDetectionFinding:
             }
         }
 
+    def _resolve_source_region(self):
+        """Extract source cloud region from device zone_group.
+
+        For AWS: strips AZ suffix (us-east-1a -> us-east-1).
+        For GCP: parses projects/<id>/zones/<zone>, strips last segment
+                 (us-central1-b -> us-central1).
+        For Azure: uses zone_group directly (resource group name).
+        Returns None when region cannot be determined.
+        """
+        cloud_provider = (self.falcon_event.cloud_provider or "").upper()
+        zone_group = self.falcon_event.device_details.get("zone_group")
+
+        if cloud_provider.startswith("AWS") and zone_group and len(zone_group) > 1:
+            return zone_group[:-1]
+
+        if cloud_provider.startswith("GCP") and zone_group:
+            parts = zone_group.split("/zones/")
+            if len(parts) == 2 and parts[1]:
+                zone = parts[1]
+                last_dash = zone.rfind("-")
+                if last_dash > 0:
+                    return zone[:last_dash]
+
+        if cloud_provider.startswith("AZURE") and zone_group:
+            return zone_group
+
+        return None
+
     def _build_unmapped(self):
         """Build CrowdStrike-specific extension fields."""
-        return {
+        unmapped = {
             "agent_id": self.event.get('AgentId', ''),
             "composite_id": self.event.get('CompositeId', ''),
             "hostname": self.event.get('Hostname', ''),
@@ -224,3 +252,16 @@ class OCSFDetectionFinding:
                 'GrandParentCommandLine', ''
             ),
         }
+
+        # Only include source cloud context when the host is cloud-managed
+        cloud_provider = self.falcon_event.cloud_provider
+        if cloud_provider:
+            unmapped["source_cloud_provider"] = cloud_provider
+            unmapped["source_cloud_account_id"] = (
+                self.falcon_event.cloud_provider_account_id or ''
+            )
+            unmapped["source_cloud_region"] = (
+                self._resolve_source_region() or ''
+            )
+
+        return unmapped
