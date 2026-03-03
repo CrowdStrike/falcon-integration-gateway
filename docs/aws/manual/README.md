@@ -8,11 +8,12 @@ an AWS EC2 instance as a Python application.
 - [Prerequisites](#prerequisites)
 - [Architecture Overview](#architecture-overview)
 - [Deployment Steps](#deployment-steps)
-  - [1. Create an Instance Profile](#1-create-an-instance-profile)
-  - [2. Create an EC2 Instance (Linux)](#2-create-an-ec2-instance-linux)
-  - [3. Deploy the FIG](#3-deploy-the-fig)
-  - [4. Run the FIG](#4-run-the-fig)
-  - [5. Verify in Security Hub](#5-verify-in-security-hub)
+  - [1. Enable CrowdStrike Integration in Security Hub](#1-enable-crowdstrike-integration-in-security-hub)
+  - [2. Create an Instance Profile](#2-create-an-instance-profile)
+  - [3. Create an EC2 Instance (Linux)](#3-create-an-ec2-instance-linux)
+  - [4. Deploy the FIG](#4-deploy-the-fig)
+  - [5. Run the FIG](#5-run-the-fig)
+  - [6. Verify in Security Hub](#6-verify-in-security-hub)
 - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
@@ -39,13 +40,26 @@ graph LR
 
 ## Deployment Steps
 
-### 1. Create an Instance Profile
+### 1. Enable CrowdStrike Integration in Security Hub
+
+Before deploying the FIG, you must enable the CrowdStrike Falcon partner integration in AWS Security Hub. Without this, the FIG will receive `AccessDeniedException` errors when attempting to import findings.
+
+1. Navigate to the [Security Hub console](https://console.aws.amazon.com/securityhub/home) in your target region
+1. Click the **Integrations** link in the left navigation
+1. Search for **CrowdStrike**
+1. Find **CrowdStrike: CrowdStrike Falcon**
+1. Click **Accept findings**
+
+> [!NOTE]
+> This is a one-time setup per region. If you are deploying the FIG across multiple regions, you must enable the integration in each region.
+
+### 2. Create an Instance Profile
 
 This will be used to grant the EC2 instance access to the Security Hub and EC2 API's.
 
-> :exclamation: If you already have an instance profile that you would like to use, just ensure the role has the appropriate permissions and skip to step 2.
+> :exclamation: If you already have an instance profile that you would like to use, just ensure the role has the appropriate permissions and skip to step 3.
 
-#### 1.1 Create a policy
+#### 2.1 Create a policy
 
 1. Navigate to the [IAM Policies](https://console.aws.amazon.com/iam/home#/policies) page
 1. Click the **Create policy** button
@@ -77,7 +91,7 @@ This will be used to grant the EC2 instance access to the Security Hub and EC2 A
 1. Click the **Next** button
 1. Give it a name (e.g. `FIG-SecurityHub-Access-Policy`) and click the **Create policy** button
 
-#### 1.2 Create a role
+#### 2.2 Create a role
 
 1. Navigate to the [IAM Roles](https://console.aws.amazon.com/iam/home#/roles) page
 1. Click the **Create role** button
@@ -88,16 +102,16 @@ This will be used to grant the EC2 instance access to the Security Hub and EC2 A
 1. Click the **Next** button
 1. Give it a name (e.g. `FIG-SecurityHub-Access-Role`) and click the **Create role** button
 
-### 2. Create an EC2 Instance (Linux)
+### 3. Create an EC2 Instance (Linux)
 
 This step is completely up to you. You can use the AWS console, CLI, or any other method you prefer to create an EC2 instance. Just make sure you select the instance profile you created in the previous step
 and that you have access to the instance via SSH.
 
 For the purposes of this guide, we will be using the latest Amazon Linux 2023 AMI.
 
-> If you have an existing instance that you would like to use, just ensure the instance has instance profile you created in the previous step and skip to step 3.
+> If you have an existing instance that you would like to use, just ensure the instance has instance profile you created in the previous step and skip to step 4.
 
-#### 2.1 Create an EC2 instance
+#### 3.1 Create an EC2 instance
 
 1. Navigate to the [EC2 Instances](https://console.aws.amazon.com/ec2/v2/home#Instances) page
 1. Click the **Launch Instance** button
@@ -106,7 +120,7 @@ For the purposes of this guide, we will be using the latest Amazon Linux 2023 AM
       1. Select the instance profile you created in the previous step
 1. Click the **Launch instance** button
 
-### 3. Deploy the FIG
+### 4. Deploy the FIG
 
 Connect to your EC2 instance via SSH and follow the steps below to install the FIG.
 
@@ -117,11 +131,11 @@ Connect to your EC2 instance via SSH and follow the steps below to install the F
 | Python Package | • Simple installation<br>• Automatic updates<br>• Dependency management | • Less customization | Most users |
 | Git Repository | • Full source access<br>• Maximum customization<br>• Development features | • Manual updates<br>• Manual dependency management | Developers |
 
-#### Choose Your Installation Method:
+#### Choose Your Installation Method
 
 <details><summary>Python Package (<strong>Recommended</strong>)</summary>
 
-#### 3.1 Ensure the following packages are installed
+#### 4.1 Ensure the following packages are installed
 
 - Python 3.6 <= 3.11
 - pip
@@ -132,7 +146,7 @@ sudo dnf install python3 python3-pip python3-devel
 
 > Use the package manager for your distro to ensure these packages are installed.
 
-#### 3.2 Install the FIG
+#### 4.2 Install the FIG
 
 Install the package:
 
@@ -140,7 +154,7 @@ Install the package:
 python3 -m pip install 'falcon-integration-gateway>3.2.5'
 ```
 
-#### 3.3 Configure the FIG
+#### 4.3 Configure the FIG
 
 There are two different ways that you can configure the FIG to use the AWS backend.
 You can either use the `config.ini` file or you can use environment variables.
@@ -148,7 +162,7 @@ You can either use the `config.ini` file or you can use environment variables.
 > Refer to the [configuration options](../../../config/config.ini) available to the application
 > and backend.
 
-##### 3.3.1 Configure the FIG using the `config.ini` file
+##### 4.3.1 Configure the FIG using the `config.ini` file
 
 > [!NOTE]
 > Instance existence confirmation can be disabled using the `confirm_instance` config.ini in
@@ -175,7 +189,7 @@ application_id = <EXAMPLE-SECHUB-APPID>
 region = <AWS Region>
 ```
 
-##### 3.2.2 Configure the FIG using environment variables
+##### 4.3.2 Configure the FIG using environment variables
 
 Alternatively, if you would like to use environment variables, set the following minimum environment variables:
 
@@ -193,7 +207,7 @@ export AWS_REGION=<AWS Region>
 
 <details><summary>Git Repository</summary>
 
-#### 3.1 Ensure the following packages are installed
+#### 4.1 Ensure the following packages are installed
 
 - Python 3.6+
 - pip
@@ -205,7 +219,7 @@ sudo dnf install python3 python3-pip python3-devel git
 
 > Use the package manager for your distro to ensure these packages are installed.
 
-#### 3.2 Install the FIG
+#### 4.2 Install the FIG
 
 1. Clone the repository
 
@@ -225,7 +239,7 @@ sudo dnf install python3 python3-pip python3-devel git
     pip install -r requirements.txt
     ```
 
-#### 3.3 Configure the FIG
+#### 4.3 Configure the FIG
 
 There are two different ways that you can configure the FIG to use the AWS backend.
 You can either use the `config/config.ini` file or you can use environment variables.
@@ -233,7 +247,7 @@ You can either use the `config/config.ini` file or you can use environment varia
 > Refer to the [configuration options](../../../config/config.ini) available to the application
 > and backend.
 
-##### 3.3.1 Configure the FIG using the `config/config.ini` file
+##### 4.3.1 Configure the FIG using the `config/config.ini` file
 
 > [!NOTE]
 > Instance existence confirmation can be disabled using the `confirm_instance` config.ini in
@@ -260,7 +274,7 @@ You can either use the `config/config.ini` file or you can use environment varia
     region = <AWS Region>
     ```
 
-##### 3.3.2 Configure the FIG using environment variables
+##### 4.3.2 Configure the FIG using environment variables
 
 1. Set the following minimum environment variables:
 
@@ -276,7 +290,7 @@ You can either use the `config/config.ini` file or you can use environment varia
 
 </details>
 
-### 4. Run the FIG
+### 5. Run the FIG
 
 Run the following to start the FIG:
 
@@ -296,7 +310,7 @@ Verify output
 ...
 ```
 
-### 5. Verify in Security Hub
+### 6. Verify in Security Hub
 
 As events are processed by the FIG, they will be sent to Security Hub. You can verify this by following the steps below.
 
@@ -322,3 +336,13 @@ level = DEBUG
 ```bash
 export LOG_LEVEL=DEBUG
 ```
+
+### `AccessDeniedException` when importing findings
+
+If you see an error like the following:
+
+```
+botocore.exceptions.ClientError: An error occurred (AccessDeniedException) when calling the BatchImportFindings operation
+```
+
+This typically means the CrowdStrike Falcon partner integration has not been enabled in Security Hub. Verify that you have completed [Step 1](#1-enable-crowdstrike-integration-in-security-hub) in the target region. If you are deploying across multiple regions, the integration must be enabled in each region separately.
