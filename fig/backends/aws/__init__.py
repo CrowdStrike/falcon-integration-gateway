@@ -8,6 +8,29 @@ from ...config import config
 from ...log import log
 from ... import __version__
 
+# AWS Security Finding Format (ASFF) field length limits
+# https://docs.aws.amazon.com/securityhub/latest/userguide/asff-top-level-attributes.html
+ASFF_LIMIT_TITLE = 256
+ASFF_LIMIT_DESCRIPTION = 1024
+ASFF_LIMIT_SEVERITY_ORIGINAL = 64
+ASFF_LIMIT_PROCESS_NAME = 64
+ASFF_LIMIT_PROCESS_PATH = 512
+ASFF_LIMIT_PRODUCT_FIELD_VALUE = 2048
+ASFF_LIMIT_RESOURCE_DETAILS_OTHER_VALUE = 1024
+
+
+def _truncate_field(value, max_length, field_name=None):
+    """Truncate a string value to fit within an ASFF field length limit."""
+    if value is None:
+        return None
+    value = str(value)
+    if len(value) <= max_length:
+        return value
+    truncated = value[:max_length - 3] + "..."
+    if field_name:
+        log.debug("Truncated %s from %d to %d characters", field_name, len(value), max_length)
+    return truncated
+
 
 class Submitter():
     def __init__(self, event):
@@ -49,7 +72,9 @@ class Submitter():
         # Extract device details using comprehension
         device_details = getattr(self.event, 'device_details', {}) or {}
         details.update({
-            output_key: device_details[input_key]
+            output_key: _truncate_field(
+                device_details[input_key], ASFF_LIMIT_RESOURCE_DETAILS_OTHER_VALUE, output_key
+            )
             for input_key, output_key in device_field_mapping.items()
             if device_details.get(input_key)
         })
@@ -63,7 +88,9 @@ class Submitter():
 
         # Extract cloud context using comprehension
         details.update({
-            output_key: getattr(self.event, input_key)
+            output_key: _truncate_field(
+                getattr(self.event, input_key), ASFF_LIMIT_RESOURCE_DETAILS_OTHER_VALUE, output_key
+            )
             for input_key, output_key in cloud_field_mapping.items()
             if getattr(self.event, input_key, None)
         })
@@ -242,7 +269,9 @@ class Submitter():
         # Instance ID based detail - use helper method for proper resource classification
         resource_type, resource_id, title_suffix, resource_details = self._determine_resource_info()
         payload["Id"] = f"crowdstrike:crowdstrike-falcon:{self.event.event_id}"
-        payload["Title"] = f"Falcon Alert. {title_suffix}"
+        payload["Title"] = _truncate_field(
+            f"Falcon Alert. {title_suffix}", ASFF_LIMIT_TITLE, "Title"
+        )
 
         # Build Resources section with enhanced details for non-AWS events
         resource_entry = {"Type": resource_type, "Id": resource_id, "Region": instance_region}
@@ -256,7 +285,9 @@ class Submitter():
         if self.event.cloud_provider_account_id:
             cloud_provider = getattr(self.event, 'cloud_provider', 'Cloud')
             cloud_account_info = f"| {cloud_provider} Account: {self.event.cloud_provider_account_id}"
-        payload["Description"] = f"{self.event.detect_description} {cloud_account_info}"
+        payload["Description"] = _truncate_field(
+            f"{self.event.detect_description} {cloud_account_info}", ASFF_LIMIT_DESCRIPTION, "Description"
+        )
 
         # TTPs with simple fallback to MitreAttack
         try:
@@ -283,8 +314,12 @@ class Submitter():
         # Running process detail
         try:
             payload["Process"] = {}
-            payload["Process"]["Name"] = self.event.original_event["event"]["FileName"]
-            payload["Process"]["Path"] = self.event.original_event["event"]["FilePath"]
+            payload["Process"]["Name"] = _truncate_field(
+                self.event.original_event["event"]["FileName"], ASFF_LIMIT_PROCESS_NAME, "Process.Name"
+            )
+            payload["Process"]["Path"] = _truncate_field(
+                self.event.original_event["event"]["FilePath"], ASFF_LIMIT_PROCESS_PATH, "Process.Path"
+            )
         except KeyError:
             payload.pop("Process", None)
 
@@ -341,7 +376,9 @@ class Submitter():
             if field_name in event_data:
                 try:
                     value = str(event_data[field_name])
-                    product_fields[f"crowdstrike/crowdstrike-falcon/{field_name}"] = value
+                    product_fields[f"crowdstrike/crowdstrike-falcon/{field_name}"] = _truncate_field(
+                        value, ASFF_LIMIT_PRODUCT_FIELD_VALUE, field_name
+                    )
                 except Exception as e:
                     log.warning("Error processing field %s: %s", field_name, str(e))
 
@@ -359,7 +396,9 @@ class Submitter():
                                 if key in entry:
                                     try:
                                         value = str(entry[key])
-                                        product_fields[f"{entry_prefix}/{key}"] = value
+                                        product_fields[f"{entry_prefix}/{key}"] = _truncate_field(
+                                            value, ASFF_LIMIT_PRODUCT_FIELD_VALUE, f"MitreAttack/{i}/{key}"
+                                        )
                                     except Exception as e:
                                         log.warning("Error processing MITRE field %s: %s", key, str(e))
         except Exception as e:
