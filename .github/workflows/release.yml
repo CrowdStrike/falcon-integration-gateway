@@ -40,6 +40,7 @@ jobs:
   container:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: release
     permissions:
       contents: "read"
       id-token: "write"
@@ -91,6 +92,7 @@ jobs:
   deployer:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: release
     permissions:
       contents: "read"
       id-token: "write"
