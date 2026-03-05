@@ -80,7 +80,7 @@ class StreamRefreshThread(StoppableThread):
         log.debug("Refresh of streaming session succeeded")
 
 
-class StreamingThread(StoppableThread):
+class StreamingThread(StoppableThread):  # pylint: disable=too-many-instance-attributes
     def __init__(self, stream: Stream, queue, relevant_event_types, *args, **kwargs):
         kwargs['name'] = kwargs.get('name', 'cs_stream')
         super().__init__(*args, **kwargs)
