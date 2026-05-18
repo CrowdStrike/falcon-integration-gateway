@@ -4,39 +4,39 @@ from datetime import datetime
 from json import dumps
 from hmac import new
 from requests import post
+from azure.monitor.ingestion import LogsIngestionClient
+from azure.identity import ClientSecretCredential, DefaultAzureCredential
+from azure.core.exceptions import HttpResponseError
 from ...log import log
 from ...config import config
 from ...falcon.errors import RTRConnectionError
 
-
-def build_signature(workspace_id, primary_key, date, content_length, method, content_type, resource):
-    x_headers = 'x-ms-date:' + date
-    string_to_hash = method + "\n" + str(content_length) + "\n" + content_type + "\n" + x_headers + "\n" + resource
-    bytes_to_hash = bytes(string_to_hash, encoding="utf-8")
-    decoded_key = b64decode(primary_key)
-    encoded_hash = b64encode(new(decoded_key, bytes_to_hash, digestmod=sha256).digest()).decode()
-    authorization = "SharedKey {}:{}".format(workspace_id, encoded_hash)
-    return authorization
+STREAM_NAME = 'Custom-FalconIntegrationGatewayLogs'
 
 
-def post_data(workspace_id, primary_key, body, log_type):
+def post_data(client, dcr_immutable_id, body):
+    try:
+        client.upload(dcr_immutable_id, STREAM_NAME, body)
+    except HttpResponseError as e:
+        log.error("Failed to send detection to Log Analytics: %s", e)
+
+
+def post_data_legacy(workspace_id, primary_key, body, log_type):
     method = 'POST'
     content_type = 'application/json'
     resource = '/api/logs'
     rfc1123date = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
     content_length = len(body)
-    signature = build_signature(
-        workspace_id,
-        primary_key,
-        rfc1123date,
-        content_length,
-        method,
-        content_type,
-        resource)
+    x_headers = 'x-ms-date:' + rfc1123date
+    string_to_hash = method + "\n" + str(content_length) + "\n" + content_type + "\n" + x_headers + "\n" + resource
+    bytes_to_hash = bytes(string_to_hash, encoding="utf-8")
+    decoded_key = b64decode(primary_key)
+    encoded_hash = b64encode(new(decoded_key, bytes_to_hash, digestmod=sha256).digest()).decode()
+    authorization = "SharedKey {}:{}".format(workspace_id, encoded_hash)
     uri = 'https://' + workspace_id + '.ods.opinsights.azure.com' + resource + '?api-version=2016-04-01'
     headers = {
         'content-type': content_type,
-        'Authorization': signature,
+        'Authorization': authorization,
         'Log-Type': log_type,
         'x-ms-date': rfc1123date
     }
@@ -48,10 +48,13 @@ def post_data(workspace_id, primary_key, body, log_type):
 class Submitter():
     AZURE_ARC_KEYS = ['resourceName', 'resourceGroup', 'subscriptionId', 'tenantId', 'vmId']
 
-    def __init__(self, event):
+    def __init__(self, event, ingestion_client=None, dcr_immutable_id=None,
+                 workspace_id=None, primary_key=None):
         self.event = event
-        self.workspace_id = config.get('azure', 'workspace_id')
-        self.primary_key = config.get('azure', 'primary_key')
+        self.ingestion_client = ingestion_client
+        self.dcr_immutable_id = dcr_immutable_id
+        self.workspace_id = workspace_id
+        self.primary_key = primary_key
         self.azure_arc_config = self.autodiscovery()
 
     def autodiscovery(self):
@@ -98,7 +101,10 @@ class Submitter():
 
     def submit(self):
         log.info("Processing detection: %s", self.event.detect_description)
-        post_data(self.workspace_id, self.primary_key, self.log(), 'FalconIntegrationGatewayLogs')
+        if self.ingestion_client is not None:
+            post_data(self.ingestion_client, self.dcr_immutable_id, self.log())
+        else:
+            post_data_legacy(self.workspace_id, self.primary_key, self.log(), 'FalconIntegrationGatewayLogs')
 
     def log(self):
         json_data = [{
@@ -132,13 +138,51 @@ class Runtime():
     RELEVANT_EVENT_TYPES = ['EppDetectionSummaryEvent']
 
     def __init__(self):
-        log.info("Azure Backend is enabled.")
+        auth_method = config.get('azure', 'auth_method')
+        if auth_method == 'workload_identity':
+            log.info("Azure Backend is enabled (auth: workload federated identity).")
+            credential = DefaultAzureCredential()
+            self._ingestion_client = LogsIngestionClient(
+                config.get('azure', 'dcr_endpoint'), credential
+            )
+            self._dcr_immutable_id = config.get('azure', 'dcr_immutable_id')
+            self._workspace_id = None
+            self._primary_key = None
+        elif auth_method == 'client_secret':
+            log.info("Azure Backend is enabled (auth: client secret).")
+            credential = ClientSecretCredential(
+                tenant_id=config.get('azure', 'tenant_id'),
+                client_id=config.get('azure', 'client_id'),
+                client_secret=config.get('azure', 'client_secret'),
+            )
+            self._ingestion_client = LogsIngestionClient(
+                config.get('azure', 'dcr_endpoint'), credential
+            )
+            self._dcr_immutable_id = config.get('azure', 'dcr_immutable_id')
+            self._workspace_id = None
+            self._primary_key = None
+        else:
+            log.warning(
+                "Azure Backend is enabled using the deprecated HTTP Data Collector API. "
+                "Please migrate to the Logs Ingestion API by setting azure.auth_method to "
+                "'workload_identity' or 'client_secret'."
+            )
+            self._ingestion_client = None
+            self._dcr_immutable_id = None
+            self._workspace_id = config.get('azure', 'workspace_id')
+            self._primary_key = config.get('azure', 'primary_key')
 
     def is_relevant(self, falcon_event):
         return True
 
     def process(self, falcon_event):
-        Submitter(falcon_event).submit()
+        Submitter(
+            falcon_event,
+            ingestion_client=self._ingestion_client,
+            dcr_immutable_id=self._dcr_immutable_id,
+            workspace_id=self._workspace_id,
+            primary_key=self._primary_key,
+        ).submit()
 
 
 __all__ = ['Runtime']

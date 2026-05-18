@@ -1,5 +1,7 @@
 boto3
 crowdstrike-falconpy
+azure-monitor-ingestion
+azure-identity
 google-cloud-securitycenter
 google-cloud-resource-manager >= 1.0.2
 tls-syslog

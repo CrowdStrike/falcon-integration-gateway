@@ -1,18 +1,65 @@
 # Kubernetes pod spec for falcon-integration-gateway
 #
+# Usage:
+#   Before deploying, replace all REPLACE_ME_* placeholders with your values.
+#
 # Deployment
 #    kubectl apply -f ./falcon-integration-gateway.yaml
 # Tear Down
 #    kubectl delete -f ./falcon-integration-gateway.yaml
 #
-# This example shows how to bind CrowdStrike OAuth Credentials and configuration file to the application.
+# Prerequisites (one-time cluster setup):
+#   These instructions are written for Azure AKS clusters, but the workload identity configuration may differ
+#   for other Kubernetes environments. Please refer to your Kubernetes environment documentation for workload
+#   identity setup instructions.
+#
+#   1. Enable OIDC issuer and Workload Identity on the cluster:
+#        az aks update --enable-oidc-issuer --enable-workload-identity \
+#          --name <cluster> --resource-group <rg>
+#
+#   2. Retrieve the OIDC Issuer URL — this is the value you enter as the "Issuer" when configuring
+#      the federated identity credential on the App Registration (SPN) in Tenant B:
+#        az aks show \
+#          --name <cluster> \
+#          --resource-group <rg> \
+#          --query "oidcIssuerProfile.issuerUrl" -o tsv
+#
+#      Example output: https://eastus.oic.prod-aks.azure.com/<tenant-a-id>/<cluster-oidc-guid>/
+#
+#   3. Determine the Subject — this is the value you enter as the "Subject identifier" when configuring
+#      the federated identity credential. It is composed of the Kubernetes namespace and ServiceAccount
+#      name defined in this file:
+#
+#        Format:  system:serviceaccount:<namespace>:<service-account-name>
+#        Example: system:serviceaccount:default:falcon-integration-gateway
+#
+#      If you change the namespace or ServiceAccount name below, update this subject accordingly.
+#      Each FIG instance targeting a different workspace needs its own ServiceAccount name, and
+#      therefore its own federated identity credential with a matching subject.
+#
+# For multiple FIG instances targeting different workspaces, copy this file
+# and give each a unique name prefix (e.g. falcon-integration-gateway-teamA).
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: falcon-integration-gateway
+  namespace: default
+  annotations:
+    # Client ID of the App Registration (SPN) in the TARGET tenant (Tenant B)
+    azure.workload.identity/client-id: REPLACE_ME_WITH_SPN_CLIENT_ID
+    # Tenant ID of the TARGET Log Analytics workspace (Tenant B)
+    # Required when the cluster (Tenant A) differs from the workspace tenant (Tenant B)
+    azure.workload.identity/tenant-id: REPLACE_ME_WITH_TARGET_TENANT_ID
+
 ---
 apiVersion: v1
 data:
   FALCON_CLIENT_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
   FALCON_CLIENT_SECRET: REPLACE_ME_WITH_BASE64_ENCODED_STR=
-  WORKSPACE_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
-  PRIMARY_KEY: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  #The following can be uncommented and populated if you are using the legacy Azure authentication method. For workload identity, these values are not needed.
+  #WORKSPACE_ID: REPLACE_ME_WITH_BASE64_ENCODED_STR=
+  #PRIMARY_KEY: REPLACE_ME_WITH_BASE64_ENCODED_STR=
 
 kind: Secret
 type: Opaque
@@ -70,10 +117,18 @@ data:
     # Uncomment to provide Azure Primary Key. Alternatively, use PRIMARY_KEY env variable.
     #primary_key =
 
+    # Authentication method: workload_identity | client_secret | legacy (deprecated)
+    auth_method = workload_identity
+
+    # DCR logs ingestion endpoint (from the DCR overview in Azure portal, JSON view)
+    #dcr_endpoint = REPLACE_ME_WITH_DCR_ENDPOINT
+
+    # DCR immutable ID (from the DCR overview in Azure portal, JSON view)
+    #dcr_immutable_id = REPLACE_ME_WITH_DCR_IMMUTABLE_ID
+
     # Uncomment to enable RTR based auto discovery of Azure Arc Systems. Alternatively,
     # use ARC_AUTODISCOVERY env variable.
     #arc_autodiscovery = true
-
 
 ---
 apiVersion: apps/v1
@@ -82,14 +137,17 @@ metadata:
   name: falcon-integration-gateway
 spec:
   selector:
-   matchLabels:
+    matchLabels:
       run: falcon-integration-gateway
   replicas: 1
   template:
     metadata:
       labels:
         run: falcon-integration-gateway
+        # Required: opt this pod in to the Azure Workload Identity webhook
+        azure.workload.identity/use: "true"
     spec:
+      serviceAccountName: falcon-integration-gateway
       containers:
           - name: app
             image: quay.io/crowdstrike/falcon-integration-gateway:latest
@@ -126,3 +184,4 @@ spec:
               items:
               - key: config.ini
                 path: config.ini
+
