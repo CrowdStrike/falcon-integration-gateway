@@ -127,7 +127,7 @@ class Submitter():
         if self.azure_arc_config is not None:
             json_data[0]['arc'] = self.azure_arc_config
 
-        return dumps(json_data)
+        return json_data
 
     @property
     def cloud(self):
