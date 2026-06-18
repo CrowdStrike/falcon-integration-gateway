@@ -167,16 +167,17 @@ spec:
                   secretKeyRef:
                     name: falcon-integration-gateway-creds
                     key: FALCON_CLIENT_SECRET
-              - name: WORKSPACE_ID
-                valueFrom:
-                  secretKeyRef:
-                    name: falcon-integration-gateway-creds
-                    key: WORKSPACE_ID
-              - name: PRIMARY_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: falcon-integration-gateway-creds
-                    key: PRIMARY_KEY
+              #The following can be uncommented and populated if you are using the legacy Azure authentication method. For workload identity, these values are not needed.
+              # - name: WORKSPACE_ID
+              #   valueFrom:
+              #     secretKeyRef:
+              #       name: falcon-integration-gateway-creds
+              #       key: WORKSPACE_ID
+              # - name: PRIMARY_KEY
+              #   valueFrom:
+              #     secretKeyRef:
+              #       name: falcon-integration-gateway-creds
+              #       key: PRIMARY_KEY
       volumes:
           - name: config-volume
             configMap:
