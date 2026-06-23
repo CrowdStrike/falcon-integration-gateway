@@ -47,5 +47,5 @@ setup(
         "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6, <3.12'
+    python_requires='>=3.8, <3.12'
 )

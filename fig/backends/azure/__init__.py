@@ -6,7 +6,7 @@ from hmac import new
 from requests import post
 from azure.monitor.ingestion import LogsIngestionClient
 from azure.identity import ClientSecretCredential, DefaultAzureCredential
-from azure.core.exceptions import HttpResponseError
+from azure.core.exceptions import ClientAuthenticationError, HttpResponseError
 from ...log import log
 from ...config import config
 from ...falcon.errors import RTRConnectionError
@@ -17,11 +17,14 @@ STREAM_NAME = 'Custom-FalconIntegrationGatewayLogs'
 def post_data(client, dcr_immutable_id, body):
     try:
         client.upload(dcr_immutable_id, STREAM_NAME, body)
+    except ClientAuthenticationError as e:
+        log.error("Azure authentication failed sending detection to Log Analytics: %s", e)
     except HttpResponseError as e:
         log.error("Failed to send detection to Log Analytics: %s", e)
 
 
 def post_data_legacy(workspace_id, primary_key, body, log_type):
+    body = dumps(body, ensure_ascii=False).encode('utf-8')
     method = 'POST'
     content_type = 'application/json'
     resource = '/api/logs'
