@@ -22,6 +22,8 @@ setup(
     install_requires=[
         'boto3',
         'crowdstrike-falconpy',
+        'azure-monitor-ingestion==1.0.4',
+        'azure-identity>=1.25.3',
         'google-cloud-securitycenter',
         'google-cloud-resource-manager >= 1.0.2',
         'tls-syslog',
@@ -47,5 +49,5 @@ setup(
         "License :: OSI Approved :: The Unlicense (Unlicense)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6, <3.12'
+    python_requires='>=3.8, <3.12'
 )

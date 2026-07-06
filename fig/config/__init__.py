@@ -33,6 +33,12 @@ class FigConfig(configparser.ConfigParser):
         ['azure', 'workspace_id', 'WORKSPACE_ID'],
         ['azure', 'primary_key', 'PRIMARY_KEY'],
         ['azure', 'arc_autodiscovery', 'ARC_AUTODISCOVERY'],
+        ['azure', 'auth_method', 'AZURE_AUTH_METHOD'],
+        ['azure', 'tenant_id', 'AZURE_TENANT_ID'],
+        ['azure', 'client_id', 'AZURE_CLIENT_ID'],
+        ['azure', 'client_secret', 'AZURE_CLIENT_SECRET'],
+        ['azure', 'dcr_endpoint', 'AZURE_DCR_ENDPOINT'],
+        ['azure', 'dcr_immutable_id', 'AZURE_DCR_IMMUTABLE_ID'],
         ['aws', 'region', 'AWS_REGION'],
         ['aws', 'confirm_instance', 'AWS_CONFIRM_INSTANCE'],
         ['aws', 'accept_all_events', 'AWS_ACCEPT_ALL_EVENTS'],
@@ -206,10 +212,28 @@ class FigConfig(configparser.ConfigParser):
             if len(self.get('cloudtrail_lake', 'region')) == 0:
                 raise Exception('Malformed Configuration: expected cloudtrail_lake.region to be non-empty')
         if 'AZURE' in self.backends:
-            if len(self.get('azure', 'workspace_id')) == 0:
-                raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
-            if len(self.get('azure', 'primary_key')) == 0:
-                raise Exception('Malformed Configuration: expected azure.primary_key to be non-empty')
+            auth_method = self.get('azure', 'auth_method')
+            if auth_method not in ['legacy', 'client_secret', 'workload_identity']:
+                raise Exception(
+                    'Malformed Configuration: azure.auth_method must be one of: legacy, client_secret, workload_identity'
+                )
+            if auth_method == 'legacy':
+                if len(self.get('azure', 'workspace_id')) == 0:
+                    raise Exception('Malformed Configuration: expected azure.workspace_id to be non-empty')
+                if len(self.get('azure', 'primary_key')) == 0:
+                    raise Exception('Malformed Configuration: expected azure.primary_key to be non-empty')
+            elif auth_method == 'client_secret':
+                for key in ['tenant_id', 'client_id', 'client_secret', 'dcr_endpoint', 'dcr_immutable_id']:
+                    if len(self.get('azure', key)) == 0:
+                        raise Exception(
+                            'Malformed Configuration: azure.{} must be non-empty when auth_method is client_secret'.format(key)
+                        )
+            elif auth_method == 'workload_identity':
+                for key in ['dcr_endpoint', 'dcr_immutable_id']:
+                    if len(self.get('azure', key)) == 0:
+                        raise Exception(
+                            'Malformed Configuration: azure.{} must be non-empty when auth_method is workload_identity'.format(key)
+                        )
             if self.get('azure', 'arc_autodiscovery') not in ['false', 'true']:
                 raise Exception('Malformed Configuration: expected azure.arc_autodiscovery must be either true or false')
 
