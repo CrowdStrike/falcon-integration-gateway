@@ -23,6 +23,16 @@ def post_data(client, dcr_immutable_id, body):
         log.error("Failed to send detection to Log Analytics: %s", e)
 
 
+def build_signature(workspace_id, primary_key, date, content_length, method, content_type, resource):
+    x_headers = 'x-ms-date:' + date
+    string_to_hash = method + "\n" + str(content_length) + "\n" + content_type + "\n" + x_headers + "\n" + resource
+    bytes_to_hash = bytes(string_to_hash, encoding="utf-8")
+    decoded_key = b64decode(primary_key)
+    encoded_hash = b64encode(new(decoded_key, bytes_to_hash, digestmod=sha256).digest()).decode()
+    authorization = "SharedKey {}:{}".format(workspace_id, encoded_hash)
+    return authorization
+
+
 def post_data_legacy(workspace_id, primary_key, body, log_type):
     body = dumps(body, ensure_ascii=False).encode('utf-8')
     method = 'POST'
@@ -30,16 +40,12 @@ def post_data_legacy(workspace_id, primary_key, body, log_type):
     resource = '/api/logs'
     rfc1123date = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
     content_length = len(body)
-    x_headers = 'x-ms-date:' + rfc1123date
-    string_to_hash = method + "\n" + str(content_length) + "\n" + content_type + "\n" + x_headers + "\n" + resource
-    bytes_to_hash = bytes(string_to_hash, encoding="utf-8")
-    decoded_key = b64decode(primary_key)
-    encoded_hash = b64encode(new(decoded_key, bytes_to_hash, digestmod=sha256).digest()).decode()
-    authorization = "SharedKey {}:{}".format(workspace_id, encoded_hash)
+    signature = build_signature(
+        workspace_id, primary_key, rfc1123date, content_length, method, content_type, resource)
     uri = 'https://' + workspace_id + '.ods.opinsights.azure.com' + resource + '?api-version=2016-04-01'
     headers = {
         'content-type': content_type,
-        'Authorization': authorization,
+        'Authorization': signature,
         'Log-Type': log_type,
         'x-ms-date': rfc1123date
     }

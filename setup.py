@@ -22,6 +22,8 @@ setup(
     install_requires=[
         'boto3',
         'crowdstrike-falconpy',
+        'azure-monitor-ingestion==1.0.4',
+        'azure-identity>=1.25.3',
         'google-cloud-securitycenter',
         'google-cloud-resource-manager >= 1.0.2',
         'tls-syslog',
