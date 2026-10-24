@@ -8,6 +8,7 @@ tls-syslog
 google-auth
 google-api-python-client
 py7zr
+brotli>=1.2.1 # not directly required (via py7zr), pinned to fix CVE-2026-111497
 certifi>=2023.7.22 # not directly required, pinned by Snyk to avoid a vulnerability
 grpcio>=1.53.2 # not directly required, pinned by Snyk to avoid a vulnerability
 idna>=3.7 # not directly required, pinned by Snyk to avoid a vulnerability
