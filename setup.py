@@ -29,7 +29,8 @@ setup(
         'tls-syslog',
         'google-auth',
         'google-api-python-client',
-        'py7zr'
+        'py7zr',
+        'brotli>=1.2.1',  # CVE-2026-111497 (transitive via py7zr)
     ],
     extras_require={
         'devel': [
