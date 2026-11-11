@@ -19,6 +19,11 @@ backends=WORKSPACEONE
 # Uncomment to provide syslog host. Alternatively, use SYSLOG_HOST env variable
 #syslog_host = 
 
+# The syslog server certificate is verified against the system CA store and must match syslog_host.
+# Uncomment to trust an additional CA bundle (PEM), for example for a private syslog relay.
+# Alternatively, use SYSLOG_CA_FILE env variable
+#syslog_ca_file =
+
 ```
 
 ### Developer Guide
